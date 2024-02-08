@@ -1,4 +1,4 @@
-package com.example.demo.redis;
+package com.example.demo.global.redis;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -6,10 +6,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AlarmRedisService {
+public class ChatRedisService {
 
     @Autowired
-    @Qualifier("alarmRedisTemplate")
+    @Qualifier("chatRedisTemplate")
     private RedisTemplate<String, Object> redisTemplate;
 
     public void setValue(String key, Object value) {

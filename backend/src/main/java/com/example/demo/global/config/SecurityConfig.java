@@ -1,6 +1,6 @@
-package com.example.demo.config;
+package com.example.demo.global.config;
 
-import com.example.demo.login.OAuth2MemberService;
+import com.example.demo.global.auth.userdetails.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

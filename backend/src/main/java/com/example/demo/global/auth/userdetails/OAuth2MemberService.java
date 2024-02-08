@@ -1,5 +1,7 @@
-package com.example.demo.login;
+package com.example.demo.global.auth.userdetails;
 
+import com.example.demo.domain.member.entity.Member;
+import com.example.demo.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

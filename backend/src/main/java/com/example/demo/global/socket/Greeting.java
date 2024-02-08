@@ -1,4 +1,4 @@
-package com.example.demo.socket;
+package com.example.demo.global.socket;
 
 public class Greeting {
 

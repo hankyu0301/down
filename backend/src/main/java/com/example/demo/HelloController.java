@@ -1,10 +1,10 @@
 package com.example.demo;
 
 
-import com.example.demo.redis.AlarmRedisService;
-import com.example.demo.redis.ChatRedisService;
-import com.example.demo.socket.Greeting;
-import com.example.demo.socket.HelloMessage;
+import com.example.demo.global.redis.AlarmRedisService;
+import com.example.demo.global.redis.ChatRedisService;
+import com.example.demo.global.socket.Greeting;
+import com.example.demo.global.socket.HelloMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
