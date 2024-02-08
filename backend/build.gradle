@@ -1,0 +1,64 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	/**
+	 * Swagger
+	 * URL : https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+	 * 참고 : https://velog.io/@kjgi73k/Springboot3%EC%97%90-Swagger3%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0
+	 * 확인 : http://localhost:8080/swagger-ui/index.html
+	 * */
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+	/**
+	 * Redis
+	 * */
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	/**
+	 * WebSocket
+	 * 참고 : https://spring.io/guides/gs/messaging-stomp-websocket/#scratch
+	 * */
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	/**
+	 * Oauth 2
+	 * 참고 : https://growth-coder.tistory.com/135
+	 * */
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-test'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.mysql:mysql-connector-j' // MySQL 드라이버
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

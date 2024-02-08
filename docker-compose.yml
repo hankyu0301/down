@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  # DB
+  mysql:
+    restart: always
+    container_name: mysql-db
+    build: 
+      context: ./backend/docker/MySQL
+      dockerfile: Dockerfile
+    ports:
+      - "3306:3306"
+
+  #  redis-chat
+  redis-chat:
+    restart: always
+    container_name: redis-chat-cache
+    build: 
+      context: ./backend/docker/redis-chat
+      dockerfile: Dockerfile
+    ports:
+      - "6380:6379"
+
+  # spring-boot app
+  backend:
+    restart: always
+    container_name: backend-app
+    build: 
+      context: ./backend/
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis-chat
+  
+  # react app
+  frontend:
+    restart: always
+    container_name: frontend-app
+    build: 
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
