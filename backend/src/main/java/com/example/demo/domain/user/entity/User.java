@@ -1,4 +1,4 @@
-package com.example.demo.domain.member.entity;
+package com.example.demo.domain.user.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-public class Member {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //기본키

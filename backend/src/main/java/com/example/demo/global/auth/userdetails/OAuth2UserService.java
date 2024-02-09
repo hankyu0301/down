@@ -1,7 +1,7 @@
 package com.example.demo.global.auth.userdetails;
 
-import com.example.demo.domain.member.entity.Member;
-import com.example.demo.domain.member.repository.MemberRepository;
+import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,10 +14,10 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class OAuth2MemberService extends DefaultOAuth2UserService {
+public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final BCryptPasswordEncoder encoder;
-    private final MemberRepository memberRepository;
+    private final UserRepository memberRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -27,10 +27,10 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         String username = provider + "_" + providerId; //중복이 발생하지 않도록 provider와 providerId를 조합
         String email = oAuth2User.getAttribute("email");
         String role = "ROLE_USER"; //일반 유저
-        Optional<Member> findMember = memberRepository.findByName(username);
+        Optional<User> findMember = memberRepository.findByName(username);
 
         if (findMember.isEmpty()) { //찾지 못했다면
-            Member member = Member.builder()
+            User member = User.builder()
                     .name(username)
                     .email(email)
                     .password(encoder.encode("password"))

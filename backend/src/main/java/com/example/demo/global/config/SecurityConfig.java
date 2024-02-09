@@ -1,6 +1,6 @@
 package com.example.demo.global.config;
 
-import com.example.demo.global.auth.userdetails.OAuth2MemberService;
+import com.example.demo.global.auth.userdetails.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final OAuth2MemberService oAuth2MemberService;
+    private final OAuth2UserService oAuth2MemberService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
