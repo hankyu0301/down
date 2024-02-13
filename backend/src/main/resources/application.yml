@@ -1,0 +1,79 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.0.2:3306/mydb
+    username: myuser
+    password: mypassword
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: create-drop
+
+  redis:
+    host:
+      alarm: 192.168.0.2
+      chat: 192.168.0.2
+    port:
+      alarm: 6379
+      chat: 6380
+    password:
+      alarm: redis-alarm-pw
+      chat: redis-chat-pw
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 670687707962-k9gdlufh1kggejkvt8jvqnlmqs6sh9s7.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            scope:
+              - profile
+              - email
+
+          kakao:
+            client-id: 047d464876c4aa352beed70ab28fbd1d
+            client-secret: zMNssX9yyvDCv6bZlRD8HIYLslg3znT9
+            scope:
+              - account_email
+              - profile_nickname
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            client-name: Kakao
+            client-authentication-method: client_secret_post
+
+          naver:
+            client-id: U2Htq3Wug7aV_Tc8IFB0
+            client-secret: Ee6YX0MVQx
+            scope:
+              - name
+              - email
+            client-name: Naver
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/naver
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response
+
+jwt:
+  secret: 18748a26-b13e-430f-a103-30b3684927db
+  token-period: 7776000000
+  token-provider: down-server-jwt
+
+logging:
+  level:
+    root: debug

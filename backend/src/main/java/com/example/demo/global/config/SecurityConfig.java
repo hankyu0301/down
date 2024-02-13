@@ -1,40 +1,69 @@
 package com.example.demo.global.config;
 
-import com.example.demo.global.auth.userdetails.OAuth2UserService;
+import com.example.demo.global.auth.OAuth2SuccessHandler;
+import com.example.demo.global.auth.jwt.JwtAuthenticationFilter;
+import com.example.demo.global.auth.jwt.JwtTokenProvider;
+import com.example.demo.global.auth.oauth.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final OAuth2UserService oAuth2MemberService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final OAuth2UserService oauth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    public static final String[] PUBLIC_URLS = {
+            "/loginForm/**",
+            "/address/**",
+            "/chat/**",
+    };
+
+    public static final String[] PRIVATE_URLS = {
+            "/private/**"
+    };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        return http
-                .httpBasic().disable()
-                .csrf().disable()
-                .cors()
-                .and()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-                .authorizeRequests()
-                    .requestMatchers("/private/**").authenticated() //private로 시작하는 uri는 로그인 필수
-                    .anyRequest().permitAll() //나머지 uri는 모든 접근 허용
-                    .and()
+        http
+                .csrf(AbstractHttpConfigurer::disable)
 
-                .oauth2Login()
-                    .loginPage("/loginForm") //로그인이 필요한데 로그인을 하지 않았다면 이동할 uri 설정
-                    .defaultSuccessUrl("/logOut") //OAuth 구글 로그인이 성공하면 이동할 uri 설정
-                    .userInfoEndpoint()//로그인 완료 후 회원 정보 받기
-                    .userService(oAuth2MemberService)
-                    .and().and()
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
-                .build(); //로그인 후 받아온 유저 정보 처리
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers(PRIVATE_URLS).authenticated()
+                        .anyRequest().permitAll()
+                    )
+
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/")
+                )
+
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/loginForm")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(oauth2UserService)
+                        )
+                        .successHandler(oAuth2SuccessHandler)
+                )
+
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 }
