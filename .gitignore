@@ -42,40 +42,39 @@ next-env.d.ts
 
 ### BackEnd
 
-/backend/HELP.md
-/backend/.gradle
-/backend/build/
-/backend/!gradle/wrapper/gradle-wrapper.jar
-/backend/!**/src/main/**/build/
-/backend/!**/src/test/**/build/
+HELP.md
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 ### STS ###
-/backend/.apt_generated
-/backend/.classpath
-/backend/.factorypath
-/backend/.project
-/backend/.settings
-/backend/.springBeans
-/backend/.sts4-cache
-/backend/bin/
-/backend/!**/src/main/**/bin/
-/backend/!**/src/test/**/bin/
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-/backend/.idea
-/backend/*.iws
-/backend/*.iml
-/backend/*.ipr
-/backend/out/
-/backend/!**/src/main/**/out/
-/backend/!**/src/test/**/out/
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 ### NetBeans ###
-/backend/nbproject/private/
-/backend/nbbuild/
-/backend/dist/
-/backend/nbdist/
-/backend/.nb-gradle/
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
 ### VS Code ###
 /backend.vscode/
@@ -84,30 +83,30 @@ next-env.d.ts
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
-/backend/.idea/**/workspace.xml
-/backend/.idea/**/tasks.xml
-/backend/.idea/**/usage.statistics.xml
-/backend/.idea/**/dictionaries
-/backend/.idea/**/shelf
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
 
 # AWS User-specific
-/backend/.idea/**/aws.xml
+.idea/**/aws.xml
 
 # Generated files
-/backend/.idea/**/contentModel.xml
+.idea/**/contentModel.xml
 
 # Sensitive or high-churn files
-/backend/.idea/**/dataSources/
-/backend/.idea/**/dataSources.ids
-/backend/.idea/**/dataSources.local.xml
-/backend/.idea/**/sqlDataSources.xml
-/backend/.idea/**/dynamic.xml
-/backend/.idea/**/uiDesigner.xml
-/backend/.idea/**/dbnavigator.xml
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
 
 # Gradle
-/backend/.idea/**/gradle.xml
-/backend/.idea/**/libraries
+.idea/**/gradle.xml
+.idea/**/libraries
 
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
@@ -123,37 +122,37 @@ next-env.d.ts
 # *.ipr
 
 # CMake
-/backend/cmake-build-*/
+cmake-build-*/
 
 # Mongo Explorer plugin
-/backend/.idea/**/mongoSettings.xml
+.idea/**/mongoSettings.xml
 
 # File-based project format
-/backend/*.iws
+*.iws
 
 # IntelliJ
-/backend/out/
+out/
 
 # mpeltonen/sbt-idea plugin
-/backend/.idea_modules/
+.idea_modules/
 
 # JIRA plugin
-/backend/atlassian-ide-plugin.xml
+atlassian-ide-plugin.xml
 
 # Cursive Clojure plugin
-/backend/.idea/replstate.xml
+.idea/replstate.xml
 
 # SonarLint plugin
-/backend/.idea/sonarlint/
+.idea/sonarlint/
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
-/backend/com_crashlytics_export_strings.xml
-/backend/crashlytics.properties
-/backend/crashlytics-build.properties
-/backend/fabric.properties
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
 
 # Editor-based Rest Client
-/backend/.idea/httpRequests
+.idea/httpRequests
 
 # Android studio 3.1+ serialized cache file
-/backend/.idea/caches/build_file_checksums.ser
+.idea/caches/build_file_checksums.ser
