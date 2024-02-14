@@ -1,7 +1,6 @@
 package com.example.demo;
 
 
-import com.example.demo.global.redis.AlarmRedisService;
 import com.example.demo.global.redis.ChatRedisService;
 import com.example.demo.global.socket.Greeting;
 import com.example.demo.global.socket.HelloMessage;
@@ -20,9 +19,6 @@ public class HelloController {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private AlarmRedisService alarmRedisService;
-
-    @Autowired
     private ChatRedisService chatRedisService;
 
     @GetMapping("/")
@@ -38,23 +34,6 @@ public class HelloController {
         } catch (Exception ex) {
             return "MySQL 연결 확인: 실패 - " + ex.getMessage();
         }
-    }
-
-    @PostMapping("/setAlarmValue/{key}/{value}")
-    public ResponseEntity<String> setAlarmValue(
-            @PathVariable String key,
-            @PathVariable String value
-    ) {
-        alarmRedisService.setValue(key, value);
-        return ResponseEntity.ok("Value set successfully in alarm Redis");
-    }
-
-    @GetMapping("/getAlarmValue/{key}")
-    public ResponseEntity<Object> getAlarmValue(
-            @PathVariable String key
-    ) {
-        Object value = alarmRedisService.getValue(key);
-        return ResponseEntity.ok(value);
     }
 
     @PostMapping("/setChatValue/{key}/{value}")
