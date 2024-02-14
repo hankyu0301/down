@@ -5,24 +5,42 @@ spring:
     username: myuser
     password: mypassword
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: down240215@gmail.com # downpass
+    password: stmk idhi wbkh vhhj
+    properties:
+      mail:
+        smtp:
+          timeout: 5000
+          starttls:
+            enable: true
+
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 
   redis:
     host:
-      chat: redis-chat-cache
+      chat: localhost
+      email: localhost
     port:
       chat: 6379
+      email: 6380
     password:
       chat: redis-chat-pw
+      email: redis-email-pw
+    email:
+      expire-time: 3 # 분
 
   security:
     oauth2:
       client:
+        password-key: oauth2
         registration:
           google:
             client-id: 670687707962-k9gdlufh1kggejkvt8jvqnlmqs6sh9s7.apps.googleusercontent.com
@@ -73,7 +91,8 @@ jwt:
 
 logging:
   level:
-    root: debug
+    root: info
+  # root: debug
 
 api:
   version-path: /api/v1

@@ -1,26 +1,23 @@
 package com.example.demo.global.auth;
 
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.entity.UserEntity;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 @Builder
+@RequiredArgsConstructor
 public class PrincipalDetails implements UserDetails, OAuth2User {
 
-    private final User user;
+    private final UserEntity userEntity;
     private final Map<String, Object> attributes;
-
-    public PrincipalDetails(User user, Map<String, Object> attributes) {
-        this.user = user;
-        this.attributes = attributes;
-    }
 
     @Override
     public String getName() {
@@ -41,11 +38,11 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     }
 
     public String getEmail() {
-        return user.getEmail();
+        return userEntity.getEmail();
     }
 
     public Long getId() {
-        return user.getId();
+        return userEntity.getId();
     }
 
     @Override
@@ -55,7 +52,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return userEntity.getNickName();
     }
 
     @Override

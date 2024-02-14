@@ -1,5 +1,6 @@
 package com.example.demo.global.config;
 
+import com.example.demo.global.auth.OAuth2FailureHandler;
 import com.example.demo.global.auth.OAuth2SuccessHandler;
 import com.example.demo.global.auth.jwt.JwtAuthenticationFilter;
 import com.example.demo.global.auth.jwt.JwtTokenProvider;
@@ -23,11 +24,13 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final OAuth2UserService oauth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
 
     public static final String[] PUBLIC_URLS = {
             "/loginForm/**",
             "/address/**",
             "/chat/**",
+            "/check-mysql-connection/**",
     };
 
     public static final String[] PRIVATE_URLS = {
@@ -60,6 +63,7 @@ public class SecurityConfig {
                                 .userService(oauth2UserService)
                         )
                         .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler)
                 )
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

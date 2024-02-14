@@ -1,7 +1,7 @@
 package com.example.demo.global.auth.jwt;
 
 
-import com.example.demo.domain.user.entity.UserRole;
+import com.example.demo.domain.user.entity.UserRoleEnumType;
 import com.example.demo.global.auth.PrincipalDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -66,7 +66,7 @@ public class JwtTokenProvider {
 
         // Role (role): 사용자의 역할을 나타내는 정보입니다.
         // 사용자가 어떤 권한을 가지고 있는지를 나타낼 수 있습니다.
-        payloads.put("role", UserRole.ROLE_USER.name());
+        payloads.put("role", UserRoleEnumType.ROLE_USER.name());
         payloads.put("username", principalDetails.getUsername());
         payloads.put("id", principalDetails.getId());
 
