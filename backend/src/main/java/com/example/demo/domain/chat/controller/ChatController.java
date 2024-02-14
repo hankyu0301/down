@@ -1,14 +1,14 @@
-package com.example.demo.domain.address.controller;
+package com.example.demo.domain.chat.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class AddressController {
+public class ChatController {
 
-    @GetMapping("/address")
+    @GetMapping("/chat")
     public String home() {
-        return "addressTest.html";
+        return "index.html";
     }
 
 }

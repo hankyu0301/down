@@ -52,6 +52,19 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-test'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+	/**
+	 * JWT
+	 * URL : https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+	 * 참고 : https://aonee.tistory.com/72
+	 * */
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	// com.sun.xml.bind
+	implementation 'com.sun.xml.bind:jaxb-impl:4.0.1'
+	implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
+	// javax.xml.bind
+	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j' // MySQL 드라이버
 	annotationProcessor 'org.projectlombok:lombok'
