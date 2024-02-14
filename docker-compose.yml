@@ -11,6 +11,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3306:3306"
+    networks:
+      network_bridge:
+        ipv4_address: 172.24.0.2
 
   #  redis-chat
   redis-chat:
@@ -20,7 +23,11 @@ services:
       context: ./backend/docker/redis-chat
       dockerfile: Dockerfile
     ports:
-      - "6380:6379"
+      - "6379:6379"
+    networks:
+      network_bridge:
+        ipv4_address: 172.24.0.3
+      
 
   # spring-boot app
   backend:
@@ -29,11 +36,17 @@ services:
     build: 
       context: ./backend/
       dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/mydb
+
     ports:
       - "8080:8080"
     depends_on:
       - mysql
       - redis-chat
+    networks:
+      network_bridge:
+        ipv4_address: 172.24.0.4
   
   # react app
   frontend:
@@ -44,5 +57,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
+    # depends_on:
+    #   - backend
+    networks:
+      network_bridge:
+        ipv4_address: 172.24.0.5
+      
+networks:
+  network_bridge:
+      ipam:
+        config:
+          - subnet: 172.24.0.0/16

@@ -1,7 +1,7 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.0.2:3306/mydb
+    url: jdbc:mysql://localhost:3306/mydb
     username: myuser
     password: mypassword
 
@@ -14,13 +14,10 @@ spring:
 
   redis:
     host:
-      alarm: 192.168.0.2
-      chat: 192.168.0.2
+      chat: redis-chat-cache
     port:
-      alarm: 6379
-      chat: 6380
+      chat: 6379
     password:
-      alarm: redis-alarm-pw
       chat: redis-chat-pw
 
   security:
@@ -77,3 +74,6 @@ jwt:
 logging:
   level:
     root: debug
+
+api:
+  version-path: /api/v1
