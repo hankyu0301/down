@@ -20,9 +20,9 @@ const signUpSchema = z
 		email: z
 			.string({ required_error: "이메일을 입력해주세요." })
 			.email({ message: "유효하지 않은 이메일 형식입니다." }),
-		emailValidation: z
+		emailCode: z
 			.string({ required_error: "이메일 인증코드를 입력해주세요." })
-			.length(6, {message: "인증코드를 올바르게 입력해주세요."}),
+			.length(6, { message: "인증코드를 올바르게 입력해주세요." }),
 		username: z
 			.string({ required_error: "닉네임을 입력해주세요." })
 			.min(2, { message: "닉네임은 최소 2자 이상이어야 합니다." })
@@ -44,9 +44,21 @@ const SignUpForm = () => {
 		resolver: zodResolver(signUpSchema),
   });
 
-  const onSendEmailCode = () => {}
+  const onSendEmailCode = async () => {
+		const isValid = await form.trigger("email");
+
+		if (isValid) {
+			// 이메일 입력 후 '인증코드 전송' 버튼 클릭 시 인증코드 전송 로직 실행
+		}
+	};
   
-  const onCheckEmailCode = () => { };
+	const onCheckEmailCode = async () => {
+		const isValid = await form.trigger("emailCode");
+
+		if (isValid) {
+			// 이메일 인증코드 확인 로직 실행
+		}
+	};
 
 	const onSubmit = (values: z.infer<typeof signUpSchema>) => {
 		// onSubmit
@@ -72,7 +84,7 @@ const SignUpForm = () => {
                     {...field}
                   />
                 </FormControl>
-                <Button onClick={onCheckEmailCode}>인증코드 전송</Button>
+                <Button type="button" onClick={onSendEmailCode}>인증코드 전송</Button>
               </div>
 							<FormMessage />
 						</FormItem>
@@ -82,7 +94,7 @@ const SignUpForm = () => {
 				{/* 이메일 인증코드 */}
 				<FormField
 					control={form.control}
-					name="emailValidation"
+					name="emailCode"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>이메일 인증코드</FormLabel>
@@ -94,7 +106,7 @@ const SignUpForm = () => {
                     {...field}
                   />
                 </FormControl>
-                <Button onClick={onCheckEmailCode}>인증코드 확인</Button>
+                <Button type="button" onClick={onCheckEmailCode}>인증코드 확인</Button>
               </div>
 							<FormMessage />
 						</FormItem>
