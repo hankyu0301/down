@@ -5,7 +5,7 @@ const navLinks = [
 	{ label: "모임", href: "/gathering" },
 	{ label: "강습", href: "/lesson" },
 	{ label: "중고거래", href: "/fleamarket" },
-	{ label: "회원가입/로그인", href: "/sign-up", button: true },
+  { label: "로그인/회원가입", href: "/login", button: true },
 ];
 
 const NavLinks = () => {

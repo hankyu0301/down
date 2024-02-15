@@ -45,23 +45,23 @@ const SignUpForm = () => {
   });
 
   const onSendEmailCode = async () => {
-		const isValid = await form.trigger("email");
+		const email = await form.trigger("email");
 
-		if (isValid) {
+		if (email) {
 			// 이메일 입력 후 '인증코드 전송' 버튼 클릭 시 인증코드 전송 로직 실행
 		}
 	};
   
 	const onCheckEmailCode = async () => {
-		const isValid = await form.trigger("emailCode");
+		const emailCode = await form.trigger("emailCode");
 
-		if (isValid) {
+		if (emailCode) {
 			// 이메일 인증코드 확인 로직 실행
 		}
 	};
 
-	const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-		// onSubmit
+	const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
+		// 회원가입 양식 제출 로직 실행
 	};
 
 	return (
