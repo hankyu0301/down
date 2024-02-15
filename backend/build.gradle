@@ -64,6 +64,11 @@ dependencies {
 	// javax.xml.bind
 	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 
+	/**
+	 * Email
+	 * 참고 : https://lucas-owner.tistory.com/16
+	 * */
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j' // MySQL 드라이버
