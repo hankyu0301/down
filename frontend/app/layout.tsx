@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Open_Sans } from "next/font/google";
 
+import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ModalProvider } from "@/components/providers/ModalProvider";
-import { cn } from "@/lib/utils";
+
+import NavBar from "@/components/navigation/NavBar";
+import Footer from "@/components/footer/Footer";
 
 const font = Open_Sans({ subsets: ["latin"] });
 
@@ -27,7 +30,15 @@ export default function RootLayout({
           enableSystem
         >
           <ModalProvider />
-          {children}
+
+          <div className="relative flex min-h-screen flex-col">
+            <NavBar />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+
         </ThemeProvider>
       </body>
     </html>
