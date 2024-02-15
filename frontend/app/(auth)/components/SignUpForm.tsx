@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,9 +20,9 @@ const signUpSchema = z
 		email: z
 			.string({ required_error: "이메일을 입력해주세요." })
 			.email({ message: "유효하지 않은 이메일 형식입니다." }),
-		emailValidation: z
+		emailCode: z
 			.string({ required_error: "이메일 인증코드를 입력해주세요." })
-			.length(6, {message: "인증코드를 올바르게 입력해주세요."}),
+			.length(6, { message: "인증코드를 올바르게 입력해주세요." }),
 		username: z
 			.string({ required_error: "닉네임을 입력해주세요." })
 			.min(2, { message: "닉네임은 최소 2자 이상이어야 합니다." })
@@ -30,9 +30,19 @@ const signUpSchema = z
 		password: z
 			.string({ required_error: "비밀번호를 입력해주세요." })
 			.min(8, { message: "비밀번호는 최소 8자 이상이어야 합니다." }),
-		confirmPassword: z.string({
+		confirmPassword: z
+			.string({
 			required_error: "비밀번호 확인을 입력해주세요.",
 		}),
+		termsOfService: z
+			.boolean({
+				required_error: "이용약관에 동의는 필수입니다.",
+			}),
+		privacyPolicy: z
+			.boolean({
+				required_error: "개인정보 수집 및 이용 동의는 필수입니다.",
+			}),
+		marketingConsent: z.boolean().optional(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
@@ -40,16 +50,38 @@ const signUpSchema = z
 	});
 
 const SignUpForm = () => {
+	const [sentEmailCode, setSentEmailCode] = useState(false);
+
 	const form = useForm<z.infer<typeof signUpSchema>>({
 		resolver: zodResolver(signUpSchema),
-  });
+	});
 
-  const onSendEmailCode = () => {}
-  
-  const onCheckEmailCode = () => { };
+	const onCheckEmailDuplication = async () => {
+		const email = await form.trigger("email");
 
-	const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-		// onSubmit
+		if (email) {
+			// 이메일 입력 후 서버로 보내 중복 확인 검사 로직 실행
+		}
+	};
+
+	const onCheckEmailCode = async () => {
+		const email = await form.trigger("email");
+		const emailCode = await form.trigger("emailCode");
+
+		if (email && emailCode) {
+			try {
+				setSentEmailCode(true);
+				// 이메일 인증코드 전송 로직
+			} catch (error) {
+				setSentEmailCode(false);
+			}
+		}
+
+		// 성공적으로 전송됐으면 인증코드 확인 로직
+	};
+
+	const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
+		// 회원가입 양식 제출 로직 실행
 	};
 
 	return (
@@ -64,16 +96,21 @@ const SignUpForm = () => {
 					name="email"
 					render={({ field }) => (
 						<FormItem>
-              <FormLabel>이메일</FormLabel>
-              <div className="flex gap-2">
-                <FormControl>
-                  <Input
-                    placeholder="이메일을 입력해주세요."
-                    {...field}
-                  />
-                </FormControl>
-                <Button onClick={onCheckEmailCode}>인증코드 전송</Button>
-              </div>
+							<FormLabel>이메일</FormLabel>
+							<div className="flex gap-2">
+								<FormControl>
+									<Input
+										placeholder="email@example.com"
+										{...field}
+									/>
+								</FormControl>
+								<Button
+									type="button"
+									onClick={onCheckEmailDuplication}
+								>
+									중복 확인
+								</Button>
+							</div>
 							<FormMessage />
 						</FormItem>
 					)}
@@ -82,24 +119,29 @@ const SignUpForm = () => {
 				{/* 이메일 인증코드 */}
 				<FormField
 					control={form.control}
-					name="emailValidation"
+					name="emailCode"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>이메일 인증코드</FormLabel>
-              <div className="flex gap-2">
-                <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="인증코드를 입력해주세요."
-                    {...field}
-                  />
-                </FormControl>
-                <Button onClick={onCheckEmailCode}>인증코드 확인</Button>
-              </div>
+							<div className="flex gap-2">
+								<FormControl>
+									<Input
+										type="text"
+										placeholder="인증코드를 입력해주세요."
+										{...field}
+									/>
+								</FormControl>
+								<Button
+									type="button"
+									onClick={onCheckEmailCode}
+								>
+									{sentEmailCode ? "인증코드 확인" : "인증코드 전송"}
+								</Button>
+							</div>
 							<FormMessage />
 						</FormItem>
 					)}
-        />
+				/>
 
 				{/* 닉네임 */}
 				<FormField
@@ -113,10 +155,12 @@ const SignUpForm = () => {
 									placeholder="닉네임을 입력해주세요."
 									{...field}
 								/>
-              </FormControl>
-              <FormDescription>닉네임은 2자 이상 12자 미만으로 입력해주세요.</FormDescription>
+							</FormControl>
+							<FormDescription>
+								닉네임은 2자 이상 12자 미만으로 입력해주세요.
+							</FormDescription>
 							<FormMessage />
-            </FormItem>
+						</FormItem>
 					)}
 				/>
 
@@ -158,7 +202,80 @@ const SignUpForm = () => {
 					)}
 				/>
 
-				<Button type="submit">가입하기</Button>
+				{/* 약관 동의 */}
+				<FormField
+					control={form.control}
+					name="termsOfService"
+					render={({ field }) => {
+						const { value, ...fieldProps } = field;
+						return (
+							<FormItem className="flex flex-col w-full gap-2 space-y-0">
+								<div className="flex justify-between">
+									<FormLabel>
+										이용 약관 동의 <span className="text-red-400">(필수)</span>
+									</FormLabel>
+									<FormControl>
+										<input
+											type="checkbox"
+											{...fieldProps}
+										/>
+									</FormControl>
+								</div>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="privacyPolicy"
+					render={({ field }) => {
+						const { value, ...fieldProps } = field;
+						return (
+							<FormItem className="flex flex-col w-full gap-2 space-y-0">
+								<div className="flex justify-between">
+									<FormLabel>
+										개인정보 수집 및 이용 동의{" "}
+										<span className="text-red-400">(필수)</span>
+									</FormLabel>
+									<FormControl>
+										<input
+											type="checkbox"
+											{...fieldProps}
+										/>
+									</FormControl>
+								</div>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="marketingConsent"
+					render={({ field }) => {
+						const { value, ...fieldProps } = field;
+						return (
+							<FormItem className="flex w-full justify-between gap-2 items-center space-y-0">
+								<FormLabel>마케팅 알림 수신 동의</FormLabel>
+								<FormControl>
+									<input
+										type="checkbox"
+										{...fieldProps}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+
+				<Button
+					className="w-full"
+					type="submit"
+				>
+					회원가입
+				</Button>
 			</form>
 		</Form>
 	);
