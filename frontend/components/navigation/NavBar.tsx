@@ -4,7 +4,7 @@ import NavLinks from "./NavLinks";
 
 const NavigationBar = () => {
 	return (
-		<header className="sticky top-0 z-50 w-full h-14 flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<header className="sticky top-0 z-50 w-screen h-14 flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex justify-between items-center">
 				<Link href="/">
 					<button className="font-semibold text-xl">로고</button>
