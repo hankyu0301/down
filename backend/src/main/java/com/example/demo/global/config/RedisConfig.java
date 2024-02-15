@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 @Configuration
@@ -37,19 +38,19 @@ public class RedisConfig {
     @Bean(name = "emailRedisConnectionFactory")
     @Primary
     public RedisConnectionFactory emailRedisConnectionFactory() {
-        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();
-        connectionFactory.setHostName(emailHost);
-        connectionFactory.setPort(emailPort);
-        connectionFactory.setPassword(emailPassword);
-        return connectionFactory;
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+        configuration.setHostName(emailHost);
+        configuration.setPort(emailPort);
+        configuration.setPassword(emailPassword);
+        return new LettuceConnectionFactory(configuration);
     }
 
     @Bean(name = "chatRedisConnectionFactory")
     public RedisConnectionFactory chatRedisConnectionFactory() {
-        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();
-        connectionFactory.setHostName(chatHost);
-        connectionFactory.setPort(chatPort);
-        connectionFactory.setPassword(chatPassword);
-        return connectionFactory;
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+        configuration.setHostName(chatHost);
+        configuration.setPort(chatPort);
+        configuration.setPassword(chatPassword);
+        return new LettuceConnectionFactory(configuration);
     }
 }
