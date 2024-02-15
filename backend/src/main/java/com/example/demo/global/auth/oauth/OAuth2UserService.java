@@ -1,10 +1,13 @@
 package com.example.demo.global.auth.oauth;
 
-import com.example.demo.domain.user.entity.UserRole;
+import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.repository.PendingEmailsRepository;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -12,9 +15,10 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.entity.UserEntity;
 
 import java.util.Map;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -22,8 +26,12 @@ import java.util.Map;
 @Slf4j
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
+    @Value("${spring.security.oauth2.client.password-key}")
+    private String OAUTH2_PASSWORD_KEY;
 
+    private final UserRepository userRepository;
+    private final PendingEmailsRepository pendingEmailsRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -48,27 +56,32 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             }
         };
 
-        String provider = oAuth2UserInfo.getProvider();
+        LoginEnumType provider = LoginEnumType.valueOf(oAuth2UserInfo.getProvider().toUpperCase());
         String providerId = oAuth2UserInfo.getProviderId();
         String email = oAuth2UserInfo.getEmail();
-        String loginId = provider + "_" + providerId;
         String nickname = oAuth2UserInfo.getName();
 
-        log.info("oAuth2UserInfo : {}", oAuth2UserInfo);
+        Optional<UserEntity> optUser = userRepository.findByEmailAndProviderId(email, providerId);
 
-        User user = userRepository.findByLoginId(loginId)
-                .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .loginId(loginId)
-                            .email(email)
-                            .userName(nickname)
-                            .provider(provider)
-                            .providerId(providerId)
-                            .role(UserRole.ROLE_USER)
-                            .build();
-                    return userRepository.save(newUser);
-                });
+        if (optUser.isPresent()) {
+            return new PrincipalDetails(optUser.get(), oAuth2User.getAttributes());
+        }
 
+        if (userRepository.existsByEmail(email) || pendingEmailsRepository.existsByEmail(email)) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("email_exists"), "이미 가입된 이메일입니다.");
+        }
+
+        UserEntity newUser = UserEntity.builder()
+                .email(email)
+                .nickName(nickname)
+                .provider(provider)
+                .termsAgree(true)
+                .password(passwordEncoder.encode(email + OAUTH2_PASSWORD_KEY))
+                .providerId(providerId)
+                .role(UserRoleEnumType.ROLE_USER)
+                .build();
+
+        UserEntity user = userRepository.save(newUser);
         return new PrincipalDetails(user, oAuth2User.getAttributes());
     }
 }

@@ -1,11 +1,13 @@
 package com.example.demo.domain.user.repository;
 
-import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    Optional<User> findByLoginId(String loginId);
+    Optional<UserEntity> findByEmailAndProviderId(String email, String providerId);
+
+    boolean existsByEmail(String email);
 }

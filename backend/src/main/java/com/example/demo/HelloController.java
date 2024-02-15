@@ -1,10 +1,11 @@
 package com.example.demo;
 
 
-import com.example.demo.global.redis.ChatRedisService;
+import com.example.demo.global.redis.EmailRedisRepository;
+import com.example.demo.global.redis.ChatRedisRepository;
 import com.example.demo.global.socket.Greeting;
 import com.example.demo.global.socket.HelloMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,14 +13,13 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
+@RequiredArgsConstructor
 @RestController
 public class HelloController {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private ChatRedisService chatRedisService;
+    private final JdbcTemplate jdbcTemplate;
+    private final ChatRedisRepository chatRedisService;
+    private final EmailRedisRepository emailRedisService;
 
     @GetMapping("/")
     public String index() {
@@ -34,6 +34,22 @@ public class HelloController {
         } catch (Exception ex) {
             return "MySQL 연결 확인: 실패 - " + ex.getMessage();
         }
+    }
+
+    @PostMapping("/setAlarmValue/{key}/")
+    public ResponseEntity<String> setAlarmValue(
+            @PathVariable String key
+    ) {
+        emailRedisService.setVerification(key);
+        return ResponseEntity.ok("Value set successfully in alarm Redis");
+    }
+
+    @GetMapping("/getAlarmValue/{key}")
+    public ResponseEntity<Object> getAlarmValue(
+            @PathVariable String key
+    ) {
+        Object value = emailRedisService.getVerification(key);
+        return ResponseEntity.ok(value);
     }
 
     @PostMapping("/setChatValue/{key}/{value}")
