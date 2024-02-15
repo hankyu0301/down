@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -40,24 +40,34 @@ const signUpSchema = z
 	});
 
 const SignUpForm = () => {
+	const [sentEmailCode, setSentEmailCode] = useState(false);
 	const form = useForm<z.infer<typeof signUpSchema>>({
 		resolver: zodResolver(signUpSchema),
   });
 
-  const onSendEmailCode = async () => {
+  const onCheckEmailDuplication = async () => {
 		const email = await form.trigger("email");
 
 		if (email) {
-			// 이메일 입력 후 '인증코드 전송' 버튼 클릭 시 인증코드 전송 로직 실행
+			// 이메일 입력 후 서버로 보내 중복 확인 검사 로직 실행
 		}
 	};
   
 	const onCheckEmailCode = async () => {
+		const email = await form.trigger("email");
 		const emailCode = await form.trigger("emailCode");
 
-		if (emailCode) {
-			// 이메일 인증코드 확인 로직 실행
+		if (email && emailCode) {
+			try {
+				setSentEmailCode(true);
+				// 이메일 인증코드 전송 로직
+				
+			} catch (error) {
+				setSentEmailCode(false);
+			}
 		}
+
+		// 성공적으로 전송됐으면 인증코드 확인 로직
 	};
 
 	const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
@@ -84,7 +94,7 @@ const SignUpForm = () => {
                     {...field}
                   />
                 </FormControl>
-                <Button type="button" onClick={onSendEmailCode}>인증코드 전송</Button>
+                <Button type="button" onClick={onCheckEmailDuplication}>이메일 중복 확인</Button>
               </div>
 							<FormMessage />
 						</FormItem>
@@ -102,11 +112,13 @@ const SignUpForm = () => {
                 <FormControl>
                   <Input
                     type="text"
-                    placeholder="인증코드를 입력해주세요."
+										placeholder="인증코드를 입력해주세요."
                     {...field}
                   />
                 </FormControl>
-                <Button type="button" onClick={onCheckEmailCode}>인증코드 확인</Button>
+								<Button type="button" onClick={onCheckEmailCode}>
+									{sentEmailCode ? "인증코드 확인" : "인증코드 전송"}
+								</Button>
               </div>
 							<FormMessage />
 						</FormItem>
