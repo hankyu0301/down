@@ -17,6 +17,7 @@ public class User extends BaseDomain {
     private String email; // 로그인 이메일
     private String password; // 로그인 비밀번호
     private String nickName; // 사용자 이름
+    private String username; // 사용자 닉네임
     private LoginEnumType provider; // 제공자
     private String providerId; // 제공자 ID
     private UserRoleEnumType role; // 사용자 권한
