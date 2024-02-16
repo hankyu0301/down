@@ -58,4 +58,11 @@ public class UserService {
                 .map(User::getId)
                 .orElseThrow();
     }
+
+    public boolean checkEmail(User user) {
+        if (!userRepository.existsByEmailAndUserName(user.getEmail(), user.getUserName())) {
+            throw new IllegalArgumentException("회원이 존재하지 않습니다.");
+        }
+        return true;
+    }
 }
