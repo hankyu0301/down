@@ -59,7 +59,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         LoginEnumType provider = LoginEnumType.valueOf(oAuth2UserInfo.getProvider().toUpperCase());
         String providerId = oAuth2UserInfo.getProviderId();
         String email = oAuth2UserInfo.getEmail();
-        String username = oAuth2UserInfo.getName();
+        String userName = oAuth2UserInfo.getName();
 
         Optional<UserEntity> optUser = userRepository.findByEmailAndProviderId(email, providerId);
 
@@ -73,7 +73,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
         UserEntity newUser = UserEntity.builder()
                 .email(email)
-                .username(username)
+                .userName(userName)
                 .nickName(null)
                 .provider(provider)
                 .termsAgree(true)

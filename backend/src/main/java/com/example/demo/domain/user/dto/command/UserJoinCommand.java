@@ -25,7 +25,7 @@ public class UserJoinCommand {
 
     @NotBlank(message = "사용자 이름은 필수 입력 값입니다.")
     @Schema(description = "사용자 이름", example = "이상혁")
-    private String username;
+    private String userName;
 
     @NotBlank(message = "이메일 인증코드는 필수 입력 값입니다.")
     @Schema(description = "이메일 인증코드", example = "1A3B5C")
@@ -40,7 +40,7 @@ public class UserJoinCommand {
                 .email(email)
                 .password(password)
                 .nickName(nickName)
-                .username(username)
+                .userName(userName)
                 .termsAgree(termsAgree)
                 .build();
     }
