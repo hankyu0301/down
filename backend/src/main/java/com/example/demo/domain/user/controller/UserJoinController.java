@@ -6,7 +6,6 @@ import com.example.demo.domain.user.dto.response.CheckEmailVerificationResponseD
 import com.example.demo.domain.user.dto.response.SendEmailVerificationResponseDTO;
 import com.example.demo.domain.user.dto.response.UserJoinResponseDTO;
 import com.example.demo.domain.user.model.EmailVerification;
-import com.example.demo.domain.user.model.PendingEmail;
 import com.example.demo.domain.user.dto.command.CheckEmailCommand;
 import com.example.demo.domain.user.dto.command.SendEmailVerificationCommand;
 import com.example.demo.domain.user.dto.response.CheckEmailResponseDTO;
@@ -74,11 +73,11 @@ public class UserJoinController {
     public ResponseEntity<BaseResponse<CheckEmailResponseDTO>> checkEmail(
             @Validated @RequestBody CheckEmailCommand cmd
     ) {
-        PendingEmail pendingEmail = emailService.registerPendingEmail(cmd.toPendingEmailDomain());
+        boolean result = emailService.registerPendingEmail(cmd.toPendingEmailDomain());
 
         CheckEmailResponseDTO responseDTO = CheckEmailResponseDTO.builder()
-                .checkedEmail(pendingEmail.getEmail())
-                .available(true)
+                .checkedEmail(cmd.getEmail())
+                .available(result)
                 .build();
 
         SuccessResponse<CheckEmailResponseDTO> response =

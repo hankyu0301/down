@@ -8,8 +8,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: down240215@gmail.com # downpass
-    password: stmk idhi wbkh vhhj
+    username: gksxorb147@gmail.com # downpass
+    password:
     properties:
       mail:
         smtp:
@@ -92,7 +92,7 @@ jwt:
 logging:
   level:
     root: info
-  # root: debug
+   # root: debug
 
 api:
   version-path: /api/v1

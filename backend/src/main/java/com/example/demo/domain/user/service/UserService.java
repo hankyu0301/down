@@ -51,12 +51,17 @@ public class UserService {
         user.setRole(UserRoleEnumType.ROLE_USER);
         user.setProviderId(FROM_EMAIL);
 
-        return Optional.of(user)
+        UserId userId = Optional.of(user)
                 .map(userMapper::domainToEntity)
                 .map(userRepository::save)
                 .map(userMapper::entityToDomain)
                 .map(User::getId)
                 .orElseThrow();
+
+        // 회원 가입 완료 후 팬딩 이메일 삭제
+        pendingEmailsRepository.deleteByEmail(user.getEmail());
+
+        return userId;
     }
 
     public boolean checkEmail(User user) {
