@@ -41,23 +41,13 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final PasswordEncoder passwordEncoder;
 
-    public PendingEmail registerPendingEmail(PendingEmail pendingEmail) {
+    public Boolean registerPendingEmail(PendingEmail pendingEmail) {
 
         if (userRepository.existsByEmail(pendingEmail.getEmail())) {
             throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
         }
 
-        if (pendingEmailsRepository.existsByEmail(pendingEmail.getEmail())) {
-            throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
-        }
-
-        pendingEmail.setAuthCount(0);
-
-        return Optional.of(pendingEmail)
-                .map(emailMapper::domainToEntity)
-                .map(pendingEmailsRepository::save)
-                .map(emailMapper::entityToDomain)
-                .orElseThrow();
+        return true;
     }
 
     public EmailVerification sendEmailVerification(EmailVerification domain) throws MessagingException {
@@ -68,10 +58,21 @@ public class EmailService {
             throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
         }
 
-        // 보류 이메일에 있는지 확인
+        // 보류 이메일이 있는지 확인
         PendingEmail pendingEmail = pendingEmailsRepository.findByEmail(email)
                 .map(emailMapper::entityToDomain)
-                .orElseThrow(() -> new PendingEmailNotFoundException("보류 이메일에 존재하지 않습니다."));
+                .orElseGet(() -> { // 보류 이메일 없으면 생성
+                    PendingEmail newPendingEmail = PendingEmail.builder()
+                            .email(email)
+                            .authCount(0)
+                            .build();
+
+                    return Optional.of(newPendingEmail)
+                            .map(emailMapper::domainToEntity)
+                            .map(pendingEmailsRepository::save)
+                            .map(emailMapper::entityToDomain)
+                            .orElseThrow();
+                });
 
         // 인증 횟수 5번 초과 확인
         if (pendingEmail.getAuthCount() >= MAX_VERIFICATION_ATTEMPTS) {
