@@ -8,7 +8,7 @@ const headers = {
 };
 
 const instance = axios.create({
-  baseURL: process.env.REACT_APP_SERVER_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers,
 });
 
