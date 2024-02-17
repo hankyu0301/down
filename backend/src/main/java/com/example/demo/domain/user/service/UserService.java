@@ -51,11 +51,23 @@ public class UserService {
         user.setRole(UserRoleEnumType.ROLE_USER);
         user.setProviderId(FROM_EMAIL);
 
-        return Optional.of(user)
+        UserId userId = Optional.of(user)
                 .map(userMapper::domainToEntity)
                 .map(userRepository::save)
                 .map(userMapper::entityToDomain)
                 .map(User::getId)
                 .orElseThrow();
+
+        // 회원 가입 완료 후 팬딩 이메일 삭제
+        pendingEmailsRepository.deleteByEmail(user.getEmail());
+
+        return userId;
+    }
+
+    public boolean checkEmail(User user) {
+        if (!userRepository.existsByEmailAndUserName(user.getEmail(), user.getUserName())) {
+            throw new IllegalArgumentException("회원이 존재하지 않습니다.");
+        }
+        return true;
     }
 }

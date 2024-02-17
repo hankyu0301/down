@@ -27,9 +27,13 @@ public class UserEntity extends BaseEntity {
     @Column(name = "password")
     private String password;
 
+    @Comment("사용자 닉네임")
+    @Column(name = "nick_name")
+    private String nickName;
+
     @Comment("사용자 이름")
     @Column(name = "user_name")
-    private String nickName;
+    private String userName;
 
     @Comment("로그인 공급자 SNS 구분")
     @Column(name = "provider")

@@ -7,6 +7,7 @@ import com.example.demo.domain.user.exception.PendingEmailNotFoundException;
 import com.example.demo.domain.user.mapper.EmailMapper;
 import com.example.demo.domain.user.model.EmailVerification;
 import com.example.demo.domain.user.model.PendingEmail;
+import com.example.demo.domain.user.model.User;
 import com.example.demo.domain.user.repository.PendingEmailsRepository;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.redis.EmailRedisRepository;
@@ -15,10 +16,12 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.security.SecureRandom;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ import java.util.Optional;
 @Transactional
 public class EmailService {
     private static final int MAX_VERIFICATION_ATTEMPTS = 5;
+    private static final int RESET_PASSWORD_LENGTH = 10;
 
     @Value("${spring.mail.username}")
     private String FROM_EMAIL_ADDRESS;
@@ -35,24 +39,15 @@ public class EmailService {
     private final EmailMapper emailMapper;
     private final EmailRedisRepository emailRedisRepository;
     private final JavaMailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
 
-    public PendingEmail registerPendingEmail(PendingEmail pendingEmail) {
+    public Boolean registerPendingEmail(PendingEmail pendingEmail) {
 
         if (userRepository.existsByEmail(pendingEmail.getEmail())) {
             throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
         }
 
-        if (pendingEmailsRepository.existsByEmail(pendingEmail.getEmail())) {
-            throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
-        }
-
-        pendingEmail.setAuthCount(0);
-
-        return Optional.of(pendingEmail)
-                .map(emailMapper::domainToEntity)
-                .map(pendingEmailsRepository::save)
-                .map(emailMapper::entityToDomain)
-                .orElseThrow();
+        return true;
     }
 
     public EmailVerification sendEmailVerification(EmailVerification domain) throws MessagingException {
@@ -63,10 +58,21 @@ public class EmailService {
             throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
         }
 
-        // 보류 이메일에 있는지 확인
+        // 보류 이메일이 있는지 확인
         PendingEmail pendingEmail = pendingEmailsRepository.findByEmail(email)
                 .map(emailMapper::entityToDomain)
-                .orElseThrow(() -> new PendingEmailNotFoundException("보류 이메일에 존재하지 않습니다."));
+                .orElseGet(() -> { // 보류 이메일 없으면 생성
+                    PendingEmail newPendingEmail = PendingEmail.builder()
+                            .email(email)
+                            .authCount(0)
+                            .build();
+
+                    return Optional.of(newPendingEmail)
+                            .map(emailMapper::domainToEntity)
+                            .map(pendingEmailsRepository::save)
+                            .map(emailMapper::entityToDomain)
+                            .orElseThrow();
+                });
 
         // 인증 횟수 5번 초과 확인
         if (pendingEmail.getAuthCount() >= MAX_VERIFICATION_ATTEMPTS) {
@@ -114,4 +120,47 @@ public class EmailService {
 
         return true;
     }
+
+    // 임시 비밀번호 전송
+    public boolean sendResetPassword(User user) throws MessagingException {
+
+        // 임시 비밀번호 생성
+        String resetPassword = generateResetPassword();
+
+        // 회원 비밀번호 변경
+        userRepository.findByEmailAndUserName(user.getEmail(), user.getUserName())
+                .map(u -> {
+                    u.setPassword(passwordEncoder.encode(resetPassword));
+                    return userRepository.save(u);
+                })
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        // 이메일 전송
+        MimeMessage message = mailSender.createMimeMessage();
+
+        message.addRecipients(MimeMessage.RecipientType.TO, user.getEmail());
+        message.setSubject("Down 임시 비밀번호 발송");
+        message.setText("임시 비밀번호 발송: " + resetPassword);
+        message.setFrom(FROM_EMAIL_ADDRESS);
+
+        mailSender.send(message);
+
+        return true;
+    }
+
+    private String generateResetPassword() {
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder();
+
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+
+        for (int i = 0; i < RESET_PASSWORD_LENGTH; i++) {
+            int index = random.nextInt(characters.length());
+            sb.append(characters.charAt(index));
+        }
+
+        return sb.toString();
+    }
+
 }

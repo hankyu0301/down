@@ -21,7 +21,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return null;
+        return userEntity.getUserName();
     }
 
     @Override
@@ -47,12 +47,12 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getPassword() {
-        return null;
+        return userEntity.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return userEntity.getNickName();
+        return userEntity.getUserName();
     }
 
     @Override
