@@ -51,11 +51,13 @@ public class EmailService {
     }
 
     public EmailVerification sendEmailVerification(EmailVerification domain) throws MessagingException {
+        // 이메일 인증 코드 생성
         String email = domain.getEmail();
+        String verificationCode = emailRedisRepository.setVerification(email);
 
         // 이미 사용중인 이메일인지 확인
         if (userRepository.existsByEmail(email)) {
-            throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
+            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
         }
 
         // 보류 이메일이 있는지 확인
@@ -64,6 +66,7 @@ public class EmailService {
                 .orElseGet(() -> { // 보류 이메일 없으면 생성
                     PendingEmail newPendingEmail = PendingEmail.builder()
                             .email(email)
+                            .authCode(verificationCode)
                             .authCount(0)
                             .build();
 
@@ -79,9 +82,6 @@ public class EmailService {
             throw new MaxVerificationAttemptsExceededException("인증 횟수 5번을 초과하였습니다.");
         }
 
-        // 이메일 인증 코드 생성 및 저장
-        String verificationCode = emailRedisRepository.setVerification(email);
-
         // 이메일 전송
         MimeMessage message = mailSender.createMimeMessage();
 
@@ -94,14 +94,15 @@ public class EmailService {
 
         // 인증 횟수 증가
         pendingEmail.setAuthCount(pendingEmail.getAuthCount() + 1);
+        pendingEmail.setAuthCode(verificationCode);
         pendingEmailsRepository.save(emailMapper.domainToEntity(pendingEmail));
 
         return domain;
     }
 
-    public boolean checkEmailVerification(EmailVerification domain) {
+    public boolean checkEmailVerification(EmailVerification domain) throws RuntimeException {
 
-        // 이메일 인증 코드 확인
+        // 이메일 인증 코드 확인 3분안에 진행 해야함
         if(!emailRedisRepository.hasVerification(domain.getEmail())) {
             throw new EmailVerificationCodeNotFoundException("인증코드가 존재하지 않습니다. 이메일 인증을 다시 진행해주세요.");
         }
@@ -110,6 +111,11 @@ public class EmailService {
         PendingEmail pendingEmail = pendingEmailsRepository.findByEmail(domain.getEmail())
                 .map(emailMapper::entityToDomain)
                 .orElseThrow(() -> new PendingEmailNotFoundException("보류 이메일에 존재하지 않습니다."));
+
+        // 인증코드 일치 확인
+        if (!pendingEmail.getAuthCode().equals(domain.getCode())) {
+            throw new EmailVerificationCodeNotFoundException("인증코드가 일치하지 않습니다.");
+        }
 
         // 인증 코드 저장
         pendingEmail.setAuthCode(domain.getCode());

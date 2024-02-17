@@ -2,6 +2,7 @@ package com.example.demo.global.auth.jwt;
 
 
 import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.model.User;
 import com.example.demo.global.auth.PrincipalDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -48,18 +49,21 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
+    public String generateJwtToken(Authentication authentication) {
+        log.info("getPrincipal: {}", authentication.getPrincipal());
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        return generateJwtToken(principalDetails.toUserDomain());
+    }
+
     /**
      * 토큰 발급
      */
-    public String generateJwtToken(Authentication authentication) {
-        log.info("getPrincipal: {}", authentication.getPrincipal());
-
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+    public String generateJwtToken(User user) {
 
         Map<String, Object> payloads = new HashMap<>();
 
         // Subject (sub): 토큰의 주체를 식별하는 정보입니다.
-        payloads.put("sub", principalDetails.getEmail());
+        payloads.put("sub", user.getEmail());
 
         // Issuer (iss): 토큰을 발급한 발급자를 식별하는 정보입니다.
         payloads.put("iss", TOKEN_PROVIDER);
@@ -67,8 +71,8 @@ public class JwtTokenProvider {
         // Role (role): 사용자의 역할을 나타내는 정보입니다.
         // 사용자가 어떤 권한을 가지고 있는지를 나타낼 수 있습니다.
         payloads.put("role", UserRoleEnumType.ROLE_USER.name());
-        payloads.put("username", principalDetails.getUsername());
-        payloads.put("id", principalDetails.getId());
+        payloads.put("username", user.getUserName());
+        payloads.put("id", user.getId().getId());
 
         Date now = new Date();
         return Jwts.builder()
