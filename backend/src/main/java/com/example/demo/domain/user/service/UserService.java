@@ -11,6 +11,7 @@ import com.example.demo.domain.user.mapper.UserMapper;
 import com.example.demo.domain.user.repository.PendingEmailsRepository;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.global.auth.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PendingEmailsRepository pendingEmailsRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
     private final EmailMapper emailMapper;
     private final UserMapper userMapper;
 
@@ -69,5 +71,21 @@ public class UserService {
             throw new IllegalArgumentException("회원이 존재하지 않습니다.");
         }
         return true;
+    }
+
+    public String login(User cmd) {
+
+        // 이메일 존재 확인
+        User user = userRepository.findByEmail(cmd.getEmail())
+                .map(userMapper::entityToDomain)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        // 비밀번호 확인
+        if (!passwordEncoder.matches(cmd.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 토큰 발행
+        return jwtTokenProvider.generateJwtToken(user);
     }
 }

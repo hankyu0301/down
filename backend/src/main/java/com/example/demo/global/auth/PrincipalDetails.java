@@ -1,5 +1,6 @@
 package com.example.demo.global.auth;
 
+import com.example.demo.domain.user.model.User;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -73,5 +74,21 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    public User toUserDomain() {
+        return User.builder()
+                .id(User.UserId.of(userEntity.getId()))
+                .email(userEntity.getEmail())
+                .password(userEntity.getPassword())
+                .nickName(userEntity.getNickName())
+                .userName(userEntity.getUserName())
+                .provider(userEntity.getProvider())
+                .providerId(userEntity.getProviderId())
+                .role(userEntity.getRole())
+                .termsAgree(userEntity.getTermsAgree())
+                .createdAt(userEntity.getCreatedAt())
+                .updatedAt(userEntity.getUpdatedAt())
+                .build();
     }
 }
