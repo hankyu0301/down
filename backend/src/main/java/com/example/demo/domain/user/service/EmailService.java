@@ -111,6 +111,11 @@ public class EmailService {
                 .map(emailMapper::entityToDomain)
                 .orElseThrow(() -> new PendingEmailNotFoundException("보류 이메일에 존재하지 않습니다."));
 
+        // 인증코드 일치 확인
+        if (!pendingEmail.getAuthCode().equals(domain.getCode())) {
+            throw new IllegalArgumentException("인증코드가 일치하지 않습니다.");
+        }
+
         // 인증 코드 저장
         pendingEmail.setAuthCode(domain.getCode());
         pendingEmailsRepository.save(emailMapper.domainToEntity(pendingEmail));
