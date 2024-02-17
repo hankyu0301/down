@@ -45,7 +45,11 @@ public class UserLoginController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "로그인 실패, 요청이 잘못되었습니다.",
+                            description =
+                                    """
+                                    - 회원이 존재하지 않습니다.
+                                    - 비밀번호가 일치하지 않습니다.
+                                    """,
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = FailResponse.class)

@@ -1,9 +1,5 @@
 package com.example.demo.domain.user.service;
 
-import com.example.demo.domain.user.exception.EmailAlreadyExistsException;
-import com.example.demo.domain.user.exception.EmailVerificationCodeNotFoundException;
-import com.example.demo.domain.user.exception.MaxVerificationAttemptsExceededException;
-import com.example.demo.domain.user.exception.PendingEmailNotFoundException;
 import com.example.demo.domain.user.mapper.EmailMapper;
 import com.example.demo.domain.user.model.EmailVerification;
 import com.example.demo.domain.user.model.PendingEmail;
@@ -44,7 +40,7 @@ public class EmailService {
     public Boolean registerPendingEmail(PendingEmail pendingEmail) {
 
         if (userRepository.existsByEmail(pendingEmail.getEmail())) {
-            throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
+            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
         }
 
         return true;
@@ -79,7 +75,7 @@ public class EmailService {
 
         // 인증 횟수 5번 초과 확인
         if (pendingEmail.getAuthCount() >= MAX_VERIFICATION_ATTEMPTS) {
-            throw new MaxVerificationAttemptsExceededException("인증 횟수 5번을 초과하였습니다.");
+            throw new IllegalArgumentException("인증 횟수 5번을 초과하였습니다.");
         }
 
         // 이메일 전송
@@ -104,17 +100,17 @@ public class EmailService {
 
         // 이메일 인증 코드 확인 3분안에 진행 해야함
         if(!emailRedisRepository.hasVerification(domain.getEmail())) {
-            throw new EmailVerificationCodeNotFoundException("인증코드가 존재하지 않습니다. 이메일 인증을 다시 진행해주세요.");
+            throw new IllegalArgumentException("인증코드가 존재하지 않습니다. 이메일 인증을 다시 진행해주세요.");
         }
 
         // 보류 이메일에 있는지 확인
         PendingEmail pendingEmail = pendingEmailsRepository.findByEmail(domain.getEmail())
                 .map(emailMapper::entityToDomain)
-                .orElseThrow(() -> new PendingEmailNotFoundException("보류 이메일에 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("보류 이메일에 존재하지 않습니다."));
 
         // 인증코드 일치 확인
         if (!pendingEmail.getAuthCode().equals(domain.getCode())) {
-            throw new EmailVerificationCodeNotFoundException("인증코드가 일치하지 않습니다.");
+            throw new IllegalArgumentException("인증코드가 일치하지 않습니다.");
         }
 
         // 인증 코드 저장
