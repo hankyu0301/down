@@ -61,8 +61,11 @@ public class UserJoinController {
                     description = "이메일 중복 체크 성공"
             ),
             @ApiResponse(
-                    responseCode = "409",
-                    description = "사용중이거나, 회원가입을 진행중인 이메일 입니다.",
+                    responseCode = "400",
+                    description =
+                            """
+                            - 이미 사용중인 이메일입니다.
+                            """,
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = FailResponse.class)
@@ -107,24 +110,12 @@ public class UserJoinController {
                     description = "이메일 인증코드 발송 성공"
             ),
             @ApiResponse(
-                    responseCode = "409",
-                    description = "사용중인 이메일입니다.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = FailResponse.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "사용가능한 이메일 확인을 먼저 진행해주시기 바랍니다.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = FailResponse.class)
-                    )
-            ),
-            @ApiResponse(
                     responseCode = "400",
-                    description = "인증 횟수 5번을 초과하였습니다.",
+                    description =
+                            """
+                            - 이미 사용중인 이메일입니다.
+                            - 인증 횟수 5번을 초과하였습니다.
+                            """,
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = FailResponse.class)
@@ -170,8 +161,13 @@ public class UserJoinController {
                     description = "이메일 인증코드 확인 성공"
             ),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "이메일 유효성 검사 또는 이메일 인증코드 발송을 먼저 진행해주시기 바랍니다.",
+                    responseCode = "400",
+                    description =
+                            """
+                            - 인증코드가 존재하지 않습니다. 이메일 인증을 다시 진행해주세요.
+                            - 보류 이메일이 존재하지 않습니다. 이메일 인증을 다시 진행해주세요.
+                            - 인증코드가 일치하지 않습니다.
+                            """,
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = FailResponse.class)
@@ -217,15 +213,11 @@ public class UserJoinController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "이메일 인증코드가 일치하지 않습니다.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = FailResponse.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "이메일 유효성 검사 또는 이메일 인증코드 발송을 먼저 진행해주시기 바랍니다.",
+                    description =
+                            """
+                            - 이메일 유효성 검사를 진행하지 않은 이메일 주소에 대한 요청입니다.
+                            - 이메일 인증코드가 일치하지 않습니다.
+                            """,
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = FailResponse.class)

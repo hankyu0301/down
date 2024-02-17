@@ -57,7 +57,10 @@ public class UserRecoveryController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "회원가입 여부 확인 실패, 회원이 존재하지 않습니다.",
+                    description =
+                            """
+                            - 회원이 존재하지 않습니다.
+                            """,
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = FailResponse.class)
@@ -101,7 +104,10 @@ public class UserRecoveryController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "임시 비밀번호 전송 실패, 회원이 존재하지 않습니다.",
+                    description =
+                            """
+                            - 회원이 존재하지 않습니다.
+                            """,
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = FailResponse.class)
