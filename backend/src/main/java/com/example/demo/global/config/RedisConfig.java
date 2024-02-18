@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 @Configuration
 public class RedisConfig {
@@ -52,5 +53,17 @@ public class RedisConfig {
         configuration.setPort(chatPort);
         configuration.setPassword(chatPassword);
         return new LettuceConnectionFactory(configuration);
+    }
+
+
+    /** RedisMessageListenerContainer는 Redis Channel(Topic)로 부터 메시지를 받고,
+     주입된 리스너들에게 비동기적으로 dispatch 하는 역할을 수행하는 컨테이너이다.
+     즉, 발행된 메시지 처리를 위한 리스너들을 설정할 수 있다.
+     */
+    @Bean
+    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory){
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        return container;
     }
 }
