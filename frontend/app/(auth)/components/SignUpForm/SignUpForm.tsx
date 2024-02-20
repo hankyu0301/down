@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signUpSchema } from "../../constants/schema";
 
-import { checkEmailDuplication } from "@/api/signup";
+import { postEmailCheck, postSendEmailCode, postCheckEmailCode } from "@/api/signup";
 
 import {
 	Form,
@@ -18,57 +18,84 @@ import {
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
 
-type EmailCheck = {
+type EmailDuplicationStatus = {
 	success: boolean;
-	checkedEmail: string;
+	data: {checkedEmail: string, available: boolean};
 	message: string;
 };
 
+type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
+
+type EmailValidationStatus = {
+	success: boolean;
+	data: {email: string, result: boolean};
+	message: string;
+}
+
 const SignUpForm = () => {
-	const [emailCheck, setEmailCheck] = useState<EmailCheck | null>(null);
-	const [sentEmailCode, setSentEmailCode] = useState(false);
+	const [emailDuplicationStatus, setEmailDuplicationStatus] =
+		useState<EmailDuplicationStatus | null>(null);
+	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
+		useState<EmailCodeSendingStatus>(null);
+	const [emailValidationStatus, setEmailValidationStatus] =
+		useState<EmailValidationStatus | null>(null);
 
 	const form = useForm<z.infer<typeof signUpSchema>>({
 		resolver: zodResolver(signUpSchema),
+		defaultValues: {
+			email: "",
+			emailCode: "",
+			nickname: "",
+			password: "",
+		}
 	});
-	const { formState: { errors } } = form;
+	const {
+		formState: { errors },
+	} = form;
 
 	// 이메일 중복검사
-	const onCheckEmailDuplication = async () => {
+	const onCheckValidEmail = async () => {
 		const input = await form.trigger("email");
 		if (!input) return;
 
 		const email = form.getValues("email");
-		const response = await checkEmailDuplication(email);
+		const result = await postEmailCheck(email);
+		console.log("onCheckValidEmail result", result);
 
-		console.log("response", response);
-
-		const success = response.success;
-		const checkedEmail = response.data.checkedEmail;
-		const message = response.message;
-
-		setEmailCheck({ success, checkedEmail, message });
+		setEmailDuplicationStatus(result);
 	};
 
 	// 이메일 인증코드 전송
 	const onSendEmailCode = async () => {
-		const email = await form.trigger("email");
-		const emailCode = await form.trigger("emailCode");
+		if (errors.email) return;
+		if (!emailDuplicationStatus?.success) return;
 
-		if (email && emailCode) {
-			try {
-				setSentEmailCode(true);
-				// 이메일 인증코드 전송 로직
-			} catch (error) {
-				setSentEmailCode(false);
+		try {
+			setEmailCodeSendingStatus("sending");
+			const email = form.getValues("email");
+			const result = await postSendEmailCode(email);
+
+			if (result.success) {
+				console.log("이메일 인증코드 전송 result", result)
+				setEmailCodeSendingStatus("success");
+			} else {
+				setEmailCodeSendingStatus("error");
 			}
+			// console.log(emailCodeSendingStatus);
+		} catch (error) {
+			setEmailCodeSendingStatus("error");
 		}
-	}
+	};
 
 	// 이메일 인증코드 확인
 	const onCheckEmailCode = async () => {
-		const email = await form.trigger("email");
-		const emailCode = await form.trigger("emailCode");
+		console.log("emailCodeSendingStatus", emailCodeSendingStatus)
+		if (errors.email || errors.emailCode) return;
+		if (emailCodeSendingStatus !== "success") return;
+
+		const email = form.getValues("email");
+		const code = form.getValues("emailCode");
+		const response = await postCheckEmailCode(email, code);
 	};
 
 	const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
@@ -82,6 +109,7 @@ const SignUpForm = () => {
 					onSubmit={form.handleSubmit(onSubmit)}
 					className="space-y-8"
 				>
+					{/* 이메일 */}
 					<FormField
 						control={form.control}
 						name="email"
@@ -92,17 +120,25 @@ const SignUpForm = () => {
 									<Input
 										placeholder="email@example.com"
 										{...field}
-										onBlur={onCheckEmailDuplication}
+										onBlur={onCheckValidEmail}
 									/>
 								</FormControl>
 								<FormMessage />
-								{!errors.email && emailCheck && (
-									<p className="text-sm font-medium text-stone-500">{emailCheck.message}</p>
+								{!errors.email && emailDuplicationStatus && (
+									<p className="text-sm font-medium text-stone-500">
+										{emailDuplicationStatus.message}
+									</p>
+								)}
+								{!errors.email && emailDuplicationStatus?.success && (
+									<p className="text-sm font-medium text-stone-500">
+										{emailDuplicationStatus.message}
+									</p>
 								)}
 							</FormItem>
 						)}
 					/>
 
+					{/* 이메일 인증코드 */}
 					<FormField
 						control={form.control}
 						name="emailCode"
@@ -116,11 +152,38 @@ const SignUpForm = () => {
 											{...field}
 										/>
 									</FormControl>
-									<Button type="button">
-										{sentEmailCode ? "인증코드 확인" : "인증코드 전송"}
+									<Button
+										className={
+											emailCodeSendingStatus === "success" ? "hidden" : "block"
+										}
+										onClick={onSendEmailCode}
+										disabled={emailCodeSendingStatus === "sending"}
+										type="button"
+									>
+										{emailCodeSendingStatus === "sending" ? "인증코드 전송중" : "인증코드 전송"}
+									</Button>
+									<Button
+										className={
+											emailCodeSendingStatus !== "success" ? "hidden" : "block"
+										}
+										onClick={onCheckEmailCode}
+										type="button"
+									>
+										인증코드 확인
 									</Button>
 								</div>
 								<FormMessage />
+								{!errors.emailCode && emailCodeSendingStatus === "success" && (
+									<p className="text-sm font-medium text-stone-500">
+										인증코드가 전송되었습니다. 메일이 오지 않았다면 스팸메일함을
+										확인해주세요.
+									</p>
+								)}
+								{!errors.emailCode && emailCodeSendingStatus === "error" && (
+									<p className="text-sm font-medium text-destructive">
+										인증코드 전송 중 오류가 발생했습니다. 다시 시도해주세요.
+									</p>
+								)}
 							</FormItem>
 						)}
 					/>
@@ -155,7 +218,7 @@ const SignUpForm = () => {
 								<FormControl>
 									<Input
 										type="password"
-										placeholder="비밀번호를 입력해주세요."
+										placeholder="비밀번호는 영문과 숫자를 포함하여 8~20자로 입력해 주세요."
 										{...field}
 									/>
 								</FormControl>
@@ -252,12 +315,7 @@ const SignUpForm = () => {
 						}}
 					/>
 
-					<Button
-						className="w-full"
-						type="button"
-					>
-						회원가입
-					</Button>
+					<Button className="w-full">회원가입</Button>
 				</form>
 			</Form>
 		</>
