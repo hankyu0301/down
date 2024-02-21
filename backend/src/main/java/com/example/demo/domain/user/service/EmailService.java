@@ -6,6 +6,8 @@ import com.example.demo.domain.user.model.PendingEmail;
 import com.example.demo.domain.user.model.User;
 import com.example.demo.domain.user.repository.PendingEmailsRepository;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.global.exception.CustomException;
+import com.example.demo.global.exception.ExceptionCode;
 import com.example.demo.global.redis.EmailRedisRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -40,7 +42,7 @@ public class EmailService {
     public Boolean registerPendingEmail(PendingEmail pendingEmail) {
 
         if (userRepository.existsByEmail(pendingEmail.getEmail())) {
-            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+            throw CustomException.of(ExceptionCode.ALREADY_EXIST_USER_EMAIL);
         }
 
         return true;
@@ -53,7 +55,7 @@ public class EmailService {
 
         // 이미 사용중인 이메일인지 확인
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+            throw CustomException.of(ExceptionCode.ALREADY_EXIST_USER_EMAIL);
         }
 
         // 보류 이메일이 있는지 확인
@@ -75,7 +77,7 @@ public class EmailService {
 
         // 인증 횟수 5번 초과 확인
         if (pendingEmail.getAuthCount() >= MAX_VERIFICATION_ATTEMPTS) {
-            throw new IllegalArgumentException("인증 횟수 5번을 초과하였습니다.");
+            throw CustomException.of(ExceptionCode.EXCEED_EMAIL_VERIFICATION_ATTEMPTS);
         }
 
         // 이메일 전송
@@ -100,17 +102,17 @@ public class EmailService {
 
         // 이메일 인증 코드 확인 3분안에 진행 해야함
         if(!emailRedisRepository.hasVerification(domain.getEmail())) {
-            throw new IllegalArgumentException("인증코드가 존재하지 않습니다. 이메일 인증을 다시 진행해주세요.");
+            throw CustomException.of(ExceptionCode.NOT_EXIST_EMAIL_VERIFICATION_CODE);
         }
 
         // 보류 이메일에 있는지 확인
         PendingEmail pendingEmail = pendingEmailsRepository.findByEmail(domain.getEmail())
                 .map(emailMapper::entityToDomain)
-                .orElseThrow(() -> new IllegalArgumentException("보류 이메일에 존재하지 않습니다."));
+                .orElseThrow(() -> CustomException.of(ExceptionCode.NOT_EXIST_PENDING_EMAIL));
 
         // 인증코드 일치 확인
         if (!pendingEmail.getAuthCode().equals(domain.getCode())) {
-            throw new IllegalArgumentException("인증코드가 일치하지 않습니다.");
+            throw CustomException.of(ExceptionCode.NOT_MATCH_EMAIL_VERIFICATION_CODE);
         }
 
         // 인증 코드 저장
@@ -135,7 +137,7 @@ public class EmailService {
                     u.setPassword(passwordEncoder.encode(resetPassword));
                     return userRepository.save(u);
                 })
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+                .orElseThrow(() -> CustomException.of(ExceptionCode.NOT_EXIST_USER));
 
         // 이메일 전송
         MimeMessage message = mailSender.createMimeMessage();
@@ -164,5 +166,4 @@ public class EmailService {
 
         return sb.toString();
     }
-
 }

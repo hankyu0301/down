@@ -15,6 +15,11 @@ public class GlobalExceptionHandler {
         return responseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<FailResponse> customExceptionHandler(IllegalArgumentException e) {
+        return responseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
     @ExceptionHandler(OAuth2AuthenticationException.class)
     public ResponseEntity<FailResponse> oAuth2AuthenticationExceptionHandler(OAuth2AuthenticationException e) {
         return responseEntity(HttpStatus.BAD_REQUEST, e.getMessage());

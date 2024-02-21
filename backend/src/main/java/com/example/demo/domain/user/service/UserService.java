@@ -10,6 +10,8 @@ import com.example.demo.domain.user.repository.PendingEmailsRepository;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.LoginEnumType;
 import com.example.demo.global.auth.jwt.JwtTokenProvider;
+import com.example.demo.global.exception.CustomException;
+import com.example.demo.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,11 +40,11 @@ public class UserService {
         // 이메일 확인 코드 보류 이메일에 있는지 확인
         PendingEmail pendingEmail = pendingEmailsRepository.findByEmail(user.getEmail())
                 .map(emailMapper::entityToDomain)
-                .orElseThrow(() -> new IllegalArgumentException("이메일 유효성 검사를 진행하지 않은 이메일 주소에 대한 요청입니다."));
+                .orElseThrow(() -> CustomException.of(ExceptionCode.NOT_VERIFIED_EMAIL));
 
         // 이메일 확인 코드가 일치하는지 확인
         if (!pendingEmail.getAuthCode().equals(code)) {
-            throw new IllegalArgumentException("이메일 인증코드가 일치하지 않습니다.");
+            throw CustomException.of(ExceptionCode.NOT_MATCH_EMAIL_AUTH_CODE);
         }
 
         // 회원 가입 처리
@@ -66,7 +68,7 @@ public class UserService {
 
     public boolean checkEmail(User user) {
         if (!userRepository.existsByEmailAndUserName(user.getEmail(), user.getUserName())) {
-            throw new IllegalArgumentException("회원이 존재하지 않습니다.");
+            throw CustomException.of(ExceptionCode.NOT_EXIST_USER);
         }
         return true;
     }
@@ -76,11 +78,11 @@ public class UserService {
         // 이메일 존재 확인
         User user = userRepository.findByEmail(cmd.getEmail())
                 .map(userMapper::entityToDomain)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+                .orElseThrow(() -> CustomException.of(ExceptionCode.NOT_EXIST_USER));
 
         // 비밀번호 확인
         if (!passwordEncoder.matches(cmd.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw CustomException.of(ExceptionCode.NOT_MATCH_PASSWORD);
         }
 
         // 토큰 발행
