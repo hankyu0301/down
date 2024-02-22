@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signUpSchema } from "../../constants/schema";
 
-import { postEmailCheck, postSendEmailCode, postCheckEmailCode } from "@/api/signup";
+import { postSendEmailCode, postCheckEmailCode } from "@/api/signup";
 
 import {
 	Form,
@@ -17,12 +17,7 @@ import {
 	FormMessage,
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
-
-type EmailDuplicationStatus = {
-	success: boolean;
-	data: {checkedEmail: string, available: boolean};
-	message: string;
-};
+import { useEmailCheck } from "@/app/(auth)/hooks/useEmailCheck";
 
 type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
 
@@ -33,8 +28,7 @@ type EmailValidationStatus = {
 }
 
 const SignUpForm = () => {
-	const [emailDuplicationStatus, setEmailDuplicationStatus] =
-		useState<EmailDuplicationStatus | null>(null);
+	const { EmailCheckField, emailCheckStatus } = useEmailCheck();
 	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
 		useState<EmailCodeSendingStatus>(null);
 	const [emailValidationStatus, setEmailValidationStatus] =
@@ -49,26 +43,12 @@ const SignUpForm = () => {
 			password: "",
 		}
 	});
-	const {
-		formState: { errors },
-	} = form;
-
-	// 이메일 중복검사
-	const onCheckValidEmail = async () => {
-		const input = await form.trigger("email");
-		if (!input) return;
-
-		const email = form.getValues("email");
-		const result = await postEmailCheck(email);
-		console.log("onCheckValidEmail result", result);
-
-		setEmailDuplicationStatus(result);
-	};
+	const { formState: { errors } } = form;
 
 	// 이메일 인증코드 전송
 	const onSendEmailCode = async () => {
 		if (errors.email) return;
-		if (!emailDuplicationStatus?.success) return;
+		if (!emailCheckStatus?.success) return;
 
 		try {
 			setEmailCodeSendingStatus("sending");
@@ -110,33 +90,7 @@ const SignUpForm = () => {
 					className="space-y-8"
 				>
 					{/* 이메일 */}
-					<FormField
-						control={form.control}
-						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>이메일</FormLabel>
-								<FormControl>
-									<Input
-										placeholder="email@example.com"
-										{...field}
-										onBlur={onCheckValidEmail}
-									/>
-								</FormControl>
-								<FormMessage />
-								{!errors.email && emailDuplicationStatus && (
-									<p className="text-sm font-medium text-stone-500">
-										{emailDuplicationStatus.message}
-									</p>
-								)}
-								{!errors.email && emailDuplicationStatus?.success && (
-									<p className="text-sm font-medium text-stone-500">
-										{emailDuplicationStatus.message}
-									</p>
-								)}
-							</FormItem>
-						)}
-					/>
+					<EmailCheckField />
 
 					{/* 이메일 인증코드 */}
 					<FormField
