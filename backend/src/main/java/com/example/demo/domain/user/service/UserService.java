@@ -36,7 +36,7 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserId join(User user, String code) {
-
+        
         // 이메일 확인 코드 보류 이메일에 있는지 확인
         PendingEmail pendingEmail = pendingEmailsRepository.findByEmail(user.getEmail())
                 .map(emailMapper::entityToDomain)
@@ -51,7 +51,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setProvider(LoginEnumType.SERVICE);
         user.setRole(UserRoleEnumType.ROLE_USER);
-        user.setProviderId(FROM_EMAIL);
+        user.setProviderId(0L);
 
         UserId userId = Optional.of(user)
                 .map(userMapper::domainToEntity)

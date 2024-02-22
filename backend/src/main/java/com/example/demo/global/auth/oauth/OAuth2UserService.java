@@ -61,7 +61,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2UserInfo.getEmail();
         String userName = oAuth2UserInfo.getName();
 
-        Optional<UserEntity> optUser = userRepository.findByEmailAndProviderId(email, providerId);
+        Optional<UserEntity> optUser = userRepository.findByEmailAndProviderId(email, Long.valueOf(providerId));
 
         if (optUser.isPresent()) {
             return new PrincipalDetails(optUser.get(), oAuth2User.getAttributes());
@@ -78,7 +78,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .provider(provider)
                 .termsAgree(true)
                 .password(passwordEncoder.encode(email + OAUTH2_PASSWORD_KEY))
-                .providerId(providerId)
+                .providerId(Long.valueOf(providerId))
                 .role(UserRoleEnumType.ROLE_USER)
                 .build();
 

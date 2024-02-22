@@ -33,7 +33,11 @@ public enum ExceptionCode {
     NOT_MATCH_EMAIL_AUTH_CODE("이메일 인증코드가 일치하지 않습니다.", 400),
 
     // 비밀번호가 일치하지 않습니다.
-    NOT_MATCH_PASSWORD("비밀번호가 일치하지 않습니다.", 400)
+    NOT_MATCH_PASSWORD("비밀번호가 일치하지 않습니다.", 400),
+
+    // 카카오 OAuth 예외
+    KAKAO_OAUTH_ERROR("카카오 OAuth 예외", 400)
+
     ;
 
     private final String message;
