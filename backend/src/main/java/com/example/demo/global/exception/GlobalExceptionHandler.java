@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<FailResponse> customExceptionHandler(IllegalArgumentException e) {
+    public ResponseEntity<FailResponse> customExceptionHandler(CustomException e) {
         return responseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 

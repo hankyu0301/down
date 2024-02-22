@@ -23,6 +23,14 @@ public class UserJoinCommand {
     @Schema(description = "사용자 닉네임", example = "페이커")
     private String nickName;
 
+    @NotBlank(message = "성별은 필수 입력 값입니다.")
+    @Schema(description = "회원가입 여부 확인 성별", example = "male")
+    private String gender;
+
+    @NotBlank(message = "생년월일은 필수 입력 값입니다.")
+    @Schema(description = "회원가입 여부 확인 생년월일", example = "9999-99-99")
+    private String birth;
+
     @NotBlank(message = "사용자 이름은 필수 입력 값입니다.")
     @Schema(description = "사용자 이름", example = "이상혁")
     private String userName;
