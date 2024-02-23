@@ -1,6 +1,6 @@
 package com.example.demo.domain.user.dto.command;
 
-import com.example.demo.domain.user.model.User;
+import com.example.demo.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,11 +17,4 @@ public class UserLoginCommand {
     @NotBlank(message = "로그인 비밀번호는 필수 입력 값입니다.")
     @Schema(description = "로그인 비밀번호", example = "test1234")
     private String password;
-
-    public User toUserDomain() {
-        return User.builder()
-                .email(email)
-                .password(password)
-                .build();
-    }
 }

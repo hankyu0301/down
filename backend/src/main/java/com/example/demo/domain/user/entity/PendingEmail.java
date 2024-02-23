@@ -21,7 +21,7 @@ import org.hibernate.annotations.Comment;
                 @Index(name = "idx_pending_emails_email", columnList = "email")
         }
 )
-public class PendingEmailsEntity extends BaseEntity {
+public class PendingEmail extends BaseEntity {
 
     @Id
     @Comment("PK")

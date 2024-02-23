@@ -1,6 +1,6 @@
 package com.example.demo.domain.user.dto.command;
 
-import com.example.demo.domain.user.model.User;
+import com.example.demo.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -18,11 +18,4 @@ public class UserJoinCheckCommand {
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     @Schema(description = "회원가입 여부 확인 이름", example = "홍길동")
     private String userName;
-
-    public User toUserDomain() {
-        return User.builder()
-                .email(email)
-                .userName(userName)
-                .build();
-    }
 }

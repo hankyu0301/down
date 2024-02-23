@@ -1,8 +1,8 @@
 package com.example.demo.global.auth.jwt;
 
 
+import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.entity.UserRoleEnumType;
-import com.example.demo.domain.user.model.User;
 import com.example.demo.global.auth.PrincipalDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -52,7 +52,7 @@ public class JwtTokenProvider {
     public String generateJwtToken(Authentication authentication) {
         log.info("getPrincipal: {}", authentication.getPrincipal());
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        return generateJwtToken(principalDetails.toUserDomain());
+        return generateJwtToken(principalDetails.toEntity());
     }
 
     /**
@@ -72,7 +72,7 @@ public class JwtTokenProvider {
         // 사용자가 어떤 권한을 가지고 있는지를 나타낼 수 있습니다.
         payloads.put("role", UserRoleEnumType.ROLE_USER.name());
         payloads.put("username", user.getUserName());
-        payloads.put("id", user.getId().getId());
+        payloads.put("id", user.getId());
 
         Date now = new Date();
         return Jwts.builder()

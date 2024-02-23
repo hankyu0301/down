@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.domain.user.entity.UserEntity;
+import com.example.demo.domain.user.entity.User;
 
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2UserInfo.getEmail();
         String userName = oAuth2UserInfo.getName();
 
-        Optional<UserEntity> optUser = userRepository.findByEmailAndProviderId(email, providerId);
+        Optional<User> optUser = userRepository.findByEmailAndProviderId(email, Long.valueOf(providerId));
 
         if (optUser.isPresent()) {
             return new PrincipalDetails(optUser.get(), oAuth2User.getAttributes());
@@ -71,18 +71,18 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException(new OAuth2Error("email_exists"), "이미 가입된 이메일입니다.");
         }
 
-        UserEntity newUser = UserEntity.builder()
+        User newUser = User.builder()
                 .email(email)
                 .userName(userName)
                 .nickName(null)
                 .provider(provider)
                 .termsAgree(true)
                 .password(passwordEncoder.encode(email + OAUTH2_PASSWORD_KEY))
-                .providerId(providerId)
+                .providerId(Long.valueOf(providerId))
                 .role(UserRoleEnumType.ROLE_USER)
                 .build();
 
-        UserEntity user = userRepository.save(newUser);
+        User user = userRepository.save(newUser);
         return new PrincipalDetails(user, oAuth2User.getAttributes());
     }
 }

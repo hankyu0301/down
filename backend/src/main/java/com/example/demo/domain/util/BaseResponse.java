@@ -14,6 +14,6 @@ public abstract class BaseResponse<T> {
     private boolean success;
     @Schema(description = "응답 데이터")
     private T data;
-    @Schema(description = "응답 메시지", example = "요청이 성공했습니다.")
+    @Schema(description = "응답 메시지", example = "성공 응답 메시지")
     private String message;
 }

@@ -13,7 +13,7 @@ import org.hibernate.annotations.Comment;
 @Setter
 @Entity
 @Table(name = "user")
-public class UserEntity extends BaseEntity {
+public class User extends BaseEntity {
     @Id
     @Comment("PK")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,9 +40,17 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LoginEnumType provider;
 
+    @Comment("성별")
+    @Column(name = "gender")
+    private String gender;
+
+    @Comment("생년월일")
+    @Column(name = "birth")
+    private String birth;
+
     @Comment("로그인 공급자 ID")
     @Column(name = "provider_id")
-    private String providerId;
+    private Long providerId;
 
     @Comment("사용자 권한")
     @Column(name = "role")

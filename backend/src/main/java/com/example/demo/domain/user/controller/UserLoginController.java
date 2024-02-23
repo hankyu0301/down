@@ -12,10 +12,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -45,7 +45,11 @@ public class UserLoginController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "로그인 실패, 요청이 잘못되었습니다.",
+                            description =
+                                    """
+                                    - 회원이 존재하지 않습니다.
+                                    - 비밀번호가 일치하지 않습니다.
+                                    """,
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = FailResponse.class)
@@ -55,9 +59,9 @@ public class UserLoginController {
     )
     @PostMapping
     public ResponseEntity<BaseResponse<JwtTokenDTO>> login(
-            @Validated @RequestBody UserLoginCommand cmd
+            @RequestBody @Valid UserLoginCommand cmd
     ) {
-        String accessToken = userService.login(cmd.toUserDomain());
+        String accessToken = userService.login(cmd);
 
         JwtTokenDTO jwtTokenDTO = JwtTokenDTO.of(accessToken);
 
