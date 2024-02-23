@@ -7,7 +7,7 @@ import com.example.demo.domain.chat.entity.ChatMessage;
 import com.example.demo.domain.chat.entity.ChatRoom;
 import com.example.demo.domain.chat.entity.ChatRoomUser;
 import com.example.demo.domain.chat.repository.*;
-import com.example.demo.domain.user.entity.UserEntity;
+import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class ChatMessageService {
 
     public void saveChatMessage(ChatMessageCreateRequest req) {
 
-        UserEntity user = userRepository.findById(req.getUserId()).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findById(req.getUserId()).orElseThrow(EntityNotFoundException::new);
         ChatRoom chatRoom = chatRoomJpaRepository.findById(req.getChatRoomId()).orElseThrow(EntityNotFoundException::new);
         ChatRoomUser chatRoomUser = chatRoomUserJpaRepository.findByUserIdAndChatRoomId(req.getUserId(), req.getChatRoomId()).orElseThrow(EntityNotFoundException::new);
 

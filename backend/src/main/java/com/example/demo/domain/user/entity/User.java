@@ -13,7 +13,7 @@ import org.hibernate.annotations.Comment;
 @Setter
 @Entity
 @Table(name = "user")
-public class UserEntity extends BaseEntity {
+public class User extends BaseEntity {
     @Id
     @Comment("PK")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

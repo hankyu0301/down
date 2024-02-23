@@ -27,7 +27,7 @@ public class ChatRoomController {
     }
 
     @PostMapping("/chatRoom")
-    public void createChatRoom(@Valid @RequestBody ChatRoomCreateRequest req) {
+    public void createChatRoom(@RequestBody @Valid ChatRoomCreateRequest req) {
         chatRoomService.createChatRoom(req);
     }
 

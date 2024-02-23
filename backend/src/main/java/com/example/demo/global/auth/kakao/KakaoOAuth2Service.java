@@ -1,8 +1,7 @@
 package com.example.demo.global.auth.kakao;
 
+import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.entity.UserRoleEnumType;
-import com.example.demo.domain.user.mapper.UserMapper;
-import com.example.demo.domain.user.model.User;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.LoginEnumType;
 import jakarta.transaction.Transactional;
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Optional;
+
 
 @RequiredArgsConstructor
 @Service
@@ -29,7 +28,6 @@ public class KakaoOAuth2Service {
     private String clientSecret;
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     public KaKaoAccessTokenResponse getAccessToken(String code) {
@@ -82,8 +80,8 @@ public class KakaoOAuth2Service {
         Assert.notNull(userInfo, "유저 정보가 존재하지 않습니다.");
 
         // 기존 유저 확인
-        User user = userRepository.findByEmailAndProviderId(userInfo.getEmail(), userInfo.getId())
-                .map(userMapper::entityToDomain)
+
+        return userRepository.findByEmailAndProviderId(userInfo.getEmail(), userInfo.getId())
                 .orElseGet(() -> {
                     // 신규 유저
                     User newUser = User.builder()
@@ -99,13 +97,7 @@ public class KakaoOAuth2Service {
                             .termsAgree(true)
                             .build();
 
-                    return Optional.of(newUser)
-                            .map(userMapper::domainToEntity)
-                            .map(userRepository::save)
-                            .map(userMapper::entityToDomain)
-                            .orElseThrow();
+                    return userRepository.save(newUser);
                 });
-
-        return user;
     }
 }

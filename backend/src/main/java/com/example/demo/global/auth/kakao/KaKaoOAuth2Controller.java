@@ -1,6 +1,6 @@
 package com.example.demo.global.auth.kakao;
 
-import com.example.demo.domain.user.model.User;
+import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.util.SuccessResponse;
 import com.example.demo.global.auth.jwt.JwtTokenDTO;
 import com.example.demo.global.auth.jwt.JwtTokenProvider;
