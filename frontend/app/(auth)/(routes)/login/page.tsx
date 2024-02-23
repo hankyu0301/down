@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import { LoginForm } from "@/app/(auth)/components";
-import { Button } from "@/components/ui";
+import { LoginForm } from "@/app/(auth)/components/login";
 
 const LoginPage = () => {
 	return (

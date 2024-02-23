@@ -3,9 +3,9 @@ import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { signUpSchema } from "../../constants/schema";
+import { signUpSchema } from "../../../constants/sign-up/schema";
 
-import { postEmailCheck, postSendEmailCode, postCheckEmailCode } from "@/api/signup";
+import { postCheckEmailCode } from "@/api/signup";
 
 import {
 	Form,
@@ -18,12 +18,6 @@ import {
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
 
-type EmailDuplicationStatus = {
-	success: boolean;
-	data: {checkedEmail: string, available: boolean};
-	message: string;
-};
-
 type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
 
 type EmailValidationStatus = {
@@ -32,11 +26,7 @@ type EmailValidationStatus = {
 	message: string;
 }
 
-const SignUpForm = () => {
-	const [emailDuplicationStatus, setEmailDuplicationStatus] =
-		useState<EmailDuplicationStatus | null>(null);
-	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
-		useState<EmailCodeSendingStatus>(null);
+const PrevSignUpForm = () => {
 	const [emailValidationStatus, setEmailValidationStatus] =
 		useState<EmailValidationStatus | null>(null);
 
@@ -49,26 +39,12 @@ const SignUpForm = () => {
 			password: "",
 		}
 	});
-	const {
-		formState: { errors },
-	} = form;
-
-	// 이메일 중복검사
-	const onCheckValidEmail = async () => {
-		const input = await form.trigger("email");
-		if (!input) return;
-
-		const email = form.getValues("email");
-		const result = await postEmailCheck(email);
-		console.log("onCheckValidEmail result", result);
-
-		setEmailDuplicationStatus(result);
-	};
+	const { formState: { errors } } = form;
 
 	// 이메일 인증코드 전송
 	const onSendEmailCode = async () => {
 		if (errors.email) return;
-		if (!emailDuplicationStatus?.success) return;
+		if (!emailCheckStatus?.success) return;
 
 		try {
 			setEmailCodeSendingStatus("sending");
@@ -76,12 +52,10 @@ const SignUpForm = () => {
 			const result = await postSendEmailCode(email);
 
 			if (result.success) {
-				console.log("이메일 인증코드 전송 result", result)
 				setEmailCodeSendingStatus("success");
 			} else {
 				setEmailCodeSendingStatus("error");
 			}
-			// console.log(emailCodeSendingStatus);
 		} catch (error) {
 			setEmailCodeSendingStatus("error");
 		}
@@ -89,7 +63,6 @@ const SignUpForm = () => {
 
 	// 이메일 인증코드 확인
 	const onCheckEmailCode = async () => {
-		console.log("emailCodeSendingStatus", emailCodeSendingStatus)
 		if (errors.email || errors.emailCode) return;
 		if (emailCodeSendingStatus !== "success") return;
 
@@ -110,33 +83,7 @@ const SignUpForm = () => {
 					className="space-y-8"
 				>
 					{/* 이메일 */}
-					<FormField
-						control={form.control}
-						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>이메일</FormLabel>
-								<FormControl>
-									<Input
-										placeholder="email@example.com"
-										{...field}
-										onBlur={onCheckValidEmail}
-									/>
-								</FormControl>
-								<FormMessage />
-								{!errors.email && emailDuplicationStatus && (
-									<p className="text-sm font-medium text-stone-500">
-										{emailDuplicationStatus.message}
-									</p>
-								)}
-								{!errors.email && emailDuplicationStatus?.success && (
-									<p className="text-sm font-medium text-stone-500">
-										{emailDuplicationStatus.message}
-									</p>
-								)}
-							</FormItem>
-						)}
-					/>
+					{/* <EmailCheckField /> */}
 
 					{/* 이메일 인증코드 */}
 					<FormField
@@ -156,7 +103,7 @@ const SignUpForm = () => {
 										className={
 											emailCodeSendingStatus === "success" ? "hidden" : "block"
 										}
-										onClick={onSendEmailCode}
+										// onClick={onSendEmailCode}
 										disabled={emailCodeSendingStatus === "sending"}
 										type="button"
 									>
@@ -322,4 +269,4 @@ const SignUpForm = () => {
 	);
 };
 
-export default SignUpForm;
+export default PrevSignUpForm;
