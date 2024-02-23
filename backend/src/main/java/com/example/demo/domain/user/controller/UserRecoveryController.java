@@ -16,10 +16,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,9 +69,9 @@ public class UserRecoveryController {
     })
     @PostMapping("/find-id")
     public ResponseEntity<BaseResponse<EmailExistenceDTO>> checkUserJoin(
-            @Validated @RequestBody UserJoinCheckCommand cmd
+            @RequestBody @Valid UserJoinCheckCommand cmd
     ) {
-        boolean result = userService.checkEmail(cmd.toUserDomain());
+        boolean result = userService.checkEmail(cmd);
 
         EmailExistenceDTO responseDTO = EmailExistenceDTO.builder()
                 .checkedEmail(cmd.getEmail())
@@ -116,10 +116,10 @@ public class UserRecoveryController {
     })
     @PostMapping("/send-reset-password")
     public ResponseEntity<BaseResponse<PasswordResetResponseDTO>> sendResetPassword(
-            @Validated @RequestBody UserJoinCheckCommand cmd
+            @RequestBody @Valid UserJoinCheckCommand cmd
     ) throws MessagingException {
 
-        boolean result = emailService.sendResetPassword(cmd.toUserDomain());
+        boolean result = emailService.sendResetPassword(cmd);
 
         PasswordResetResponseDTO responseDTO = PasswordResetResponseDTO.builder()
                 .email(cmd.getEmail())

@@ -4,6 +4,7 @@ import com.example.demo.domain.user.model.EmailVerification;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -16,13 +17,7 @@ public class CheckEmailVerificationCommand {
     private String email;
 
     @NotBlank(message = "인증코드는 필수 입력 값입니다.")
+    @Size(min = 6, max = 6, message = "인증코드는 6자리입니다.")
     @Schema(description = "인증코드", example = "1A3B5C")
     private String code;
-
-    public EmailVerification toEmailVerificationDomain() {
-        return EmailVerification.builder()
-                .email(email)
-                .code(code)
-                .build();
-    }
 }

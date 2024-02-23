@@ -5,11 +5,11 @@ import com.example.demo.domain.user.dto.command.UserJoinCommand;
 import com.example.demo.domain.user.dto.response.CheckEmailVerificationResponseDTO;
 import com.example.demo.domain.user.dto.response.SendEmailVerificationResponseDTO;
 import com.example.demo.domain.user.dto.response.UserJoinResponseDTO;
-import com.example.demo.domain.user.model.EmailVerification;
 import com.example.demo.domain.user.dto.command.CheckEmailCommand;
 import com.example.demo.domain.user.dto.command.SendEmailVerificationCommand;
 import com.example.demo.domain.user.dto.response.CheckEmailResponseDTO;
-import com.example.demo.domain.user.model.User;
+import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.model.EmailVerification;
 import com.example.demo.domain.user.service.EmailService;
 import com.example.demo.domain.user.service.UserService;
 import com.example.demo.domain.util.*;
@@ -19,11 +19,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +40,6 @@ public class UserJoinController {
 
     private final EmailService emailService;
     private final UserService userService;
-    private final HttpSession httpSession;
 
     @Operation(
             summary = "이메일 중복 체크",
@@ -74,9 +72,9 @@ public class UserJoinController {
     })
     @PostMapping("/check-email")
     public ResponseEntity<BaseResponse<CheckEmailResponseDTO>> checkEmail(
-            @Validated @RequestBody CheckEmailCommand cmd
+            @RequestBody @Valid CheckEmailCommand cmd
     ) {
-        boolean result = emailService.registerPendingEmail(cmd.toPendingEmailDomain());
+        boolean result = emailService.registerPendingEmail(cmd.getEmail());
 
         CheckEmailResponseDTO responseDTO = CheckEmailResponseDTO.builder()
                 .checkedEmail(cmd.getEmail())
@@ -124,10 +122,9 @@ public class UserJoinController {
     })
     @PostMapping("/send-email-verification-code")
     public ResponseEntity<BaseResponse<SendEmailVerificationResponseDTO>> sendEmailVerification(
-            @Validated @RequestBody SendEmailVerificationCommand cmd
+            @RequestBody @Valid SendEmailVerificationCommand cmd
     ) throws MessagingException {
-        EmailVerification domain = emailService.sendEmailVerification(cmd.toEmailVerificationDomain());
-        httpSession.setAttribute(domain.getEmail(), domain.getCode());
+        EmailVerification domain = emailService.sendEmailVerification(cmd);
 
         SendEmailVerificationResponseDTO responseDTO = SendEmailVerificationResponseDTO.builder()
                 .success(true)
@@ -176,9 +173,9 @@ public class UserJoinController {
     })
     @PostMapping("/check-email-verification-code")
     public ResponseEntity<BaseResponse<CheckEmailVerificationResponseDTO>> checkEmailVerification(
-            @Validated @RequestBody CheckEmailVerificationCommand cmd
+            @RequestBody @Valid CheckEmailVerificationCommand cmd
     ) {
-        boolean success = emailService.checkEmailVerification(cmd.toEmailVerificationDomain());
+        boolean success = emailService.checkEmailVerification(cmd);
 
         CheckEmailVerificationResponseDTO responseDTO = CheckEmailVerificationResponseDTO.builder()
                 .email(cmd.getEmail())
@@ -226,12 +223,12 @@ public class UserJoinController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse<UserJoinResponseDTO>> join(
-            @Validated @RequestBody UserJoinCommand cmd
+            @RequestBody @Valid UserJoinCommand cmd
     ) {
-        User.UserId userId = userService.join(cmd.toUserDomain(), cmd.getCode());
+        User user = userService.join(cmd);
 
         UserJoinResponseDTO responseDTO = UserJoinResponseDTO.builder()
-                .id(userId.getId())
+                .id(user.getId())
                 .email(cmd.getEmail())
                 .build();
 

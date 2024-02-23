@@ -10,7 +10,7 @@ import com.example.demo.domain.chat.repository.ChatMessageJpaRepository;
 import com.example.demo.domain.chat.repository.ChatRoomJpaRepository;
 import com.example.demo.domain.chat.repository.ChatRoomRepository;
 import com.example.demo.domain.chat.repository.ChatRoomUserJpaRepository;
-import com.example.demo.domain.user.entity.UserEntity;
+import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +52,10 @@ public class ChatRoomService {
 
         ChatRoom chatRoomJpa = chatRoomJpaRepository.save(new ChatRoom(chatRoomCreateRequest.getChatRoomName()));
 
-        List<UserEntity> userList = userRepository.findAllById(chatRoomCreateRequest.getUserIdList());
+        List<User> userList = userRepository.findAllById(chatRoomCreateRequest.getUserIdList());
         List<ChatRoomUser> chatRoomUserList = new ArrayList<>();
 
-        for(UserEntity user : userList){
+        for(User user : userList){
             ChatRoomUser chatRoomUser = new ChatRoomUser(user, chatRoomJpa);
             chatRoomUserList.add(chatRoomUser);
         }
