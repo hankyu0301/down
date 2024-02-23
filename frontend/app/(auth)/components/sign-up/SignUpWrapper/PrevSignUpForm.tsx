@@ -3,9 +3,9 @@ import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { signUpSchema } from "../../constants/schema";
+import { signUpSchema } from "../../../constants/sign-up/schema";
 
-import { postSendEmailCode, postCheckEmailCode } from "@/api/signup";
+import { postEmailCheck, postSendEmailCode, postCheckEmailCode } from "@/api/signup";
 
 import {
 	Form,
@@ -17,7 +17,8 @@ import {
 	FormMessage,
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
-import { useEmailCheck } from "@/app/(auth)/hooks/useEmailCheck";
+
+import { EmailCheckField } from "@/app/(auth)/components/sign-up";
 
 type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
 
@@ -27,8 +28,7 @@ type EmailValidationStatus = {
 	message: string;
 }
 
-const SignUpForm = () => {
-	const { EmailCheckField, emailCheckStatus } = useEmailCheck();
+const PrevSignUpForm = () => {
 	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
 		useState<EmailCodeSendingStatus>(null);
 	const [emailValidationStatus, setEmailValidationStatus] =
@@ -46,30 +46,27 @@ const SignUpForm = () => {
 	const { formState: { errors } } = form;
 
 	// 이메일 인증코드 전송
-	const onSendEmailCode = async () => {
-		if (errors.email) return;
-		if (!emailCheckStatus?.success) return;
+	// const onSendEmailCode = async () => {
+	// 	if (errors.email) return;
+	// 	if (!emailCheckStatus?.success) return;
 
-		try {
-			setEmailCodeSendingStatus("sending");
-			const email = form.getValues("email");
-			const result = await postSendEmailCode(email);
+	// 	try {
+	// 		setEmailCodeSendingStatus("sending");
+	// 		const email = form.getValues("email");
+	// 		const result = await postSendEmailCode(email);
 
-			if (result.success) {
-				console.log("이메일 인증코드 전송 result", result)
-				setEmailCodeSendingStatus("success");
-			} else {
-				setEmailCodeSendingStatus("error");
-			}
-			// console.log(emailCodeSendingStatus);
-		} catch (error) {
-			setEmailCodeSendingStatus("error");
-		}
-	};
+	// 		if (result.success) {
+	// 			setEmailCodeSendingStatus("success");
+	// 		} else {
+	// 			setEmailCodeSendingStatus("error");
+	// 		}
+	// 	} catch (error) {
+	// 		setEmailCodeSendingStatus("error");
+	// 	}
+	// };
 
 	// 이메일 인증코드 확인
 	const onCheckEmailCode = async () => {
-		console.log("emailCodeSendingStatus", emailCodeSendingStatus)
 		if (errors.email || errors.emailCode) return;
 		if (emailCodeSendingStatus !== "success") return;
 
@@ -90,7 +87,7 @@ const SignUpForm = () => {
 					className="space-y-8"
 				>
 					{/* 이메일 */}
-					<EmailCheckField />
+					{/* <EmailCheckField /> */}
 
 					{/* 이메일 인증코드 */}
 					<FormField
@@ -110,7 +107,7 @@ const SignUpForm = () => {
 										className={
 											emailCodeSendingStatus === "success" ? "hidden" : "block"
 										}
-										onClick={onSendEmailCode}
+										// onClick={onSendEmailCode}
 										disabled={emailCodeSendingStatus === "sending"}
 										type="button"
 									>
@@ -276,4 +273,4 @@ const SignUpForm = () => {
 	);
 };
 
-export default SignUpForm;
+export default PrevSignUpForm;

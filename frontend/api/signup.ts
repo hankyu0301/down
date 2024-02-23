@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import instance from "@/lib/axios/instance";
 
 export const postEmailCheck = async (email: string) => {
@@ -7,10 +7,11 @@ export const postEmailCheck = async (email: string) => {
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.log("checkEmailDuplication axios error", error);
+      console.log("postEmailCheck Api response", error.response?.data);
       return error.response?.data;
     } else {
-      console.log("Different checkEmailDuplication Error than axios", error);
+      console.log("Different emailCheck Error than axios", error);
+      return new Error("Different emailCheck Error than axios");
     }
   }
 };
