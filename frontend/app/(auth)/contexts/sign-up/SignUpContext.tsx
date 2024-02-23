@@ -3,6 +3,7 @@ import React, { useContext, createContext, ReactNode, useMemo, useState, useEffe
 
 interface UserInfo {
   email: string;
+  isEmailCodeChecked: boolean;
   password: string;
   nickname: string;
   gender: "MALE" | "FEMALE" | null;
@@ -19,6 +20,7 @@ const SignupContext = createContext<SignupContextValue | null>(null);
 const SignupContextProvider = ({ children }: { children: ReactNode }) => {
   const [userInfo, setUserInfo] = useState<UserInfo>({
     email: "",
+    isEmailCodeChecked: false,
     password: "",
     nickname: "",
     gender: null,

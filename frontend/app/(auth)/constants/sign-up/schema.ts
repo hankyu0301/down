@@ -3,7 +3,15 @@ import { z } from "zod";
 export const emailCheckFieldSchema = z.object({
 	email: z
 		.string({ required_error: "이메일을 입력해주세요." })
+		.min(1, "이메일을 입력해주세요.")
 		.email({ message: "유효하지 않은 이메일 형식입니다." }),
+});
+
+export const emailCodeFieldSchema = z.object({
+	emailCode: z
+		.string()
+		.min(1, "이메일 인증코드를 입력해주세요.")
+		.length(6, { message: "인증코드를 올바르게 입력해주세요." }),
 });
 
 export const signUpSchema = z

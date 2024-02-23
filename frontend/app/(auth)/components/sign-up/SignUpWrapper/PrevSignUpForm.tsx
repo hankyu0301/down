@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signUpSchema } from "../../../constants/sign-up/schema";
 
-import { postEmailCheck, postSendEmailCode, postCheckEmailCode } from "@/api/signup";
+import { postCheckEmailCode } from "@/api/signup";
 
 import {
 	Form,
@@ -18,8 +18,6 @@ import {
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
 
-import { EmailCheckField } from "@/app/(auth)/components/sign-up";
-
 type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
 
 type EmailValidationStatus = {
@@ -29,8 +27,6 @@ type EmailValidationStatus = {
 }
 
 const PrevSignUpForm = () => {
-	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
-		useState<EmailCodeSendingStatus>(null);
 	const [emailValidationStatus, setEmailValidationStatus] =
 		useState<EmailValidationStatus | null>(null);
 
@@ -46,24 +42,24 @@ const PrevSignUpForm = () => {
 	const { formState: { errors } } = form;
 
 	// 이메일 인증코드 전송
-	// const onSendEmailCode = async () => {
-	// 	if (errors.email) return;
-	// 	if (!emailCheckStatus?.success) return;
+	const onSendEmailCode = async () => {
+		if (errors.email) return;
+		if (!emailCheckStatus?.success) return;
 
-	// 	try {
-	// 		setEmailCodeSendingStatus("sending");
-	// 		const email = form.getValues("email");
-	// 		const result = await postSendEmailCode(email);
+		try {
+			setEmailCodeSendingStatus("sending");
+			const email = form.getValues("email");
+			const result = await postSendEmailCode(email);
 
-	// 		if (result.success) {
-	// 			setEmailCodeSendingStatus("success");
-	// 		} else {
-	// 			setEmailCodeSendingStatus("error");
-	// 		}
-	// 	} catch (error) {
-	// 		setEmailCodeSendingStatus("error");
-	// 	}
-	// };
+			if (result.success) {
+				setEmailCodeSendingStatus("success");
+			} else {
+				setEmailCodeSendingStatus("error");
+			}
+		} catch (error) {
+			setEmailCodeSendingStatus("error");
+		}
+	};
 
 	// 이메일 인증코드 확인
 	const onCheckEmailCode = async () => {
