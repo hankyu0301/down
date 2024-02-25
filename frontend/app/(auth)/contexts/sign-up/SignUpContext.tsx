@@ -1,29 +1,23 @@
 "use client";
 import React, { useContext, createContext, ReactNode, useMemo, useState, useEffect } from "react";
 
-interface UserInfo {
+export type UserInfoType = {
   email: string;
-  isEmailCodeChecked: boolean;
-  password: string;
-  nickname: string;
-  gender: "MALE" | "FEMALE" | null;
+  emailCode: string;
 }
 
 // useState에서 반환하는 타입과 일치하도록 setUserInfo 타입 조정
 interface SignupContextValue {
-  userInfo: UserInfo;
-  setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>;
+  userInfo: UserInfoType;
+  setUserInfo: React.Dispatch<React.SetStateAction<UserInfoType>>;
 }
 
 const SignupContext = createContext<SignupContextValue | null>(null);
 
 const SignupContextProvider = ({ children }: { children: ReactNode }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo>({
+  const [userInfo, setUserInfo] = useState<UserInfoType>({
     email: "",
-    isEmailCodeChecked: false,
-    password: "",
-    nickname: "",
-    gender: null,
+    emailCode: "",
   });
 
   useEffect(() => {

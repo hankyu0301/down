@@ -23,7 +23,7 @@ interface EmailCheckFieldProps {
   onNext: () => void;
 };
 
-type EmailCheckStatus = {
+type EmailCheckResponse = {
 	success: boolean;
 	data: { checkedEmail: string, available: boolean; } | { errorMessage: string; };
 	message: string;
@@ -33,17 +33,23 @@ type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
 
 const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 	const { userInfo, setUserInfo } = useSignupContext();
-	const { method } = useCommonForm({ schema: emailCheckFieldSchema, checkMode: "onSubmit" });
+	
+	const { method } = useCommonForm({
+		schema: emailCheckFieldSchema,
+		checkMode: "onSubmit",
+		defaultValues: { email: "" },
+	});
 	const { email: formErrors } = method.formState.errors;
-	const [emailCheckStatus, setEmailCheckStatus] =
-		useState<EmailCheckStatus | null>(null);
+
+	const [emailCheckResponse, setEmailCheckResponse] =
+		useState<EmailCheckResponse | null>(null);
 	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
 		useState<EmailCodeSendingStatus>(null);
 
 	const emailValue = method.watch("email");
 
 	useEffect(() => {
-		setEmailCheckStatus(null);
+		setEmailCheckResponse(null);
 	}, [emailValue]);
   
 	const onSubmit = async () => {
@@ -52,7 +58,7 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 
 		const result = await postEmailCheck(emailValue);
 
-		setEmailCheckStatus(result);
+		setEmailCheckResponse(result);
 		
 		if (result.success) {
 			setUserInfo({ ...userInfo, email: emailValue });
@@ -60,7 +66,7 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 	};
 
 	const onSendEmailVerificationCode = async () => {
-		if (!emailCheckStatus || !emailCheckStatus.success) return;
+		if (!emailCheckResponse || !emailCheckResponse.success) return;
 		try {
 			setEmailCodeSendingStatus("sending");
 			const result = await postSendEmailCode(userInfo.email);
@@ -74,12 +80,7 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 		} catch (error) {
 			setEmailCodeSendingStatus("error");
 		}
-
-		// onNext(); // 이메일 인증코드 전송 정상 동작하면 삭제
 	}
-
-	console.log("formErrors", formErrors);
-	console.log("emailCheckStatus", emailCheckStatus)
 	
 	return (
 		<FormFieldWrapper
@@ -102,16 +103,16 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 							<Button type="submit">중복확인</Button>
 						</div>
 						<FormMessage />
-						{!formErrors && emailCheckStatus && (
+						{!formErrors && emailCheckResponse && (
 							<p
 								className={clsx(
 									"text-sm font-medium",
-									emailCheckStatus.success
+									emailCheckResponse.success
 										? "text-stone-500"
 										: "text-destructive"
 								)}
 							>
-								{emailCheckStatus.message}
+								{emailCheckResponse.message}
 							</p>
 						)}
 						{!formErrors && emailCodeSendingStatus === "error" && (

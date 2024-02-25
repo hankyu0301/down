@@ -15,10 +15,10 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormDescription,
 	FormMessage,
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
+import clsx from "clsx";
 
 interface EmailCodeFieldProps {
 	onNext: () => void;
@@ -26,7 +26,7 @@ interface EmailCodeFieldProps {
 
 type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
 
-type EmailCodeStatus = {
+type EmailCodeResponse = {
 	success: boolean;
 	data: { checkedEmail: string; result: boolean } | { errorMessage: string };
 	message: string;
@@ -35,17 +35,20 @@ type EmailCodeStatus = {
 const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 	const { userInfo, setUserInfo } = useSignupContext();
 	const router = useRouter();
-	console.log(userInfo);
+
 	const { method } = useCommonForm({
 		schema: emailCodeFieldSchema,
 		checkMode: "onSubmit",
 	});
 	const { email: formErrors } = method.formState.errors;
+	
 	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
 		useState<EmailCodeSendingStatus>("success");
+	const [emailCodeResponse, setEmailCodeResponse] = useState<EmailCodeResponse | null>(null);
 
 	// 이메일 인증코드 다시 보내기
 	const onSendEmailCode = async () => {
+		setEmailCodeResponse(null);
 		try {
 			setEmailCodeSendingStatus("sending");
 			const result = await postSendEmailCode(userInfo.email);
@@ -67,10 +70,14 @@ const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 
 		const code = method.getValues("emailCode");
 		
-		try {
-			const result = await postCheckEmailCode(userInfo.email, code);
-		} catch (error) {
-			console.log(error);
+		const result = await postCheckEmailCode(userInfo.email, code);
+		
+		console.log(result);
+		setEmailCodeResponse(result);
+
+		if (result.success) {
+			setUserInfo({ ...userInfo, emailCode: code });
+			onNext();
 		}
 	};
 
@@ -79,6 +86,12 @@ const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 			method={method}
 			onSubmit={onCheckEmailCode}
 		>
+			{!formErrors && emailCodeSendingStatus === "success" && (
+				<p className="text-sm font-medium text-stone-500">
+					{userInfo.email}으로 인증코드가 전송되었습니다.
+					<br />메일이 오지 않았다면 스팸메일함을 확인해주세요.
+				</p>
+			)}
 			<FormField
 				control={method.control}
 				name="emailCode"
@@ -106,10 +119,16 @@ const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 							</div>
 						</div>
 						<FormMessage />
-						{!formErrors && emailCodeSendingStatus === "success" && (
-							<p className="text-sm font-medium text-stone-500">
-								{userInfo.email}로 인증코드가 전송되었습니다.
-								<br />메일이 오지 않았다면 스팸메일함을 확인해주세요.
+						{!formErrors && emailCodeResponse && (
+							<p
+								className={clsx(
+									"text-sm font-medium",
+									emailCodeResponse.success
+										? "text-stone-500"
+										: "text-destructive"
+								)}
+							>
+								{emailCodeResponse.message}
 							</p>
 						)}
 						{!formErrors && emailCodeSendingStatus === "error" && (
