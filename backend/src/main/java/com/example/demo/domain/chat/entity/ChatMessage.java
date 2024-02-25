@@ -1,6 +1,6 @@
 package com.example.demo.domain.chat.entity;
 
-import com.example.demo.domain.chat.dto.ChatMessageDto;
+import com.example.demo.domain.chat.dto.response.ChatMessageDto;
 import com.example.demo.domain.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
