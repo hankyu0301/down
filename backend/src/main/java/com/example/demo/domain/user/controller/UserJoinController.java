@@ -1,13 +1,7 @@
 package com.example.demo.domain.user.controller;
 
-import com.example.demo.domain.user.dto.command.CheckEmailVerificationCommand;
-import com.example.demo.domain.user.dto.command.UserJoinCommand;
-import com.example.demo.domain.user.dto.response.CheckEmailVerificationResponseDTO;
-import com.example.demo.domain.user.dto.response.SendEmailVerificationResponseDTO;
-import com.example.demo.domain.user.dto.response.UserJoinResponseDTO;
-import com.example.demo.domain.user.dto.command.CheckEmailCommand;
-import com.example.demo.domain.user.dto.command.SendEmailVerificationCommand;
-import com.example.demo.domain.user.dto.response.CheckEmailResponseDTO;
+import com.example.demo.domain.user.dto.command.*;
+import com.example.demo.domain.user.dto.response.*;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.model.EmailVerification;
 import com.example.demo.domain.user.service.EmailService;
@@ -23,10 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(
         name = "회원가입",
@@ -34,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 )
 @Slf4j
 @RestController
-@RequestMapping("${api.version-path}/user/join")
+@RequestMapping("${api.version-path}/users")
 @RequiredArgsConstructor
 public class UserJoinController {
 
@@ -70,7 +61,7 @@ public class UserJoinController {
                     )
             )
     })
-    @PostMapping("/check-email")
+    @PostMapping("/email/check")
     public ResponseEntity<BaseResponse<CheckEmailResponseDTO>> checkEmail(
             @RequestBody @Valid CheckEmailCommand cmd
     ) {
@@ -120,7 +111,7 @@ public class UserJoinController {
                     )
             )
     })
-    @PostMapping("/send-email-verification-code")
+    @PostMapping("/email/send")
     public ResponseEntity<BaseResponse<SendEmailVerificationResponseDTO>> sendEmailVerification(
             @RequestBody @Valid SendEmailVerificationCommand cmd
     ) throws MessagingException {
@@ -171,7 +162,7 @@ public class UserJoinController {
                     )
             )
     })
-    @PostMapping("/check-email-verification-code")
+    @PostMapping("/email/verify")
     public ResponseEntity<BaseResponse<CheckEmailVerificationResponseDTO>> checkEmailVerification(
             @RequestBody @Valid CheckEmailVerificationCommand cmd
     ) {
@@ -186,6 +177,56 @@ public class UserJoinController {
                 SuccessResponse.<CheckEmailVerificationResponseDTO>builder()
                         .data(responseDTO)
                         .message("이메일 인증코드 확인이 완료되었습니다.")
+                        .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @Operation(
+            summary = "닉네임 중복 체크",
+            description = "회원가입을 진행하는 사용자의 닉네임이 이미 사용중인지 확인합니다.",
+            tags = {"회원가입"}
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "중복 체크할 닉네임 DTO",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CheckNickNameCommand.class)
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "닉네임 중복 체크 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            """
+                            - 이미 사용중인 닉네임입니다.
+                            """,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FailResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/nickname/check")
+    public ResponseEntity<BaseResponse<CheckNickNameResponseDTO>> checkNickName(
+            @RequestBody @Valid CheckNickNameCommand cmd
+    ) {
+        boolean result = userService.checkNickName(cmd);
+
+        CheckNickNameResponseDTO responseDTO = CheckNickNameResponseDTO.builder()
+                .nickName(cmd.getNickName())
+                .available(result)
+                .build();
+
+        SuccessResponse<CheckNickNameResponseDTO> response =
+                SuccessResponse.<CheckNickNameResponseDTO>builder()
+                        .data(responseDTO)
+                        .message("사용 가능한 닉네임입니다.")
                         .build();
 
         return ResponseEntity.ok(response);

@@ -2,6 +2,7 @@ package com.example.demo.domain.user.controller;
 
 
 import com.example.demo.domain.user.dto.command.CheckEmailVerificationCommand;
+import com.example.demo.domain.user.dto.command.CheckNickNameCommand;
 import com.example.demo.domain.user.dto.command.SendEmailVerificationCommand;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.entity.UserRoleEnumType;
@@ -59,7 +60,7 @@ class UserJoinControllerTest {
         given(emailService.registerPendingEmail("test@gmail.com")).willReturn(true);
 
         // When
-        mockMvc.perform(post("/api/v1/user/join/check-email")
+        mockMvc.perform(post("/api/v1/users/email/check")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyJson))
@@ -98,7 +99,7 @@ class UserJoinControllerTest {
                 .willReturn(emailVerification);
 
         // When
-        mockMvc.perform(post("/api/v1/user/join/send-email-verification-code")
+        mockMvc.perform(post("/api/v1/users/email/send")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyJson))
@@ -133,7 +134,7 @@ class UserJoinControllerTest {
                 .willReturn(true);
 
         // When
-        mockMvc.perform(post("/api/v1/user/join/check-email-verification-code")
+        mockMvc.perform(post("/api/v1/users/email/verify")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyJson))
@@ -187,7 +188,7 @@ class UserJoinControllerTest {
         given(userService.join(any())).willReturn(user);
 
         // When
-        mockMvc.perform(post("/api/v1/user/join")
+        mockMvc.perform(post("/api/v1/users")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyJson))
@@ -202,6 +203,39 @@ class UserJoinControllerTest {
                      },
                      "message": "회원가입이 완료되었습니다."
                    }
+                """));
+    }
+
+    @DisplayName("성공 닉네임 중복 체크")
+    @Test
+    @WithMockUser
+    void checkNickName() throws Exception {
+        // Given
+        String requestBodyJson =
+                """
+                    {
+                        "nickName": "페이커"
+                    }
+                """;
+
+        given(userService.checkNickName(any(CheckNickNameCommand.class))).willReturn(true);
+
+        // When
+        mockMvc.perform(post("/api/v1/users/nickname/check")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                    {
+                      "success": true,
+                      "data": {
+                        "nickName": "페이커",
+                        "available": true
+                      },
+                      "message": "사용 가능한 닉네임입니다."
+                    }
                 """));
     }
 }
