@@ -33,7 +33,9 @@ public class UserLoginController {
 
     @Operation(
             summary = "로그인",
-            description = "로그인을 진행합니다.")
+            description = "로그인을 진행합니다.",
+            tags = "로그인"
+    )
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "로그인 정보",
             required = true

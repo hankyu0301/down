@@ -46,7 +46,7 @@ class UserRecoveryControllerTest {
         given(userService.checkEmail(any(UserJoinCheckCommand.class))).willReturn(true);
 
         // When
-        mockMvc.perform(post("/api/v1/user/find-id")
+        mockMvc.perform(post("/api/v1/users/verify")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBodyJson)
                 .with(csrf()))
@@ -58,7 +58,7 @@ class UserRecoveryControllerTest {
                                 "checkedEmail": "test@gmail.com",
                                 "existence": true
                               },
-                              "message": "이메일 중복 체크 성공"
+                              "message": "회원이 존재합니다."
                             }
                         """));
     }
@@ -77,7 +77,7 @@ class UserRecoveryControllerTest {
         given(userService.checkEmail(any(UserJoinCheckCommand.class))).willReturn(true);
 
         // When
-        mockMvc.perform(post("/api/v1/user/find-id")
+        mockMvc.perform(post("/api/v1/users/verify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyJson)
                         .with(csrf()))
@@ -112,7 +112,7 @@ class UserRecoveryControllerTest {
         given(emailService.sendResetPassword(any(UserJoinCheckCommand.class))).willReturn(true);
 
         // When
-        mockMvc.perform(post("/api/v1/user/send-reset-password")
+        mockMvc.perform(post("/api/v1/users/password/reset")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyJson)
                         .with(csrf()))
