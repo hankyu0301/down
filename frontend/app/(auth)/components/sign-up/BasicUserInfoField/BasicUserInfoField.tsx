@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 
@@ -24,7 +25,6 @@ import {
 	Button,
 	Checkbox,
 } from "@/components/ui";
-import { useEffect } from "react";
 
 const BasicUserInfoField = () => {
 	const router = useRouter();

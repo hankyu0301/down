@@ -10,6 +10,8 @@ import { useCommonForm } from "@/app/(auth)/hooks/sign-up/useCommonForm";
 
 import { postEmailCheck, postSendEmailCode } from "@/api/signup";
 
+import { FieldProps, EmailCheckResponse, EmailCodeSendingStatus } from "@/app/(auth)/types/signup";
+
 import {
 	FormControl,
 	FormField,
@@ -18,21 +20,8 @@ import {
 	FormMessage,
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
-import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
 
-interface EmailCheckFieldProps {
-  onNext: () => void;
-};
-
-type EmailCheckResponse = {
-	success: boolean;
-	data: { checkedEmail: string, available: boolean; } | { errorMessage: string; };
-	message: string;
-};
-
-type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
-
-const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
+const EmailCheckField = ({ onNext }: FieldProps) => {
 	const { userEmailInfo, setUserEmailInfo } = useSignupContext();
 	
 	const { method } = useCommonForm({
