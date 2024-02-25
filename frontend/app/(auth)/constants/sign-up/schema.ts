@@ -38,10 +38,10 @@ export const basicUserInfoFieldSchema = z
 		}),
 		birth: z.string(),
 		termsAgree: z
-			.boolean({
-				required_error: "이용약관, 개인정보 수집 및 이용 동의는 필수입니다.",
+			.boolean({ required_error: "이용약관, 개인정보 수집 및 이용 동의는 필수입니다." })
+			.refine(value => value === true, {
+				message: "이용약관, 개인정보 수집 및 이용 동의는 필수입니다."
 			})
-			.default(false),
 	})
 	.refine((data) => data.password === data.passwordCheck, {
 		message: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",

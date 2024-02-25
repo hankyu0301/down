@@ -33,7 +33,7 @@ type EmailCodeResponse = {
 };
 
 const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
-	const { userInfo, setUserInfo } = useSignupContext();
+	const { userEmailInfo, setUserEmailInfo } = useSignupContext();
 	const router = useRouter();
 
 	const { method } = useCommonForm({
@@ -51,7 +51,7 @@ const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 		setEmailCodeResponse(null);
 		try {
 			setEmailCodeSendingStatus("sending");
-			const result = await postSendEmailCode(userInfo.email);
+			const result = await postSendEmailCode(userEmailInfo.email);
 
 			if (result.success) {
 				setEmailCodeSendingStatus("success");
@@ -66,17 +66,17 @@ const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 	// 이메일 인증코드 확인
 	const onCheckEmailCode = async () => {
 		if (emailCodeSendingStatus !== "success") return;
-		if (!userInfo.email) router.refresh();
+		if (!userEmailInfo.email) router.refresh();
 
 		const code = method.getValues("emailCode");
 		
-		const result = await postCheckEmailCode(userInfo.email, code);
+		const result = await postCheckEmailCode(userEmailInfo.email, code);
 		
 		console.log(result);
 		setEmailCodeResponse(result);
 
 		if (result.success) {
-			setUserInfo({ ...userInfo, emailCode: code });
+			setUserEmailInfo({ ...userEmailInfo, emailCode: code });
 			onNext();
 		}
 	};
@@ -88,7 +88,7 @@ const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 		>
 			{!formErrors && emailCodeSendingStatus === "success" && (
 				<p className="text-sm font-medium text-stone-500">
-					{userInfo.email}으로 인증코드가 전송되었습니다.
+					{userEmailInfo.email}으로 인증코드가 전송되었습니다.
 					<br />메일이 오지 않았다면 스팸메일함을 확인해주세요.
 				</p>
 			)}

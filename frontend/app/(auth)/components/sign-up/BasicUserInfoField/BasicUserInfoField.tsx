@@ -1,4 +1,5 @@
 "use client";
+import { redirect } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 
 import { useSignupContext } from "@/app/(auth)/contexts/sign-up/SignUpContext";
@@ -23,18 +24,19 @@ import {
 } from "@/components/ui";
 
 const BasicUserInfoField = () => {
-	const { userInfo } = useSignupContext();
+	const { userEmailInfo } = useSignupContext();
 	const { method } = useCommonForm({
 		schema: basicUserInfoFieldSchema,
 		checkMode: "onSubmit",
 	});
 
 	const onSubmit = async (value: FieldValues) => {
-		console.log("userInfo", userInfo);
+		console.log("userInfo", userEmailInfo);
+		if (!userEmailInfo.email || !userEmailInfo.emailCode) return;
 		
 		const newUserData = {
-			email: userInfo.email,
-			code: userInfo.emailCode,
+			email: userEmailInfo.email,
+			code: userEmailInfo.emailCode,
 			password: value.password,
 			userName: value.username,
 			nickName: value.nickname,
@@ -43,10 +45,14 @@ const BasicUserInfoField = () => {
 			termsAgree: value.termsAgree,
 		};
 
-		console.log("newUserData", newUserData);
-
 		const result = await postSignUp(newUserData);
-		console.log(result);
+
+		if (result.success) {
+			// toastify 회원가입 완료 알림
+			redirect("/login")
+		} else {
+			// toastify 회원가입 에러 알림
+		}
 	};
 
 	return (

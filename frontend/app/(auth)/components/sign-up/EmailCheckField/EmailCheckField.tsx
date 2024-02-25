@@ -32,7 +32,7 @@ type EmailCheckResponse = {
 type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
 
 const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
-	const { userInfo, setUserInfo } = useSignupContext();
+	const { userEmailInfo, setUserEmailInfo } = useSignupContext();
 	
 	const { method } = useCommonForm({
 		schema: emailCheckFieldSchema,
@@ -43,6 +43,7 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 
 	const [emailCheckResponse, setEmailCheckResponse] =
 		useState<EmailCheckResponse | null>(null);
+	const [emailCheckErrorMessage, setEmailCheckErrorMessage] = useState<string | null>(null);
 	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
 		useState<EmailCodeSendingStatus>(null);
 
@@ -50,6 +51,7 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 
 	useEffect(() => {
 		setEmailCheckResponse(null);
+		setEmailCheckErrorMessage(null);
 	}, [emailValue]);
   
 	const onSubmit = async () => {
@@ -61,15 +63,20 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 		setEmailCheckResponse(result);
 		
 		if (result.success) {
-			setUserInfo({ ...userInfo, email: emailValue });
+			setEmailCheckErrorMessage(null);
+			setUserEmailInfo({ ...userEmailInfo, email: emailValue });
 		}
 	};
 
 	const onSendEmailVerificationCode = async () => {
-		if (!emailCheckResponse || !emailCheckResponse.success) return;
+		if (!emailCheckResponse || !emailCheckResponse.success) {
+			setEmailCheckErrorMessage("먼저 이메일 중복확인을 해주세요.");
+			return;
+		};
+
 		try {
 			setEmailCodeSendingStatus("sending");
-			const result = await postSendEmailCode(userInfo.email);
+			const result = await postSendEmailCode(userEmailInfo.email);
 
 			if (result.success) {
 				setEmailCodeSendingStatus("success");
@@ -80,7 +87,7 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 		} catch (error) {
 			setEmailCodeSendingStatus("error");
 		}
-	}
+	};
 	
 	return (
 		<FormFieldWrapper
@@ -103,6 +110,11 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 							<Button type="submit">중복확인</Button>
 						</div>
 						<FormMessage />
+						{!formErrors && !emailCheckResponse && emailCheckErrorMessage && (
+							<p className="text-sm font-medium text-destructive">
+								{emailCheckErrorMessage}
+							</p>
+						)}
 						{!formErrors && emailCheckResponse && (
 							<p
 								className={clsx(
