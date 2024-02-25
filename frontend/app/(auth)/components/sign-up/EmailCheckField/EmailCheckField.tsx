@@ -10,6 +10,8 @@ import { useCommonForm } from "@/app/(auth)/hooks/sign-up/useCommonForm";
 
 import { postEmailCheck, postSendEmailCode } from "@/api/signup";
 
+import { ToastSuccess } from "@/lib/toastifyAlert";
+
 import { FieldProps, EmailCheckResponse, EmailCodeSendingStatus } from "@/app/(auth)/types/signup";
 
 import {
@@ -72,6 +74,7 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 
 			if (result.success) {
 				setEmailCodeSendingStatus("success");
+				ToastSuccess("인증코드가 성공적으로 전송되었습니다.")
 				onNext();
 			} else {
 				setEmailCodeSendingStatus("error");

@@ -11,6 +11,8 @@ import { emailCodeFieldSchema } from "@/app/(auth)/constants/sign-up/schema";
 
 import { postSendEmailCode, postCheckEmailCode } from "@/api/signup";
 
+import { ToastSuccess } from "@/lib/toastifyAlert";
+
 import { EmailCodeResponse, EmailCodeSendingStatus, FieldProps } from "@/app/(auth)/types/signup";
 
 import {
@@ -66,6 +68,7 @@ const EmailCodeField = ({ onNext }: FieldProps) => {
 
 		if (result.success) {
 			setUserEmailInfo({ ...userEmailInfo, emailCode: code });
+			ToastSuccess("인증코드가 확인되었습니다.")
 			onNext();
 		}
 	};
