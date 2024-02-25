@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 )
 @Slf4j
 @RestController
-@RequestMapping("${api.version-path}/user/")
+@RequestMapping("${api.version-path}/users/")
 @RequiredArgsConstructor
 public class UserRecoveryController {
 
@@ -67,7 +67,7 @@ public class UserRecoveryController {
                     )
             )
     })
-    @PostMapping("/find-id")
+    @PostMapping("/verify")
     public ResponseEntity<BaseResponse<EmailExistenceDTO>> checkUserJoin(
             @RequestBody @Valid UserJoinCheckCommand cmd
     ) {
@@ -80,7 +80,7 @@ public class UserRecoveryController {
 
         SuccessResponse<EmailExistenceDTO> response = SuccessResponse.<EmailExistenceDTO>builder()
                 .data(responseDTO)
-                .message("이메일 중복 체크 성공")
+                .message("회원이 존재합니다.")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -114,7 +114,7 @@ public class UserRecoveryController {
                     )
             )
     })
-    @PostMapping("/send-reset-password")
+    @PostMapping("/password/reset")
     public ResponseEntity<BaseResponse<PasswordResetResponseDTO>> sendResetPassword(
             @RequestBody @Valid UserJoinCheckCommand cmd
     ) throws MessagingException {

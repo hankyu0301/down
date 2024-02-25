@@ -4,12 +4,13 @@ package com.example.demo.global.auth.jwt;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.entity.UserRoleEnumType;
 import com.example.demo.global.auth.PrincipalDetails;
+import com.example.demo.global.exception.CustomException;
+import com.example.demo.global.exception.ExceptionCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.xml.bind.DatatypeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +45,7 @@ public class JwtTokenProvider {
      */
     private Claims getClaimsFormToken(String token) {
         return Jwts.parser()
-                .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
+                .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -95,6 +96,15 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * 토큰에서 회원 정보 추출
+     */
+    public String getEmailFormToken(String token) {
+        Claims claims = getClaimsFormToken(token);
+        return claims.get("sub", String.class);
+    }
+
+
     public Authentication getAuthentication(String token) {
         Claims claims = getClaimsFormToken(token);
 
@@ -118,4 +128,19 @@ public class JwtTokenProvider {
         // "Bearer " 이후의 토큰 문자열 추출
         return authorization.substring(7);
     }
+
+    public String authorizationToJwt(String authorizationHeader) {
+
+        if (authorizationHeader == null) {
+            throw new CustomException(ExceptionCode.INVALID_AUTH_HEADER);
+        }
+
+        if (!authorizationHeader.startsWith("Bearer ")) {
+            throw new CustomException(ExceptionCode.INVALID_AUTH_HEADER_FORMAT);
+        }
+
+        // "Bearer " 접두사를 제거한 후 반환
+        return authorizationHeader.substring(7);
+    }
+
 }

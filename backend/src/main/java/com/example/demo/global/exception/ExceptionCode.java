@@ -36,7 +36,13 @@ public enum ExceptionCode {
     NOT_MATCH_PASSWORD("비밀번호가 일치하지 않습니다.", 400),
 
     // 카카오 OAuth 예외
-    KAKAO_OAUTH_ERROR("카카오 OAuth 예외", 400)
+    KAKAO_OAUTH_ERROR("카카오 OAuth 예외", 400),
+
+    EXIST_NICKNAME("사용중인 닉네임 입니다.", 400),
+
+    INVALID_AUTH_HEADER("유효하지 않은 인증 헤더입니다.", 400),
+    INVALID_AUTH_HEADER_FORMAT("올바른 인증 헤더 형식이 아닙니다.", 400),
+
 
     ;
 
