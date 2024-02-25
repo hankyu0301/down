@@ -62,7 +62,6 @@ const EmailCodeField = ({ onNext }: FieldProps) => {
 		
 		const result = await postCheckEmailCode(userEmailInfo.email, code);
 		
-		console.log(result);
 		setEmailCodeResponse(result);
 
 		if (result.success) {
