@@ -1,36 +1,30 @@
 "use client";
 import React, { useContext, createContext, ReactNode, useMemo, useState, useEffect } from "react";
 
-interface UserInfo {
+export type UserEmailInfoType = {
   email: string;
-  isEmailCodeChecked: boolean;
-  password: string;
-  nickname: string;
-  gender: "MALE" | "FEMALE" | null;
+  emailCode: string;
 }
 
-// useState에서 반환하는 타입과 일치하도록 setUserInfo 타입 조정
+// useState에서 반환하는 타입과 일치하도록 setUserEmailInfo 타입 조정
 interface SignupContextValue {
-  userInfo: UserInfo;
-  setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>;
+  userEmailInfo: UserEmailInfoType;
+  setUserEmailInfo: React.Dispatch<React.SetStateAction<UserEmailInfoType>>;
 }
 
 const SignupContext = createContext<SignupContextValue | null>(null);
 
 const SignupContextProvider = ({ children }: { children: ReactNode }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo>({
+  const [userEmailInfo, setUserEmailInfo] = useState<UserEmailInfoType>({
     email: "",
-    isEmailCodeChecked: false,
-    password: "",
-    nickname: "",
-    gender: null,
+    emailCode: "",
   });
 
   useEffect(() => {
-    console.log("SignUpContext userInfo", userInfo);
-  }, [userInfo])
+    console.log("SignUpContext userEmailInfo", userEmailInfo);
+  }, [userEmailInfo])
 
-  const contextValue = useMemo(() => ({ userInfo, setUserInfo }), [userInfo, setUserInfo]);
+  const contextValue = useMemo(() => ({ userEmailInfo, setUserEmailInfo }), [userEmailInfo, setUserEmailInfo]);
 
   return <SignupContext.Provider value={contextValue}>{children}</SignupContext.Provider>;
 };
