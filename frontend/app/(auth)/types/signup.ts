@@ -19,6 +19,13 @@ export type EmailCodeResponse = {
 	message: string;
 };
 
+// BasicUserInfoField
+export type NickNameCheckResponse = {
+  success: boolean;
+  data: { nickName: string; available: boolean; } | Object;
+  message: string;
+}
+
 // api/signup.ts
 export interface NewUserInfo {
   email: string;

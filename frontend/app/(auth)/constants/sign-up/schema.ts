@@ -36,7 +36,7 @@ export const basicUserInfoFieldSchema = z
 		gender: z.enum(["male", "female"], {
 			required_error: "성별을 선택해주세요.",
 		}),
-		birth: z.string(),
+		birth: z.string({ required_error: "생년월일을 입력해주세요." }),
 		termsAgree: z
 			.boolean({ required_error: "이용약관, 개인정보 수집 및 이용 동의는 필수입니다." })
 			.refine(value => value === true, {

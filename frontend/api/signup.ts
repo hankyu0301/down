@@ -45,6 +45,20 @@ export const postCheckEmailCode = async (email: string, code: string) => {
   }
 };
 
+export const postCheckNickname = async (nickName: string) => {
+  try {
+    const response = await instance.post("/users/nickname/check", { nickName });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      console.log("Different checkNickname Error than axios", error);
+      return new Error("Different checkNickname Error than axios")
+    }
+  }
+}
+
 export const postSignUp = async (newUserInfo: NewUserInfo) => {
   try {
     const response = await instance.post("/users", newUserInfo);
