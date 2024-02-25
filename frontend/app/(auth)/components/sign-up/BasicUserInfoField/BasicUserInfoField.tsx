@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 
@@ -8,7 +9,9 @@ import { FormFieldWrapper } from "@/app/(auth)/components/sign-up";
 import { useCommonForm } from "@/app/(auth)/hooks/sign-up/useCommonForm";
 import { basicUserInfoFieldSchema } from "@/app/(auth)/constants/sign-up/schema";
 
-import { postSignUp } from "@/api/signup";
+import { postCheckNickname, postSignUp } from "@/api/signup";
+
+import { NickNameCheckResponse } from "@/app/(auth)/types/signup";
 
 import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
 
@@ -24,7 +27,7 @@ import {
 	Button,
 	Checkbox,
 } from "@/components/ui";
-import { useEffect } from "react";
+import clsx from "clsx";
 
 const BasicUserInfoField = () => {
 	const router = useRouter();
@@ -33,6 +36,7 @@ const BasicUserInfoField = () => {
 		schema: basicUserInfoFieldSchema,
 		checkMode: "onSubmit",
 	});
+	const [nickNameCheckResponse, setNickNameCheckResponse] = useState<NickNameCheckResponse | null>(null);
 
 	const password = method.watch("password");
 	const passwordCheck = method.watch("passwordCheck");
@@ -51,9 +55,21 @@ const BasicUserInfoField = () => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [password, passwordCheck])
 
+	const onCheckNickname = async (nickname: string) => {
+		if (!nickname) {
+			method.setError("nickname", { message: "닉네임을 입력해주세요." });
+			setNickNameCheckResponse(null);
+			return;
+		}
+
+		const result = await postCheckNickname(nickname);
+		console.log(result);
+		setNickNameCheckResponse(result);
+	}
+
 	const onSubmit = async (value: FieldValues) => {
-		console.log("userInfo", userEmailInfo);
 		if (!userEmailInfo.email || !userEmailInfo.emailCode) return;
+		if (!nickNameCheckResponse || !nickNameCheckResponse.success) return;
 		
 		const newUserData = {
 			email: userEmailInfo.email,
@@ -104,13 +120,26 @@ const BasicUserInfoField = () => {
 				render={({ field }) => (
 					<FormItem>
 						<FormLabel>닉네임</FormLabel>
-						<FormControl>
-							<Input
-								placeholder="닉네임을 입력해주세요."
-								{...field}
-							/>
-						</FormControl>
+						<div className="flex gap-2">
+							<FormControl>
+								<Input
+									placeholder="닉네임을 입력해주세요."
+									{...field}
+								/>
+							</FormControl>
+							<Button
+								type="button"
+								onClick={() => onCheckNickname(field.value)}
+							>
+								중복확인
+							</Button>
+						</div>
 						<FormMessage />
+						{nickNameCheckResponse && (
+							<p className={clsx("text-sm font-medium", nickNameCheckResponse.success ? "text-stone-500": "text-destructive")}>
+								{nickNameCheckResponse.message}
+							</p>
+						)}
 					</FormItem>
 				)}
 			/>

@@ -1,13 +1,14 @@
 import axios from "axios";
 import instance from "@/lib/axios/instance";
 
+import { NewUserInfo } from "@/app/(auth)/types/signup";
+
 export const postEmailCheck = async (email: string) => {
   try {
     const response = await instance.post("/users/email/check", { email });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      // console.log("postEmailCheck Api response", error.response?.data);
       return error.response?.data;
     } else {
       console.log("Different emailCheck Error than axios", error);
@@ -33,7 +34,6 @@ export const postSendEmailCode = async (email: string) => {
 export const postCheckEmailCode = async (email: string, code: string) => {
   try {
     const response = await instance.post("/users/email/verify", { email, code });
-    console.log(response.data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -45,15 +45,18 @@ export const postCheckEmailCode = async (email: string, code: string) => {
   }
 };
 
-interface NewUserInfo {
-  email: string;
-  password: string;
-  nickName: string;
-  gender: "male" | "female";
-  birth: string;
-  userName: string;
-  code: string;
-  termsAgree: boolean;
+export const postCheckNickname = async (nickName: string) => {
+  try {
+    const response = await instance.post("/users/nickname/check", { nickName });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      console.log("Different checkNickname Error than axios", error);
+      return new Error("Different checkNickname Error than axios")
+    }
+  }
 }
 
 export const postSignUp = async (newUserInfo: NewUserInfo) => {

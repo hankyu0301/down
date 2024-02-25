@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { EmailCheckField, EmailCodeField, BasicUserInfoField } from "@/app/(auth)/components/sign-up";
 
-// type SignUpStep = "이메일중복확인" | "이메일인증" | "비밀번호설정" | "초기회원정보";
-type SignUpStep = "이메일중복확인" | "이메일인증" | "비밀번호설정"
+// type SignUpStep = "이메일중복확인" | "이메일인증" | "기본회원정보입력" | "추가회원정보입력";
+type SignUpStep = "이메일중복확인" | "이메일인증" | "기본회원정보입력"
 
 export const useStep = (initialStep: SignUpStep) => {
   const [currentStep, setCurrentStep] = useState(initialStep);
@@ -15,7 +15,7 @@ export const useStep = (initialStep: SignUpStep) => {
   const stepComponents = {
     이메일중복확인: EmailCheckField,
     이메일인증: EmailCodeField,
-    비밀번호설정: BasicUserInfoField,
+    기본회원정보입력: BasicUserInfoField,
   };
 
   const getCurrentComponent = () => {

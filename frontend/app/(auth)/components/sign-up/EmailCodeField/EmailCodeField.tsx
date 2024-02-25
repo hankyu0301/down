@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import clsx from "clsx";
 
 import { useSignupContext } from "@/app/(auth)/contexts/sign-up/SignUpContext";
 import { FormFieldWrapper } from "@/app/(auth)/components/sign-up";
@@ -10,6 +11,10 @@ import { emailCodeFieldSchema } from "@/app/(auth)/constants/sign-up/schema";
 
 import { postSendEmailCode, postCheckEmailCode } from "@/api/signup";
 
+import { ToastSuccess } from "@/lib/toastifyAlert";
+
+import { EmailCodeResponse, EmailCodeSendingStatus, FieldProps } from "@/app/(auth)/types/signup";
+
 import {
 	FormControl,
 	FormField,
@@ -18,21 +23,8 @@ import {
 	FormMessage,
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
-import clsx from "clsx";
 
-interface EmailCodeFieldProps {
-	onNext: () => void;
-}
-
-type EmailCodeSendingStatus = "sending" | "success" | "error" | null;
-
-type EmailCodeResponse = {
-	success: boolean;
-	data: { checkedEmail: string; result: boolean } | { errorMessage: string };
-	message: string;
-};
-
-const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
+const EmailCodeField = ({ onNext }: FieldProps) => {
 	const { userEmailInfo, setUserEmailInfo } = useSignupContext();
 	const router = useRouter();
 
@@ -72,11 +64,11 @@ const EmailCodeField = ({ onNext }: EmailCodeFieldProps) => {
 		
 		const result = await postCheckEmailCode(userEmailInfo.email, code);
 		
-		console.log(result);
 		setEmailCodeResponse(result);
 
 		if (result.success) {
 			setUserEmailInfo({ ...userEmailInfo, emailCode: code });
+			ToastSuccess("인증코드가 확인되었습니다.")
 			onNext();
 		}
 	};
