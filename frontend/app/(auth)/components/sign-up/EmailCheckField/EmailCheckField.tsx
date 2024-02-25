@@ -18,6 +18,7 @@ import {
 	FormMessage,
 } from "@/components/ui";
 import { Input, Button } from "@/components/ui";
+import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
 
 interface EmailCheckFieldProps {
   onNext: () => void;
@@ -69,6 +70,8 @@ const EmailCheckField = ({ onNext }: EmailCheckFieldProps) => {
 	};
 
 	const onSendEmailVerificationCode = async () => {
+		const hasEmailInput = await method.trigger("email");
+		if (!hasEmailInput) return;
 		if (!emailCheckResponse || !emailCheckResponse.success) {
 			setEmailCheckErrorMessage("먼저 이메일 중복확인을 해주세요.");
 			return;

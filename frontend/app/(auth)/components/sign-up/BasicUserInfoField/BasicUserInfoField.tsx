@@ -1,5 +1,5 @@
 "use client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 
 import { useSignupContext } from "@/app/(auth)/contexts/sign-up/SignUpContext";
@@ -9,6 +9,8 @@ import { useCommonForm } from "@/app/(auth)/hooks/sign-up/useCommonForm";
 import { basicUserInfoFieldSchema } from "@/app/(auth)/constants/sign-up/schema";
 
 import { postSignUp } from "@/api/signup";
+
+import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
 
 import {
 	FormControl,
@@ -22,13 +24,32 @@ import {
 	Button,
 	Checkbox,
 } from "@/components/ui";
+import { useEffect } from "react";
 
 const BasicUserInfoField = () => {
+	const router = useRouter();
 	const { userEmailInfo } = useSignupContext();
 	const { method } = useCommonForm({
 		schema: basicUserInfoFieldSchema,
 		checkMode: "onSubmit",
 	});
+
+	const password = method.watch("password");
+	const passwordCheck = method.watch("passwordCheck");
+
+	useEffect(() => {
+		if (password && passwordCheck) {
+			if (password !== passwordCheck) {
+				method.setError("passwordCheck", {
+					type: "onChange",
+					message: "비밀번호와 비밀번호 확인이 일치하지 않습니다."
+				});
+			} else {
+				method.clearErrors("passwordCheck");
+			}
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [password, passwordCheck])
 
 	const onSubmit = async (value: FieldValues) => {
 		console.log("userInfo", userEmailInfo);
@@ -48,10 +69,10 @@ const BasicUserInfoField = () => {
 		const result = await postSignUp(newUserData);
 
 		if (result.success) {
-			// toastify 회원가입 완료 알림
-			redirect("/login")
+			ToastSuccess("회원가입이 완료되었습니다.")
+			router.push("/login")
 		} else {
-			// toastify 회원가입 에러 알림
+			ToastError("회원가입 중 에러가 발생했습니다. 다시 시도해주세요.")
 		}
 	};
 
@@ -123,6 +144,7 @@ const BasicUserInfoField = () => {
 								type="password"
 								placeholder="비밀번호를 다시 입력해주세요."
 								{...field}
+								onChange={field.onChange}
 							/>
 						</FormControl>
 						<FormMessage />

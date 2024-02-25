@@ -62,7 +62,7 @@ export const postSignUp = async (newUserInfo: NewUserInfo) => {
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      // console.log("postEmailCheck Api response", error.response?.data);
+      console.log("postEmailCheck Api response", error.response);
       return error.response?.data;
     } else {
       console.log("Different signUp Error than axios", error);
