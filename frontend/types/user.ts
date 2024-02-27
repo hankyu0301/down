@@ -1,10 +1,15 @@
 import { SportType } from "./sport";
 
-export interface Profile {
-  userId: number;
-  email: string;
-  preferredLocation: string;
-  preferredSport: SportType;
-  createdAt: Date;
-  updatedAt: Date;
+export type AuthData = {
+	userId: number;
+	userToken: string;
+};
+
+export type UserProfileType = UserProfile | "Unauthorized";
+
+export interface UserProfile {
+	id: number;
+	email: string;
+	nickName: string;
+	userName: string;
 }

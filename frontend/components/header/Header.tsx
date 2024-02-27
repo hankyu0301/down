@@ -1,8 +1,9 @@
+"use client";
 import Link from "next/link";
 
 import NavLinks from "./NavLinks";
 
-const NavigationBar = () => {
+const Header = () => {
 	return (
 		<header className="sticky top-0 z-50 w-screen h-14 flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex justify-between items-center">
@@ -17,4 +18,4 @@ const NavigationBar = () => {
 	);
 };
 
-export default NavigationBar;
+export default Header;
