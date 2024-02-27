@@ -32,22 +32,22 @@ export default function RootLayout({
 		>
 			<body className={cn(font.className, "bg-white")}>
 				<QueryProvider>
-					<AuthProvider>
-						<ThemeProvider
-							attribute="class"
-							defaultTheme="system"
-							enableSystem
-						>
-							<ToastProvider>
+					<ToastProvider>
+						<AuthProvider>
+							<ThemeProvider
+								attribute="class"
+								defaultTheme="system"
+								enableSystem
+							>
 								<ModalProvider />
 								<div className="relative flex min-h-screen flex-col">
 									<Header />
 									<main className="flex-1">{children}</main>
 									<Footer />
 								</div>
-							</ToastProvider>
-						</ThemeProvider>
-					</AuthProvider>
+							</ThemeProvider>
+						</AuthProvider>
+					</ToastProvider>
 				</QueryProvider>
 			</body>
 		</html>
