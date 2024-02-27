@@ -1,8 +1,12 @@
+"use client";
 import Link from "next/link";
 
 import NavLinks from "./NavLinks";
+import { useUser } from "@/hooks/user/useUser";
 
-const NavigationBar = () => {
+const Header = () => {
+	const { user } = useUser();
+	console.log(user);
 	return (
 		<header className="sticky top-0 z-50 w-screen h-14 flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex justify-between items-center">
@@ -17,4 +21,4 @@ const NavigationBar = () => {
 	);
 };
 
-export default NavigationBar;
+export default Header;
