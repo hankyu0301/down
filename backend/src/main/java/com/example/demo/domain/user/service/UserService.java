@@ -9,6 +9,10 @@ import com.example.demo.domain.user.repository.UserPagingAndSortingRepository;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.LoginEnumType;
 import com.example.demo.global.auth.jwt.JwtTokenProvider;
+import com.example.demo.global.auth.jwt.entity.AccessToken;
+import com.example.demo.global.auth.jwt.entity.RefreshToken;
+import com.example.demo.global.auth.jwt.repository.AccessTokenRepository;
+import com.example.demo.global.auth.jwt.repository.RefreshTokenRepository;
 import com.example.demo.global.exception.CustomException;
 import com.example.demo.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.List;
+import java.util.Map;
+
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -28,7 +35,10 @@ public class UserService {
     private final UserPagingAndSortingRepository userPagingAndSortingRepository;
     private final PendingEmailsRepository pendingEmailsRepository;
     private final PasswordEncoder passwordEncoder;
+
     private final JwtTokenProvider jwtTokenProvider;
+    private final AccessTokenRepository accessTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public User join(UserJoinCommand cmd) {
 
@@ -60,7 +70,7 @@ public class UserService {
         return true;
     }
 
-    public String login(UserLoginCommand cmd) {
+    public Map<String, String> login(UserLoginCommand cmd) {
 
         // 이메일 존재 확인
         User user = userRepository.findByEmail(cmd.getEmail())
@@ -72,7 +82,10 @@ public class UserService {
         }
 
         // 토큰 발행
-        return jwtTokenProvider.generateJwtToken(user);
+        return Map.of(
+                "accessToken", jwtTokenProvider.generateAccessToken(user),
+                "refreshToken", jwtTokenProvider.generateRefreshToken(user)
+        );
     }
 
     public boolean checkNickName(CheckNickNameCommand cmd) {
@@ -140,5 +153,62 @@ public class UserService {
 
         return userRepository.findById(id)
                 .orElseThrow(() -> CustomException.of(ExceptionCode.NOT_EXIST_USER));
+    }
+
+    public Map<String, String> refresh(String refreshToken) {
+        Assert.notNull(refreshToken, "refreshToken 필수 입력값 입니다. 확인해 주세요");
+
+        // 토큰 검증
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw CustomException.of(ExceptionCode.INVALID_TOKEN);
+        }
+
+        // 토큰에서 회원 정보 추출
+        String email = jwtTokenProvider.getEmail(refreshToken);
+
+        // 회원 정보로 회원 정보 가져오기
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> CustomException.of(ExceptionCode.NOT_EXIST_USER));
+
+        List<AccessToken> accessTokens = accessTokenRepository.findAllByEmail(email);
+        accessTokens.forEach(accessToken -> accessToken.setUsable(false));
+        accessTokenRepository.saveAll(accessTokens);
+
+        String nweAccessToken = jwtTokenProvider.generateAccessToken(user);
+
+        AccessToken accessToken = AccessToken.builder()
+                .email(email)
+                .accessToken(nweAccessToken)
+                .expiredAt(jwtTokenProvider.getExpire(nweAccessToken))
+                .isUsable(true)
+                .build();
+
+        accessTokenRepository.save(accessToken);
+
+        // 토큰 발행
+        return Map.of(
+                "accessToken", nweAccessToken,
+                "refreshToken", refreshToken
+        );
+    }
+
+    public void logout(String token) {
+        Assert.notNull(token, "token 필수 입력값 입니다. 확인해 주세요");
+
+        // 토큰 검증
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw CustomException.of(ExceptionCode.INVALID_TOKEN);
+        }
+
+        // 토큰에서 회원 정보 추출
+        String email = jwtTokenProvider.getEmail(token);
+
+        List<AccessToken> accessTokens = accessTokenRepository.findAllByEmail(email);
+        accessTokens.forEach(accessToken -> accessToken.setUsable(false));
+        accessTokenRepository.saveAll(accessTokens);
+
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findAllByEmail(email);
+        refreshTokens.forEach(refreshToken -> refreshToken.setUsable(false));
+        refreshTokenRepository.saveAll(refreshTokens);
     }
 }

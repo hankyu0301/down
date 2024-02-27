@@ -208,7 +208,7 @@ public class UserController {
             @RequestHeader("Authorization") String authorizationHeader
     ) {
         String token = jwtTokenProvider.authorizationToJwt(authorizationHeader);
-        String userEmail = jwtTokenProvider.getEmailFormToken(token);
+        String userEmail = jwtTokenProvider.getEmail(token);
 
         boolean result = userService.changePassword(id, cmd, userEmail);
 
