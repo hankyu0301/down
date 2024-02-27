@@ -3,13 +3,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { LoginForm } from "@/app/(auth)/components/login";
-import { useAuth } from "@/components/providers/AuthProvider";
+
+import { useProfile } from "@/hooks/user/useProfile";
 
 const LoginPage = () => {
 	const router = useRouter();
-	const { isLoggedIn } = useAuth();
+	const { user } = useProfile();
 
-	if (isLoggedIn) {
+	if (user) {
 		router.push("/");
 	}
 

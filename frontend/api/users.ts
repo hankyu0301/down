@@ -5,7 +5,7 @@ export const getUserProfile = async (userId: number, userToken: string) => {
 	try {
 		const response = await instance.get(`/users/${userId}`);
 		console.log(response);
-		return response.data;
+		return response.data.data;
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			return error.response?.data;

@@ -32,6 +32,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		setAuthInfo({ userId, userToken });
 	}, []);
 
+	console.log("AuthProvider", authInfo);
+
 	const contextValue = useMemo(
 		() => ({ authInfo, isLoggedIn, setAuthInfo }),
 		[authInfo, isLoggedIn, setAuthInfo]
