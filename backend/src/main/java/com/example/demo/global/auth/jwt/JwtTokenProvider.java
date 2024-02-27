@@ -37,12 +37,12 @@ public class JwtTokenProvider {
     @Value("${jwt.token-provider}")
     private String TOKEN_PROVIDER;
 
-    @Value("${jwt.token-period}")
-    private long TOKEN_PERIOD;
+    @Value("${jwt.refresh-token-period}")
+    private long REFRESH_TOKEN_PERIOD;
 
-    /**
-     * 토큰에서 Claim 추출
-     */
+    @Value("${jwt.access-token-period}")
+    private long ACCESS_TOKEN_PERIOD;
+
     private Claims getClaimsFormToken(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET_KEY)
@@ -50,16 +50,7 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
-    public String generateJwtToken(Authentication authentication) {
-        log.info("getPrincipal: {}", authentication.getPrincipal());
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        return generateJwtToken(principalDetails.toEntity());
-    }
-
-    /**
-     * 토큰 발급
-     */
-    public String generateJwtToken(User user) {
+    public String generateJwtToken(User user, Long period) {
 
         Map<String, Object> payloads = new HashMap<>();
 
@@ -79,14 +70,29 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(payloads)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + TOKEN_PERIOD))
+                .setExpiration(new Date(now.getTime() + period))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 
-    /**
-     * 토큰 검증
-     */
+    public String generateRefreshToken(User user) {
+        return generateJwtToken(user, REFRESH_TOKEN_PERIOD);
+    }
+
+    public String generateAccessToken(User user) {
+        return generateJwtToken(user, ACCESS_TOKEN_PERIOD);
+    }
+
+    public String generateAccessToken(Authentication authentication) {
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        return generateAccessToken(principalDetails.toEntity());
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        return generateRefreshToken(principalDetails.toEntity());
+    }
+
     public boolean validateToken(String token) {
         try {
             Claims claims = getClaimsFormToken(token);
@@ -96,14 +102,15 @@ public class JwtTokenProvider {
         }
     }
 
-    /**
-     * 토큰에서 회원 정보 추출
-     */
-    public String getEmailFormToken(String token) {
+    public String getEmail(String token) {
         Claims claims = getClaimsFormToken(token);
         return claims.get("sub", String.class);
     }
 
+    public Long getExpire(String token) {
+        Claims claims = getClaimsFormToken(token);
+        return claims.getExpiration().getTime();
+    }
 
     public Authentication getAuthentication(String token) {
         Claims claims = getClaimsFormToken(token);
@@ -116,6 +123,15 @@ public class JwtTokenProvider {
                 null,
                 List.of(new SimpleGrantedAuthority(role))
         );
+    }
+
+    public String parseToken(String headerValue) {
+        if (headerValue == null || !headerValue.startsWith("Bearer ")) {
+            return null;
+        }
+
+        // "Bearer " 이후의 토큰 문자열 추출
+        return headerValue.substring(7);
     }
 
     public String parseToken(HttpServletRequest request) {
@@ -142,5 +158,4 @@ public class JwtTokenProvider {
         // "Bearer " 접두사를 제거한 후 반환
         return authorizationHeader.substring(7);
     }
-
 }

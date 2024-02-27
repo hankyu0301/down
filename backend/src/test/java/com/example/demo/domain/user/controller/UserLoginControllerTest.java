@@ -2,6 +2,8 @@ package com.example.demo.domain.user.controller;
 
 import com.example.demo.domain.user.dto.command.UserLoginCommand;
 import com.example.demo.domain.user.service.UserService;
+import com.example.demo.global.auth.jwt.JwtTokenProvider;
+import com.example.demo.global.auth.jwt.service.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -29,6 +33,12 @@ class UserLoginControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
     @DisplayName("로그인 성공")
     @WithMockUser
     @Test
@@ -43,7 +53,9 @@ class UserLoginControllerTest {
                 """;
 
         given(userService.login(any(UserLoginCommand.class)))
-                .willReturn("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+                .willReturn(Map.of(
+                        "accessToken", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                        "refreshToken","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"));
 
         // When
         mockMvc.perform(post("/api/v1/user/login")
@@ -56,6 +68,7 @@ class UserLoginControllerTest {
                           "success": true,
                           "data": {
                             "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
                             "tokenType": "Bearer"
                           },
                           "message": "로그인 성공"

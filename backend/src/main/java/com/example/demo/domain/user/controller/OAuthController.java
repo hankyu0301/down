@@ -22,6 +22,7 @@ public class OAuthController {
         log.info("private page =================================================");
         return "privatePage.html";
     }
+
     @GetMapping("/admin")
     public String adminPage() {
         return "adminPage.html";

@@ -20,14 +20,14 @@ class JwtTokenProviderTest {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
+    @Value("${jwt.access-token-period}")
+    private long ACCESS_TOKEN_PERIOD;
+
     @Value("${jwt.token-provider}")
     private String TOKEN_PROVIDER;
 
-    @Value("${jwt.token-period}")
-    private long TOKEN_PERIOD;
-
     @Test
-    void getEmailFormToken() {
+    void getEmail() {
 
         // given
         String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpc3MiOiJkb3duLXNlcnZlci1qd3QiLCJpZCI6MSwiZXhwIjoxNzE2NTY0OTU4LCJpYXQiOjE3MDg3ODg5NTgsInVzZXJuYW1lIjoidGVzdCJ9.5somLxNq43BKloXJmUTCn0a31hsavnzyVzVpPXk_ed8";
@@ -75,7 +75,7 @@ class JwtTokenProviderTest {
         String token = Jwts.builder()
                 .setClaims(payloads)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + TOKEN_PERIOD))
+                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_PERIOD))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
 

@@ -218,7 +218,7 @@ class UserControllerTest {
                 """;
 
         given(jwtTokenProvider.authorizationToJwt(any())).willReturn("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpc3MiOiJkb3duLXNlcnZlci1qd3QiLCJpZCI6MSwiZXhwIjoxNzE2NTY0OTU4LCJpYXQiOjE3MDg3ODg5NTgsInVzZXJuYW1lIjoidGVzdCJ9.5somLxNq43BKloXJmUTCn0a31hsavnzyVzVpPXk_ed8");
-        given(jwtTokenProvider.getEmailFormToken(any())).willReturn("test@gmail.com");
+        given(jwtTokenProvider.getEmail(any())).willReturn("test@gmail.com");
         given(userService.changePassword(any(Long.class), any(PasswordChangeCommand.class), any(String.class))).willReturn(true);
 
         // When

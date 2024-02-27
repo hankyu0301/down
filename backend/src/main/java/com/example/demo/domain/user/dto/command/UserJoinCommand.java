@@ -55,6 +55,8 @@ public class UserJoinCommand {
                 .email(email)
                 .password(password)
                 .nickName(nickName)
+                .birth(birth)
+                .gender(gender)
                 .userName(userName)
                 .termsAgree(termsAgree)
                 .build();
