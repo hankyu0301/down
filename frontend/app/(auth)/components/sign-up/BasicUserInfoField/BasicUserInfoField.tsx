@@ -36,7 +36,8 @@ const BasicUserInfoField = () => {
 		schema: basicUserInfoFieldSchema,
 		checkMode: "onSubmit",
 	});
-	const [nickNameCheckResponse, setNickNameCheckResponse] = useState<NickNameCheckResponse | null>(null);
+	const [nickNameCheckResponse, setNickNameCheckResponse] =
+		useState<NickNameCheckResponse | null>(null);
 
 	const password = method.watch("password");
 	const passwordCheck = method.watch("passwordCheck");
@@ -46,14 +47,14 @@ const BasicUserInfoField = () => {
 			if (password !== passwordCheck) {
 				method.setError("passwordCheck", {
 					type: "onChange",
-					message: "비밀번호와 비밀번호 확인이 일치하지 않습니다."
+					message: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
 				});
 			} else {
 				method.clearErrors("passwordCheck");
 			}
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [password, passwordCheck])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [password, passwordCheck]);
 
 	const onCheckNickname = async (nickname: string) => {
 		if (!nickname) {
@@ -63,14 +64,13 @@ const BasicUserInfoField = () => {
 		}
 
 		const result = await postCheckNickname(nickname);
-		console.log(result);
 		setNickNameCheckResponse(result);
-	}
+	};
 
 	const onSubmit = async (value: FieldValues) => {
 		if (!userEmailInfo.email || !userEmailInfo.emailCode) return;
 		if (!nickNameCheckResponse || !nickNameCheckResponse.success) return;
-		
+
 		const newUserData = {
 			email: userEmailInfo.email,
 			code: userEmailInfo.emailCode,
@@ -85,10 +85,10 @@ const BasicUserInfoField = () => {
 		const result = await postSignUp(newUserData);
 
 		if (result.success) {
-			ToastSuccess("회원가입이 완료되었습니다.")
-			router.push("/login")
+			ToastSuccess("회원가입이 완료되었습니다.");
+			router.push("/login");
 		} else {
-			ToastError("회원가입 중 에러가 발생했습니다. 다시 시도해주세요.")
+			ToastError("회원가입 중 에러가 발생했습니다. 다시 시도해주세요.");
 		}
 	};
 
@@ -136,7 +136,14 @@ const BasicUserInfoField = () => {
 						</div>
 						<FormMessage />
 						{nickNameCheckResponse && (
-							<p className={clsx("text-sm font-medium", nickNameCheckResponse.success ? "text-stone-500": "text-destructive")}>
+							<p
+								className={clsx(
+									"text-sm font-medium",
+									nickNameCheckResponse.success
+										? "text-stone-500"
+										: "text-destructive"
+								)}
+							>
 								{nickNameCheckResponse.message}
 							</p>
 						)}
