@@ -1,25 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getUserProfile } from "@/api/users";
-import { useAuth } from "@/components/providers/AuthProvider";
 
 import { generateKeys } from "@/lib/query/generateKeys";
-
-import { UserProfile } from "@/types/user";
+import { getCookie } from "@/lib/cookie";
+import { parseJwt } from "@/lib/parseJwt";
 
 import QUERY_KEYS from "@/constants/queryKeys";
+import { ACCESS_TOKEN_COOKIE_KEY } from "@/constants/cookie";
 
 export const useProfile = () => {
-	const {
-		authInfo: { userId, userToken },
-	} = useAuth();
+	const token = getCookie(ACCESS_TOKEN_COOKIE_KEY);
+	const userId = token ? parseJwt(token).id : null;
 
-	const { data: user } = useQuery<UserProfile>({
-		enabled: !!userToken,
-		queryKey: generateKeys(QUERY_KEYS.user, userId, userToken),
-		queryFn: () => getUserProfile(userId, userToken),
+	const {
+		data: user,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: generateKeys(QUERY_KEYS.user, userId),
+		queryFn: () => getUserProfile(userId),
+		retry: 1,
 		staleTime: Infinity,
+		enabled: !!userId,
 	});
 
-	return { user };
+	return user;
 };

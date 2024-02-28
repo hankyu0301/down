@@ -1,10 +1,9 @@
 import axios from "axios";
 import instance from "@/lib/axios/instance";
 
-export const getUserProfile = async (userId: number, userToken: string) => {
+export const getUserProfile = async (userId: number) => {
 	try {
 		const response = await instance.get(`/users/${userId}`);
-		console.log(response);
 		return response.data.data;
 	} catch (error) {
 		if (axios.isAxiosError(error)) {

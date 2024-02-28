@@ -5,7 +5,6 @@ import { Open_Sans } from "next/font/google";
 import { cn } from "@/lib/cn";
 
 import { QueryProvider } from "@/components/providers/QueryProvider";
-import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ModalProvider } from "@/components/providers/ModalProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
@@ -33,20 +32,18 @@ export default function RootLayout({
 			<body className={cn(font.className, "bg-white")}>
 				<QueryProvider>
 					<ToastProvider>
-						<AuthProvider>
-							<ThemeProvider
-								attribute="class"
-								defaultTheme="system"
-								enableSystem
-							>
-								<ModalProvider />
-								<div className="relative flex min-h-screen flex-col">
-									<Header />
-									<main className="flex-1">{children}</main>
-									<Footer />
-								</div>
-							</ThemeProvider>
-						</AuthProvider>
+						<ThemeProvider
+							attribute="class"
+							defaultTheme="system"
+							enableSystem
+						>
+							<ModalProvider />
+							<div className="relative flex min-h-screen flex-col">
+								<Header />
+								<main className="flex-1">{children}</main>
+								<Footer />
+							</div>
+						</ThemeProvider>
 					</ToastProvider>
 				</QueryProvider>
 			</body>
