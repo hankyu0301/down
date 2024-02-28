@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { getCookie } from "../cookie";
+import { getCookie } from "cookies-next";
 import {
 	ACCESS_TOKEN_COOKIE_KEY,
 	REFRESH_TOKEN_COOKIE_KEY,
@@ -18,10 +18,10 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-	const token = getCookie(ACCESS_TOKEN_COOKIE_KEY);
+	const accessToken = getCookie(ACCESS_TOKEN_COOKIE_KEY);
 
-	if (token) {
-		config.headers.Authorization = `Bearer ${token}`;
+	if (accessToken) {
+		config.headers.Authorization = `Bearer ${accessToken}`;
 	}
 
 	return config;
@@ -32,6 +32,8 @@ instance.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config;
 
+		const refreshToken = getCookie(REFRESH_TOKEN_COOKIE_KEY);
+
 		if (error.response) {
 			if (
 				error.response.status === 401 &&
@@ -39,7 +41,6 @@ instance.interceptors.response.use(
 			) {
 				if (!originalRequest.shouldRetry) {
 					originalRequest.shouldRetry = true;
-					const refreshToken = getCookie(REFRESH_TOKEN_COOKIE_KEY);
 					try {
 						// refresh token으로 새로운 access token을 발급받는 API 호출
 						const { data } = await instance.post("/user/login/refresh", {

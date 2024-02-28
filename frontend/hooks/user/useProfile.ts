@@ -1,17 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
+import { jwtDecode } from "jwt-decode";
+import { getCookie } from "cookies-next";
 
 import { getUserProfile } from "@/api/users";
 
 import { generateKeys } from "@/lib/query/generateKeys";
-import { getCookie } from "@/lib/cookie";
-import { parseJwt } from "@/lib/parseJwt";
 
 import QUERY_KEYS from "@/constants/queryKeys";
 import { ACCESS_TOKEN_COOKIE_KEY } from "@/constants/cookie";
 
+interface JwtPayload {
+	sub: string;
+	role: string;
+	iss: string;
+	id: number;
+	exp: number;
+	iat: number;
+	username: string;
+}
+
 export const useProfile = () => {
 	const token = getCookie(ACCESS_TOKEN_COOKIE_KEY);
-	const userId = token ? parseJwt(token).id : null;
+	const payload: JwtPayload = jwtDecode(token!);
+	const userId = payload.id;
 
 	const {
 		data: user,

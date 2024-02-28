@@ -1,12 +1,18 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { LoginForm } from "@/app/(auth)/components/login";
 import { useProfile } from "@/hooks/user/useProfile";
 
 const LoginPage = () => {
 	const user = useProfile();
-	console.log("유저", user);
+	const router = useRouter();
+
+	if (user) {
+		router.push("/");
+	}
+
 	return (
 		<section className="w-full flex flex-col items-center justify-center">
 			<div className="md:w-[32rem] w-full py-28 px-10 flex flex-col gap-8 justify-center">

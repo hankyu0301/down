@@ -4,7 +4,6 @@ import { postUserLogin } from "@/api/login";
 
 import { setCookie } from "@/lib/cookie";
 
-import { parseJwt } from "@/lib/parseJwt";
 import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
 
 import {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui";
-// import { useAuth } from "@/hooks/user/useAuth";
+import { useProfile } from "@/hooks/user/useProfile";
 
 const navLinks = [
 	{ label: "모임", href: "/gathering" },
@@ -9,6 +9,7 @@ const navLinks = [
 ];
 
 const NavLinks = () => {
+	const user = useProfile();
 	return (
 		<ul className="flex gap-6 items-center">
 			{navLinks.map((link) => (
@@ -16,16 +17,13 @@ const NavLinks = () => {
 					<Link href={link.href}>{link.label}</Link>
 				</li>
 			))}
-			{/* {user ? (
+			{user ? (
 				<Button variant="outline">{user.nickName} 님</Button>
 			) : (
 				<Link href="/login">
 					<Button variant="outline">로그인</Button>
 				</Link>
-			)} */}
-			<Link href="/login">
-				<Button variant="outline">로그인</Button>
-			</Link>
+			)}
 		</ul>
 	);
 };
