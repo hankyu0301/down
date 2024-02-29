@@ -1,5 +1,6 @@
 package com.example.demo.global.config;
 
+import com.example.demo.domain.chat.service.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,7 +8,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 
 @Configuration
 public class RedisConfig {
@@ -36,6 +39,16 @@ public class RedisConfig {
     @Value("${spring.redis.password.chat}")
     private String chatPassword;
 
+    @Bean
+    public ChannelTopic channelTopic() {
+        return new ChannelTopic("chatRoom");
+    }
+
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter(RedisSubscriber redisSubscriber) {
+        return new MessageListenerAdapter(redisSubscriber, "sendMessage");
+    }
+
     @Bean(name = "emailRedisConnectionFactory")
     @Primary
     public RedisConnectionFactory emailRedisConnectionFactory() {
@@ -61,9 +74,12 @@ public class RedisConfig {
      즉, 발행된 메시지 처리를 위한 리스너들을 설정할 수 있다.
      */
     @Bean
-    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory){
+    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory,
+                                                              MessageListenerAdapter messageListenerAdapter,
+                                                              ChannelTopic channelTopic){
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(messageListenerAdapter, channelTopic);
         return container;
     }
 }
