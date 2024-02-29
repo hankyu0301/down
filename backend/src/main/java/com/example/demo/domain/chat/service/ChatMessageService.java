@@ -15,12 +15,12 @@ import com.example.demo.global.exception.CustomException;
 import com.example.demo.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-
-import static com.example.demo.domain.chat.repository.ChatRoomRepository.getTopic;
 
 @RequiredArgsConstructor
 @Service
@@ -31,7 +31,8 @@ public class ChatMessageService {
     private final ChatRoomJpaRepository chatRoomJpaRepository;
     private final ChatRoomUserJpaRepository chatRoomUserJpaRepository;
     private final UserRepository userRepository;
-    private final RedisPublisher redisPublisher;
+    private final RedisTemplate redisTemplate;
+    private final ChannelTopic channelTopic;
 
     public void saveChatMessage(ChatMessageCreateRequest req) {
 
@@ -54,11 +55,9 @@ public class ChatMessageService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        String chatRoomIdStr = String.valueOf(req.getChatRoomId());
-
         ChatMessage chatMessage = chatMessageDto.toEntity(chatRoom);
         chatMessageJpaRepository.save(chatMessage); //  MySQL에 저장
-        redisPublisher.messagePublish(getTopic(chatRoomIdStr), chatMessageDto);  //  webSocket에 메세지 발행
+        redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessageDto);
     }
 
     /**
