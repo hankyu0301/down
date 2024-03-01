@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 @Entity
+@Table(name = "chat_room")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom {
