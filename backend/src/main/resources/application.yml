@@ -86,7 +86,8 @@ spring:
 
 jwt:
   secret: 18748a26-b13e-430f-a103-30b3684927db
-  token-period: 7776000000
+  access-token-period: 3600000
+  refresh-token-period: 86400000
   token-provider: down-server-jwt
 
 logging:

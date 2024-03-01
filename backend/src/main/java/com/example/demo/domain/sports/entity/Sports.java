@@ -1,5 +1,6 @@
 package com.example.demo.domain.sports.entity;
 
+import com.example.demo.domain.user.entity.UserSportsInfo;
 import com.example.demo.domain.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Comment;
+
+import java.util.List;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -25,4 +28,7 @@ public class Sports extends BaseEntity {
     @Comment("운동 이름")
     @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "sports")
+    private List<UserSportsInfo> sportsUserInfos;
 }
