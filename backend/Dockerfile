@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine
+FROM  openjdk:17-jdk
 
 ARG JAR_FILE=/build/libs/demo-0.0.1-SNAPSHOT.jar
 
