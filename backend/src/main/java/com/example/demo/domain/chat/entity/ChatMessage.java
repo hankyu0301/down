@@ -9,6 +9,7 @@ import lombok.*;
 @Getter
 @Builder
 @Entity
+@Table(name = "chat_message")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage extends BaseEntity {

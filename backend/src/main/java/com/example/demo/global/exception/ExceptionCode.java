@@ -46,8 +46,9 @@ public enum ExceptionCode {
     NOT_EXIST_CHAT_ROOM_USER("채팅방에 초대되지 않은 회원입니다.", 400),
     ALREADY_EXIST_SPORTS_NAME("이미 사용중인 운동 이름 입니다.", 400),
     NOT_EXIST_SPORTS("해당 스포츠가 존재하지 않습니다.", 400),
-    INVALID_TOKEN("토큰정보가 일치하지 않습니다.", 400),
-    NOT_EXIST_ACCESS_TOKEN("Access 토큰이 존재하지 않습니다.", 400);
+    UNAUTHORIZED_USER("효청한 회원이 일치하지 않습니다.", 400),
+    INVALID_TOKEN("유효하지 않은 토큰입니다.", 400),
+    NOT_EXIST_USER_SPORTS_INFO("사용자 스포츠 정보가 없습니다.", 400);
 
     private final String message;
     private final int httpStatusCode;

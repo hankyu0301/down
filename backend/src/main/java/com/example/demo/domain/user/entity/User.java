@@ -1,11 +1,14 @@
 package com.example.demo.domain.user.entity;
 
+
 import com.example.demo.domain.util.BaseEntity;
 import com.example.demo.global.auth.LoginEnumType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Comment;
+
+import java.util.List;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -60,4 +63,7 @@ public class User extends BaseEntity {
     @Comment("이용약관 동의 여부")
     @Column(name = "terms_agree")
     private Boolean termsAgree;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserSportsInfo> userSportsInfoList;
 }

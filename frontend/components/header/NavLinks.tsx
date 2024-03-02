@@ -3,9 +3,10 @@ import { Button } from "@/components/ui";
 import useProfile from "@/hooks/user/useProfile";
 
 const navLinks = [
-	{ label: "모임", href: "/gathering" },
-	{ label: "강습", href: "/lesson" },
-	{ label: "중고거래", href: "/fleamarket" },
+  { label: "모임", href: "/gathering" },
+  { label: "강습", href: "/lesson" },
+  { label: "중고거래", href: "/fleamarket" },
+  { label: "채팅", href: "/chat" },
 ];
 
 const NavLinks = () => {

@@ -3,6 +3,7 @@ package com.example.demo.global.auth.jwt;
 
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.PrincipalDetails;
 import com.example.demo.global.exception.CustomException;
 import com.example.demo.global.exception.ExceptionCode;
@@ -10,7 +11,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,8 @@ public class JwtTokenProvider {
 
     @Value("${jwt.access-token-period}")
     private long ACCESS_TOKEN_PERIOD;
+
+    private final UserRepository userRepository;
 
     private Claims getClaimsFormToken(String token) {
         return Jwts.parser()
@@ -126,23 +129,13 @@ public class JwtTokenProvider {
     }
 
     public String parseToken(String headerValue) {
-        if (headerValue == null || !headerValue.startsWith("Bearer ")) {
-            return null;
+        Assert.notNull(headerValue, "헤더 값이 없습니다.");
+        if (!headerValue.startsWith("Bearer ")) {
+            throw new CustomException(ExceptionCode.INVALID_AUTH_HEADER_FORMAT);
         }
 
         // "Bearer " 이후의 토큰 문자열 추출
         return headerValue.substring(7);
-    }
-
-    public String parseToken(HttpServletRequest request) {
-        String authorization = request.getHeader("Authorization");
-
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            return null;
-        }
-
-        // "Bearer " 이후의 토큰 문자열 추출
-        return authorization.substring(7);
     }
 
     public String authorizationToJwt(String authorizationHeader) {
@@ -157,5 +150,20 @@ public class JwtTokenProvider {
 
         // "Bearer " 접두사를 제거한 후 반환
         return authorizationHeader.substring(7);
+    }
+
+    public void isAuthorized(String token, Long id) {
+        Assert.notNull(token, "token must not be null");
+        Assert.notNull(id, "id must not be null");
+
+        String email = getEmail(token);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+
+        if (user.getEmail().equals(email)) {
+            return;
+        }
+        throw new CustomException(ExceptionCode.UNAUTHORIZED_USER);
     }
 }
