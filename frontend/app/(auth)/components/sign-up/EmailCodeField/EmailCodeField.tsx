@@ -13,7 +13,13 @@ import { postSendEmailCode, postCheckEmailCode } from "@/api/signup";
 
 import { ToastSuccess } from "@/lib/toastifyAlert";
 
-import { EmailCodeResponse, EmailCodeSendingStatus, FieldProps } from "@/app/(auth)/types/signup";
+import { TOAST_MESSAGE } from "@/constants/toastMessage/signup";
+
+import {
+	EmailCodeResponse,
+	EmailCodeSendingStatus,
+	FieldProps,
+} from "@/app/(auth)/types/signup";
 
 import {
 	FormControl,
@@ -33,10 +39,11 @@ const EmailCodeField = ({ onNext }: FieldProps) => {
 		checkMode: "onSubmit",
 	});
 	const { email: formErrors } = method.formState.errors;
-	
+
 	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
 		useState<EmailCodeSendingStatus>("success");
-	const [emailCodeResponse, setEmailCodeResponse] = useState<EmailCodeResponse | null>(null);
+	const [emailCodeResponse, setEmailCodeResponse] =
+		useState<EmailCodeResponse | null>(null);
 
 	// 이메일 인증코드 다시 보내기
 	const onSendEmailCode = async () => {
@@ -61,14 +68,14 @@ const EmailCodeField = ({ onNext }: FieldProps) => {
 		if (!userEmailInfo.email) router.refresh();
 
 		const code = method.getValues("emailCode");
-		
+
 		const result = await postCheckEmailCode(userEmailInfo.email, code);
-		
+
 		setEmailCodeResponse(result);
 
 		if (result.success) {
 			setUserEmailInfo({ ...userEmailInfo, emailCode: code });
-			ToastSuccess("인증코드가 확인되었습니다.")
+			ToastSuccess(TOAST_MESSAGE.SUCCESS_CHECK_CODE);
 			onNext();
 		}
 	};
@@ -81,7 +88,8 @@ const EmailCodeField = ({ onNext }: FieldProps) => {
 			{!formErrors && emailCodeSendingStatus === "success" && (
 				<p className="text-sm font-medium text-stone-500">
 					{userEmailInfo.email}으로 인증코드가 전송되었습니다.
-					<br />메일이 오지 않았다면 스팸메일함을 확인해주세요.
+					<br />
+					메일이 오지 않았다면 스팸메일함을 확인해주세요.
 				</p>
 			)}
 			<FormField
@@ -104,9 +112,7 @@ const EmailCodeField = ({ onNext }: FieldProps) => {
 									disabled={emailCodeSendingStatus === "sending"}
 									type="button"
 								>
-									{emailCodeSendingStatus === "sending"
-										? "전송중"
-										: "재전송"}
+									{emailCodeSendingStatus === "sending" ? "전송중" : "재전송"}
 								</Button>
 							</div>
 						</div>

@@ -11,8 +11,13 @@ import { useCommonForm } from "@/app/(auth)/hooks/sign-up/useCommonForm";
 import { postEmailCheck, postSendEmailCode } from "@/api/signup";
 
 import { ToastSuccess } from "@/lib/toastifyAlert";
+import { TOAST_MESSAGE } from "@/constants/toastMessage/signup";
 
-import { FieldProps, EmailCheckResponse, EmailCodeSendingStatus } from "@/app/(auth)/types/signup";
+import {
+	FieldProps,
+	EmailCheckResponse,
+	EmailCodeSendingStatus,
+} from "@/app/(auth)/types/signup";
 
 import {
 	FormControl,
@@ -25,7 +30,7 @@ import { Input, Button } from "@/components/ui";
 
 const EmailCheckField = ({ onNext }: FieldProps) => {
 	const { userEmailInfo, setUserEmailInfo } = useSignupContext();
-	
+
 	const { method } = useCommonForm({
 		schema: emailCheckFieldSchema,
 		checkMode: "onSubmit",
@@ -35,7 +40,9 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 
 	const [emailCheckResponse, setEmailCheckResponse] =
 		useState<EmailCheckResponse | null>(null);
-	const [emailCheckErrorMessage, setEmailCheckErrorMessage] = useState<string | null>(null);
+	const [emailCheckErrorMessage, setEmailCheckErrorMessage] = useState<
+		string | null
+	>(null);
 	const [emailCodeSendingStatus, setEmailCodeSendingStatus] =
 		useState<EmailCodeSendingStatus>(null);
 
@@ -45,7 +52,7 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 		setEmailCheckResponse(null);
 		setEmailCheckErrorMessage(null);
 	}, [emailValue]);
-  
+
 	const onSubmit = async () => {
 		const hasEmailInput = await method.trigger("email");
 		if (!hasEmailInput) return;
@@ -53,7 +60,7 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 		const result = await postEmailCheck(emailValue);
 
 		setEmailCheckResponse(result);
-		
+
 		if (result.success) {
 			setEmailCheckErrorMessage(null);
 			setUserEmailInfo({ ...userEmailInfo, email: emailValue });
@@ -66,7 +73,7 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 		if (!emailCheckResponse || !emailCheckResponse.success) {
 			setEmailCheckErrorMessage("먼저 이메일 중복확인을 해주세요.");
 			return;
-		};
+		}
 
 		try {
 			setEmailCodeSendingStatus("sending");
@@ -74,7 +81,7 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 
 			if (result.success) {
 				setEmailCodeSendingStatus("success");
-				ToastSuccess("인증코드가 성공적으로 전송되었습니다.")
+				ToastSuccess(TOAST_MESSAGE.SUCCESS_SEND_CODE);
 				onNext();
 			} else {
 				setEmailCodeSendingStatus("error");
@@ -83,7 +90,7 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 			setEmailCodeSendingStatus("error");
 		}
 	};
-	
+
 	return (
 		<FormFieldWrapper
 			method={method}
@@ -143,6 +150,6 @@ const EmailCheckField = ({ onNext }: FieldProps) => {
 			</Button>
 		</FormFieldWrapper>
 	);
-}
+};
 
 export default EmailCheckField;

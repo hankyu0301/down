@@ -27,7 +27,7 @@ const LoginForm = () => {
 		},
 	});
 
-	const { login } = useLogin();
+	const login = useLogin();
 
 	const onSubmit = async (value: FieldValues) => {
 		login(value.email, value.password);
