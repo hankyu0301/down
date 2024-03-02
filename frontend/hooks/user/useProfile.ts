@@ -1,25 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-
-import { getUserProfile } from "@/api/users";
-import { useAuth } from "@/components/providers/AuthProvider";
-
-import { generateKeys } from "@/lib/query/generateKeys";
-
 import { UserProfile } from "@/types/user";
+import { useQuery } from "@tanstack/react-query";
 
 import QUERY_KEYS from "@/constants/queryKeys";
 
-export const useProfile = () => {
-	const {
-		authInfo: { userId, userToken },
-	} = useAuth();
-
-	const { data: user } = useQuery<UserProfile>({
-		enabled: !!userToken,
-		queryKey: generateKeys(QUERY_KEYS.user, userId, userToken),
-		queryFn: () => getUserProfile(userId, userToken),
+const useProfile = () => {
+	const { data: user } = useQuery<UserProfile | undefined>({
+		queryKey: QUERY_KEYS.user.profile,
 		staleTime: Infinity,
+		retry: 1,
 	});
 
-	return { user };
+	return user;
 };
+export default useProfile;

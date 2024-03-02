@@ -5,7 +5,7 @@ import { Open_Sans } from "next/font/google";
 import { cn } from "@/lib/cn";
 
 import { QueryProvider } from "@/components/providers/QueryProvider";
-import { AuthProvider } from "@/components/providers/AuthProvider";
+import { ProfileProvider } from "@/components/providers/ProfileProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ModalProvider } from "@/components/providers/ModalProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
@@ -33,7 +33,7 @@ export default function RootLayout({
 			<body className={cn(font.className, "bg-white")}>
 				<QueryProvider>
 					<ToastProvider>
-						<AuthProvider>
+						<ProfileProvider>
 							<ThemeProvider
 								attribute="class"
 								defaultTheme="system"
@@ -46,7 +46,7 @@ export default function RootLayout({
 									<Footer />
 								</div>
 							</ThemeProvider>
-						</AuthProvider>
+						</ProfileProvider>
 					</ToastProvider>
 				</QueryProvider>
 			</body>

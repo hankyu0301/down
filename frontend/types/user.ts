@@ -5,8 +5,6 @@ export type AuthData = {
 	userToken: string;
 };
 
-export type UserProfileType = UserProfile | "Unauthorized";
-
 export interface UserProfile {
 	id: number;
 	email: string;
