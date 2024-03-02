@@ -5,6 +5,7 @@ import { deleteCookie } from "cookies-next";
 import { getLogout } from "@/api/login";
 
 import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
+import { TOAST_MESSAGE } from "@/constants/toastMessage/login";
 
 import QUERY_KEYS from "@/constants/queryKeys";
 import {
@@ -22,11 +23,11 @@ export const useLogout = () => {
 			void queryClient.removeQueries({ queryKey: QUERY_KEYS.user.profile });
 			deleteCookie(ACCESS_TOKEN_COOKIE_KEY);
 			deleteCookie(REFRESH_TOKEN_COOKIE_KEY);
-			ToastSuccess("로그아웃 되었습니다.");
+			ToastSuccess(TOAST_MESSAGE.SUCCESS_LOGOUT);
 			router.push("/");
 		},
 		onError: () => {
-			ToastError("로그아웃 중 문제가 발생하였습니다. 다시 시도해주세요.");
+			ToastError(TOAST_MESSAGE.FAIL_LOGOUT);
 		},
 	});
 	return { logout };

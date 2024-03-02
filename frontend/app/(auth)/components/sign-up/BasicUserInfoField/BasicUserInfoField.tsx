@@ -14,6 +14,7 @@ import { postCheckNickname, postSignUp } from "@/api/signup";
 import { NickNameCheckResponse } from "@/app/(auth)/types/signup";
 
 import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
+import { TOAST_MESSAGE } from "@/constants/toastMessage/signup";
 
 import {
 	FormControl,
@@ -85,10 +86,10 @@ const BasicUserInfoField = () => {
 		const result = await postSignUp(newUserData);
 
 		if (result.success) {
-			ToastSuccess("회원가입이 완료되었습니다.");
+			ToastSuccess(TOAST_MESSAGE.SUCCESS_SIGN_UP);
 			router.push("/login");
 		} else {
-			ToastError("회원가입 중 에러가 발생했습니다. 다시 시도해주세요.");
+			ToastError(TOAST_MESSAGE.FAIL_SIGN_UP);
 		}
 	};
 

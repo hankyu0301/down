@@ -6,8 +6,6 @@ import { LogOut } from "lucide-react";
 import useProfile from "@/hooks/user/useProfile";
 import { useLogout } from "@/app/(auth)/hooks/login/useLogout";
 
-import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
-
 import { Button } from "@/components/ui";
 import {
 	DropdownMenu,

@@ -10,6 +10,7 @@ import {
 	ACCESS_TOKEN_COOKIE_KEY,
 	REFRESH_TOKEN_COOKIE_KEY,
 } from "@/constants/cookie";
+import { TOAST_MESSAGE } from "@/constants/toastMessage/login";
 
 export const useLogin = () => {
 	const router = useRouter();
@@ -25,7 +26,7 @@ export const useLogin = () => {
 				setCookie(ACCESS_TOKEN_COOKIE_KEY, accessToken);
 				setCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
 
-				ToastSuccess("로그인 성공!");
+				ToastSuccess(TOAST_MESSAGE.SUCCESS_LOGIN);
 				router.push("/");
 				router.refresh();
 			} else {
@@ -33,7 +34,7 @@ export const useLogin = () => {
 			}
 		} catch (error) {
 			console.log("로그인 실패", error);
-			ToastError("로그인에 실패하였습니다. 다시 시도해주세요.");
+			ToastError(TOAST_MESSAGE.FAIL_LOGIN);
 		}
 	};
 	return { login };
