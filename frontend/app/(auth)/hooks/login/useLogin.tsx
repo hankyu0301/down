@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 
 import { postUserLogin } from "@/api/login";
 
-import { setCookie } from "@/lib/cookie";
+import { setCookie } from "cookies-next";
 
 import { ToastError, ToastSuccess } from "@/lib/toastifyAlert";
 
@@ -18,15 +18,16 @@ export const useLogin = () => {
 		try {
 			const result = await postUserLogin(email, password);
 			if (result.success) {
-				console.log("성공", result.data);
+				// console.log("성공", result.data);
 				const accessToken: string = await result.data.accessToken;
 				const refreshToken: string = await result.data.refreshToken;
 
-				setCookie(ACCESS_TOKEN_COOKIE_KEY, accessToken, 1);
-				setCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken, 1);
+				setCookie(ACCESS_TOKEN_COOKIE_KEY, accessToken);
+				setCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
 
 				ToastSuccess("로그인 성공!");
 				router.push("/");
+				router.refresh();
 			} else {
 				ToastError(result.message);
 			}
