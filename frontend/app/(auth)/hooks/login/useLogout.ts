@@ -30,5 +30,5 @@ export const useLogout = () => {
 			ToastError(TOAST_MESSAGE.FAIL_LOGOUT);
 		},
 	});
-	return { logout };
+	return logout;
 };

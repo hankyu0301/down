@@ -37,5 +37,5 @@ export const useLogin = () => {
 			ToastError(TOAST_MESSAGE.FAIL_LOGIN);
 		}
 	};
-	return { login };
+	return login;
 };

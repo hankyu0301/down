@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import QUERY_KEYS from "@/constants/queryKeys";
 
-const useProfile = () => {
+export const useProfile = () => {
 	const { data: user } = useQuery<UserProfile | undefined>({
 		queryKey: QUERY_KEYS.user.profile,
 		staleTime: Infinity,
@@ -12,4 +12,3 @@ const useProfile = () => {
 
 	return user;
 };
-export default useProfile;

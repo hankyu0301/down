@@ -2,16 +2,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { useProfile } from "@/hooks/user/useProfile";
 import { LoginForm } from "@/app/(auth)/components/login";
-// import { useProfile } from "@/hooks/user/useProfile";
 
 const LoginPage = () => {
-	// const user = useProfile();
-	// const router = useRouter();
+	const user = useProfile();
+	const router = useRouter();
 
-	// if (user) {
-	// 	router.push("/");
-	// }
+	if (user) {
+		router.push("/");
+	}
 
 	return (
 		<section className="w-full flex flex-col items-center justify-center">

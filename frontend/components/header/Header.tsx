@@ -3,7 +3,7 @@ import Link from "next/link";
 import Navigation from "./Navigation";
 import { LogOut } from "lucide-react";
 
-import useProfile from "@/hooks/user/useProfile";
+import { useProfile } from "@/hooks/user/useProfile";
 import { useLogout } from "@/app/(auth)/hooks/login/useLogout";
 
 import { Button } from "@/components/ui";
@@ -18,7 +18,7 @@ import {
 
 const Header = () => {
 	const user = useProfile();
-	const { logout } = useLogout();
+	const logout = useLogout();
 
 	return (
 		<header className="sticky top-0 z-50 w-screen h-14 flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
