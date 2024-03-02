@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui";
-import { useProfile } from "@/hooks/user/useProfile";
+import useProfile from "@/hooks/user/useProfile";
 
 const navLinks = [
 	{ label: "모임", href: "/gathering" },
@@ -10,6 +10,7 @@ const navLinks = [
 
 const NavLinks = () => {
 	const user = useProfile();
+	console.log("USER!!!", user);
 	return (
 		<ul className="flex gap-6 items-center">
 			{navLinks.map((link) => (

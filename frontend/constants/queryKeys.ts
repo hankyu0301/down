@@ -1,5 +1,7 @@
 const QUERY_KEYS = {
-	user: "user",
+	user: {
+		profile: ["user", "profile"],
+	},
 } as const;
 
 export default QUERY_KEYS;

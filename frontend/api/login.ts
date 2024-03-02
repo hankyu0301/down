@@ -19,3 +19,5 @@ export const postUserLogin = async (email: string, password: string) => {
 };
 
 export const getKakaoLogin = async () => {};
+
+export const getLogout = async () => {};
