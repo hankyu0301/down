@@ -1,5 +1,6 @@
 package com.example.demo.domain.user.controller;
 
+import com.example.demo.domain.region.dto.jpql.RegionNameDTO;
 import com.example.demo.domain.user.dto.command.*;
 import com.example.demo.domain.user.dto.response.*;
 import com.example.demo.domain.user.entity.User;
@@ -280,6 +281,48 @@ public class UserJoinController {
                         .build();
 
         // 생성 코드 반환
+        return ResponseEntity.ok(response);
+    }
+
+    // 법정동 코드 등록
+    @Operation(
+            summary = "법정동 코드 등록",
+            description = "회원가입을 진행하는 사용자의 법정동 코드를 등록합니다.",
+            tags = {"회원가입"}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "법정동 코드 등록 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "법정동 코드 등록 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FailResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/{id}/address")
+    public ResponseEntity<BaseResponse<LegalAddressResponseDTO>> registerLegalAddress(
+            @PathVariable Long id,
+            @RequestBody @Valid LegalAddressCommand cmd
+    ) {
+        RegionNameDTO regionNameDTO = userService.registerLegalAddress(id, cmd);
+
+        LegalAddressResponseDTO responseDTO = LegalAddressResponseDTO.builder()
+                .userId(id)
+                .legalAddressCode(cmd.getLegalAddressCode())
+                .address(regionNameDTO.getSiDoName())
+                .build();
+
+        SuccessResponse<LegalAddressResponseDTO> response =
+                SuccessResponse.<LegalAddressResponseDTO>builder()
+                        .data(responseDTO)
+                        .message("법정동 코드 등록이 완료되었습니다.")
+                        .build();
+
         return ResponseEntity.ok(response);
     }
 }

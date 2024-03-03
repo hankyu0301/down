@@ -64,6 +64,10 @@ public class User extends BaseEntity {
     @Column(name = "terms_agree")
     private Boolean termsAgree;
 
+    @Comment("법정동 코드")
+    @Column(name = "legal_address_code")
+    private Long legalAddressCode;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserSportsInfo> userSportsInfoList;
 }

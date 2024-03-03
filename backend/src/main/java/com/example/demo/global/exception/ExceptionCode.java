@@ -48,7 +48,9 @@ public enum ExceptionCode {
     NOT_EXIST_SPORTS("해당 스포츠가 존재하지 않습니다.", 400),
     UNAUTHORIZED_USER("효청한 회원이 일치하지 않습니다.", 400),
     INVALID_TOKEN("유효하지 않은 토큰입니다.", 400),
-    NOT_EXIST_USER_SPORTS_INFO("사용자 스포츠 정보가 없습니다.", 400);
+    NOT_EXIST_USER_SPORTS_INFO("사용자 스포츠 정보가 없습니다.", 400),
+    NOT_FOUND_SI_DO("시/도 를 찾을 수 없는 ID 입니다.", 400),
+    NOT_FOUND_SI_GUN_GU("시/군/구를 찾을 수 없습니다.", 400);
 
     private final String message;
     private final int httpStatusCode;
