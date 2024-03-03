@@ -1,5 +1,8 @@
 package com.example.demo.domain.user.service;
 
+import com.example.demo.domain.region.dto.jpql.RegionNameDTO;
+import com.example.demo.domain.region.repository.SiGunGuRepository;
+import com.example.demo.domain.region.service.SiDoService;
 import com.example.demo.domain.user.dto.command.*;
 import com.example.demo.domain.user.entity.PendingEmail;
 import com.example.demo.domain.user.entity.User;
@@ -39,6 +42,9 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AccessTokenRepository accessTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final SiGunGuRepository siGunGuRepository;
+    private final SiDoService siDoService;
 
     public User join(UserJoinCommand cmd) {
 
@@ -210,5 +216,22 @@ public class UserService {
         List<RefreshToken> refreshTokens = refreshTokenRepository.findAllByEmail(email);
         refreshTokens.forEach(refreshToken -> refreshToken.setUsable(false));
         refreshTokenRepository.saveAll(refreshTokens);
+    }
+
+    public RegionNameDTO registerLegalAddress(Long id, LegalAddressCommand cmd) {
+        Assert.notNull(id, "id 필수 입력값 입니다. 확인해 주세요");
+        Assert.notNull(cmd, "cmd 필수 입력값 입니다. 확인해 주세요");
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> CustomException.of(ExceptionCode.NOT_EXIST_USER));
+
+        if (siGunGuRepository.existsByLegalAddressCode(cmd.getLegalAddressCode())) {
+            throw CustomException.of(ExceptionCode.NOT_FOUND_SI_GUN_GU);
+        }
+
+        user.setLegalAddressCode(cmd.getLegalAddressCode());
+        userRepository.save(user);
+
+        return siDoService.getAddressName(cmd.getLegalAddressCode());
     }
 }
