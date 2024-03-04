@@ -24,6 +24,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cookies-next": "^4.1.1",
+    "date-fns": "^3.3.1",
     "emoji-mart": "^5.5.2",
     "init": "^0.1.2",
     "jwt-decode": "^4.0.0",

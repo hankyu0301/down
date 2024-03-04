@@ -15,12 +15,20 @@ import {
 import { Input } from "@/components/ui/input/input";
 import { Plus } from "lucide-react";
 
+import { useSocket } from "@/components/providers/SocketProvider";
+
 import { EmojiPicker } from "./EmojiPicker";
+import { useProfile } from "@/hooks/user/useProfile";
 
 const formSchema = z.object({
   content: z.string().min(1),
 });
-const ChatInput = () => {
+const ChatInput = (props: any) => {
+  const router = useRouter();
+  const { socket, isConnected } = useSocket();
+
+  const user = useProfile();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -29,9 +37,26 @@ const ChatInput = () => {
   });
 
   const isLoading = form.formState.isSubmitting;
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const newMessage = {
+      type: "msg",
+      data: values.content,
+      id: user?.nickName,
+    };
+
+    socket.send(JSON.stringify(newMessage));
+    props.setMessageList((prev: any) => [
+      ...prev,
+      { msg: values.content, type: "me", id: user?.nickName },
+    ]);
+    props.setMessage("");
+    form.reset();
+  };
+
   return (
     <Form {...form}>
-      <form>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="content"
