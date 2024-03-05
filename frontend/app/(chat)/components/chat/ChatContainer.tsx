@@ -9,6 +9,7 @@ import SockJs from "sockjs-client";
 import SocketIndicator from "@/components/ui/socket/SocketIndicator";
 import { useProfile } from "@/hooks/user/useProfile";
 import { cn } from "@/lib/cn";
+import ChatRoomList from "./ChatRoomList";
 
 const ChatContainer = () => {
   const [message, setMessage] = useState("");
@@ -42,6 +43,7 @@ const ChatContainer = () => {
       socket.send(JSON.stringify(sendData));
       console.log("데이터보냄");
     }
+    console.log(user);
   }, [user]);
 
   useEffect(() => {
@@ -55,6 +57,7 @@ const ChatContainer = () => {
   return (
     <div className="m-auto w-[60%]">
       <SocketIndicator />
+      <ChatRoomList />
       <h3 className="text-lg font-semibold mb-2">
         Login as a "{user?.nickName}"
       </h3>
