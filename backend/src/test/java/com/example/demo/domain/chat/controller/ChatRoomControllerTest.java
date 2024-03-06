@@ -102,8 +102,9 @@ class ChatRoomControllerTest {
 
         // When
         mockMvc.perform(patch("/api/v1/chatRoom/{chatRoomId}/exit", chatRoomId)
-                        .param("userId", String.valueOf(req.getUserId()))
-                        .with(csrf()))
+                        .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
     }
 

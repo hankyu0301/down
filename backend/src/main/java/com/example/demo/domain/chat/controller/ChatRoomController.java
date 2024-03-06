@@ -181,7 +181,7 @@ public class ChatRoomController {
     @PatchMapping("/api/v1/chatRoom/{chatRoomId}/exit")
     public ResponseEntity<BaseResponse<ChatRoomDeleteResponseDto>> exitChatRoom(@Parameter(description = "채팅방 ID", example = "1")
                                                                                     @PathVariable long chatRoomId,
-                                                                                    @Valid @ModelAttribute ChatRoomDeleteRequest req) {
+                                                                                    @Valid @RequestBody ChatRoomDeleteRequest req) {
 
         ChatRoomDeleteResponseDto result = chatRoomService.exitChatroom(chatRoomId, req);
 
@@ -202,7 +202,7 @@ public class ChatRoomController {
             description = "채팅방 초대 요청",
             required = true,
             content = @Content(
-                    schema = @Schema(implementation = ChatRoomCreateRequest.class)
+                    schema = @Schema(implementation = ChatRoomInviteRequest.class)
             )
     )
     @ApiResponses(value = {
