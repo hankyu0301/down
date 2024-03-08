@@ -1,6 +1,6 @@
 package com.example.demo.domain.user.dto.command;
 
-import com.example.demo.domain.user.entity.SportsCareer;
+import com.example.demo.domain.user.entity.EnumSportsCareer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -19,7 +19,7 @@ public class UserSportsInfoCommand {
     @Schema(description = "운동 경력", example = "(입문자, 초보자, 중급자, 마스터, 고인물, 신) 중 1택")
     private String career;
 
-    public SportsCareer getCareer() {
-        return SportsCareer.of(career);
+    public EnumSportsCareer getCareer() {
+        return EnumSportsCareer.of(career);
     }
 }

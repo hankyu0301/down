@@ -5,7 +5,7 @@ import com.example.demo.domain.user.dto.command.CheckEmailVerificationCommand;
 import com.example.demo.domain.user.dto.command.CheckNickNameCommand;
 import com.example.demo.domain.user.dto.command.SendEmailVerificationCommand;
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.model.EmailVerification;
 import com.example.demo.domain.user.service.EmailService;
 import com.example.demo.domain.user.service.UserService;
@@ -179,7 +179,7 @@ class UserJoinControllerTest {
                 .userName("이상혁")
                 .gender("male")
                 .birth("9999-99-99")
-                .role(UserRoleEnumType.ROLE_USER)
+                .role(EnumUserRole.ROLE_USER)
                 .termsAgree(true)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())

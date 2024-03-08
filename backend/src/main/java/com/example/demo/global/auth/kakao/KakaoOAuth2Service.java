@@ -1,9 +1,9 @@
 package com.example.demo.global.auth.kakao;
 
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.repository.UserRepository;
-import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.global.auth.EnumLoginType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -88,9 +88,9 @@ public class KakaoOAuth2Service {
                             .email(userInfo.getEmail())
                             .userName(userInfo.getName())
                             .nickName(userInfo.getNickname())
-                            .provider(LoginEnumType.KAKAO)
+                            .provider(EnumLoginType.KAKAO)
                             .providerId(userInfo.getId())
-                            .role(UserRoleEnumType.ROLE_USER)
+                            .role(EnumUserRole.ROLE_USER)
                             .gender(userInfo.getGender())
                             .password(passwordEncoder.encode(userInfo.getId() + "kakao" + clientSecret))
                             .birth(userInfo.getBirthday())

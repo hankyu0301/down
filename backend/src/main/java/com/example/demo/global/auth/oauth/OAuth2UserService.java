@@ -1,6 +1,6 @@
 package com.example.demo.global.auth.oauth;
 
-import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.repository.PendingEmailsRepository;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.*;
@@ -56,7 +56,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             }
         };
 
-        LoginEnumType provider = LoginEnumType.valueOf(oAuth2UserInfo.getProvider().toUpperCase());
+        EnumLoginType provider = EnumLoginType.valueOf(oAuth2UserInfo.getProvider().toUpperCase());
         String providerId = oAuth2UserInfo.getProviderId();
         String email = oAuth2UserInfo.getEmail();
         String userName = oAuth2UserInfo.getName();
@@ -79,7 +79,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .termsAgree(true)
                 .password(passwordEncoder.encode(email + OAUTH2_PASSWORD_KEY))
                 .providerId(Long.valueOf(providerId))
-                .role(UserRoleEnumType.ROLE_USER)
+                .role(EnumUserRole.ROLE_USER)
                 .build();
 
         User user = userRepository.save(newUser);

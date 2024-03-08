@@ -2,7 +2,7 @@ package com.example.demo.global.auth.jwt;
 
 
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.PrincipalDetails;
 import com.example.demo.global.exception.CustomException;
@@ -65,7 +65,7 @@ public class JwtTokenProvider {
 
         // Role (role): 사용자의 역할을 나타내는 정보입니다.
         // 사용자가 어떤 권한을 가지고 있는지를 나타낼 수 있습니다.
-        payloads.put("role", UserRoleEnumType.ROLE_USER.name());
+        payloads.put("role", EnumUserRole.ROLE_USER.name());
         payloads.put("username", user.getUserName());
         payloads.put("id", user.getId());
 
@@ -108,6 +108,10 @@ public class JwtTokenProvider {
     public String getEmail(String token) {
         Claims claims = getClaimsFormToken(token);
         return claims.get("sub", String.class);
+    }
+
+    public Long getUserId(String token) {
+        return getClaimsFormToken(token).get("id", Long.class);
     }
 
     public Long getExpire(String token) {

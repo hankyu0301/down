@@ -36,5 +36,5 @@ public class UserSportsInfo extends BaseEntity {
     @Comment("운동 경력")
     @Column(name = "career")
     @Enumerated(EnumType.ORDINAL)
-    private SportsCareer career;
+    private EnumSportsCareer career;
 }

@@ -1,8 +1,8 @@
 package com.example.demo.global.auth.jwt;
 
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.UserRoleEnumType;
-import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
+import com.example.demo.global.auth.EnumLoginType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -49,11 +49,11 @@ class JwtTokenProviderTest {
                 .password("test1234")
                 .nickName("test")
                 .userName("test")
-                .provider(LoginEnumType.SERVICE)
+                .provider(EnumLoginType.SERVICE)
                 .gender("test")
                 .birth("test")
                 .providerId(123L)
-                .role(UserRoleEnumType.ROLE_USER)
+                .role(EnumUserRole.ROLE_USER)
                 .termsAgree(true)
                 .build();
 
@@ -67,7 +67,7 @@ class JwtTokenProviderTest {
 
         // Role (role): 사용자의 역할을 나타내는 정보입니다.
         // 사용자가 어떤 권한을 가지고 있는지를 나타낼 수 있습니다.
-        payloads.put("role", UserRoleEnumType.ROLE_USER.name());
+        payloads.put("role", EnumUserRole.ROLE_USER.name());
         payloads.put("username", user.getUserName());
         payloads.put("id", user.getId());
 
