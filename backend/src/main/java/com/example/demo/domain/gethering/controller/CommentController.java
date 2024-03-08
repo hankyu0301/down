@@ -62,6 +62,7 @@ public class CommentController {
 
         SuccessResponse<CommentResponseDTO> response = SuccessResponse.<CommentResponseDTO>builder()
                 .data(CommentResponseDTO.of(command))
+                .message("댓글 생성 성공")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -98,6 +99,7 @@ public class CommentController {
 
         SuccessResponse<Page<CommentResponseDTO>> response = SuccessResponse.<Page<CommentResponseDTO>>builder()
                 .data(list)
+                .message("댓글 조회 성공")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -122,18 +124,21 @@ public class CommentController {
                     )
             )
     })
-    @PutMapping("/{getheringId}/comment/{commentId}")
+    @PutMapping("/{getheringId}/comment/{commentId}/users/{userId}")
     public ResponseEntity<SuccessResponse<CommentResponseDTO>> update(
             @Parameter(description = "모임 ID", example = "1")
             @PathVariable Long getheringId,
             @Parameter(description = "댓글 ID", example = "1")
             @PathVariable Long commentId,
+            @Parameter(description = "사용자 ID", example = "1")
+            @PathVariable Long userId,
             @RequestBody CommentCommand cmd
     ) {
         Comment command = commentService.update(getheringId, commentId, cmd);
 
         SuccessResponse<CommentResponseDTO> response = SuccessResponse.<CommentResponseDTO>builder()
                 .data(CommentResponseDTO.of(command))
+                .message("댓글 수정 성공")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -157,17 +162,20 @@ public class CommentController {
                     )
             )
     })
-    @DeleteMapping("/{getheringId}/comment/{commentId}")
+    @DeleteMapping("/{getheringId}/comment/{commentId}/users/{userId}")
     public ResponseEntity<SuccessResponse<CommentDeleteResponseDTO>> delete(
             @Parameter(description = "모임 ID", example = "1")
             @PathVariable Long getheringId,
             @Parameter(description = "댓글 ID", example = "1")
-            @PathVariable Long commentId
+            @PathVariable Long commentId,
+            @Parameter(description = "사용자 ID", example = "1")
+            @PathVariable Long userId
     ) {
         commentService.delete(getheringId, commentId);
 
         SuccessResponse<CommentDeleteResponseDTO> response = SuccessResponse.<CommentDeleteResponseDTO>builder()
                 .data(CommentDeleteResponseDTO.of(commentId))
+                .message("댓글 삭제 성공")
                 .build();
 
         return ResponseEntity.ok(response);
