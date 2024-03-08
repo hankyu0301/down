@@ -3,9 +3,9 @@ package com.example.demo.domain.user.controller;
 import com.example.demo.domain.user.dto.command.PasswordChangeCommand;
 import com.example.demo.domain.user.dto.command.UserInfoChangeCommand;
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.service.UserService;
-import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.global.auth.EnumLoginType;
 import com.example.demo.global.auth.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -247,11 +247,11 @@ class UserControllerTest {
                 .password("password123")
                 .nickName("exampleNickname")
                 .userName("John Doe")
-                .provider(LoginEnumType.SERVICE)
+                .provider(EnumLoginType.SERVICE)
                 .gender("male")
                 .birth("1990-01-01")
                 .providerId(123456789L)
-                .role(UserRoleEnumType.ROLE_USER)
+                .role(EnumUserRole.ROLE_USER)
                 .termsAgree(true)
                 .build();
     }

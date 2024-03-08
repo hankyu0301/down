@@ -6,11 +6,11 @@ import com.example.demo.domain.region.service.SiDoService;
 import com.example.demo.domain.user.dto.command.*;
 import com.example.demo.domain.user.entity.PendingEmail;
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.repository.PendingEmailsRepository;
 import com.example.demo.domain.user.repository.UserPagingAndSortingRepository;
 import com.example.demo.domain.user.repository.UserRepository;
-import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.global.auth.EnumLoginType;
 import com.example.demo.global.auth.jwt.JwtTokenProvider;
 import com.example.demo.global.auth.jwt.entity.AccessToken;
 import com.example.demo.global.auth.jwt.entity.RefreshToken;
@@ -60,8 +60,8 @@ public class UserService {
         // 회원 가입 처리
         User user = cmd.toEntity();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setProvider(LoginEnumType.SERVICE);
-        user.setRole(UserRoleEnumType.ROLE_USER);
+        user.setProvider(EnumLoginType.SERVICE);
+        user.setRole(EnumUserRole.ROLE_USER);
         user.setProviderId(0L);
 
         // 회원 가입 완료 후 팬딩 이메일 삭제

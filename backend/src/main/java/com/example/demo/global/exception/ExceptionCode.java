@@ -52,7 +52,14 @@ public enum ExceptionCode {
     NOT_EXIST_USER_SPORTS_INFO("사용자 스포츠 정보가 없습니다.", 400),
     NOT_FOUND_SI_DO("시/도 를 찾을 수 없는 ID 입니다.", 400),
     NOT_FOUND_SI_GUN_GU("시/군/구를 찾을 수 없습니다.", 400),
-    JSON_PARSING_ERROR("JSON 변환에 실패했습니다.", 400);
+    JSON_PARSING_ERROR("JSON 변환에 실패했습니다.", 400),
+    NOT_FOUND_TAG("존재하지 않는 태그 입니다.", 400),
+    NOT_FOUND_GETHERING("모임이 존재하지 않습니다.", 400),
+    NOT_FOUND_COMMENT("조회한 댓글이 존재하지 않습니다.", 400),
+    NOT_EXIST_GETHERING("모임이 존재하지 않습니다.", 400),
+    NOT_EXIST_COMMENT("댓글이 존재하지 않습니다.", 400),
+    NOT_EXIST_REPLY("대댓글이 존재하지 않습니다.", 400),
+    NOT_MATCH_USER("사용자가 일치하지 않습니다.", 400);
 
     private final String message;
     private final int httpStatusCode;

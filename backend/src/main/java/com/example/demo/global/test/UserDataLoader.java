@@ -2,13 +2,13 @@ package com.example.demo.global.test;
 
 import com.example.demo.domain.sports.entity.Sports;
 import com.example.demo.domain.sports.repository.SportsRepository;
-import com.example.demo.domain.user.entity.SportsCareer;
+import com.example.demo.domain.user.entity.EnumSportsCareer;
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.UserRoleEnumType;
+import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.entity.UserSportsInfo;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.domain.user.repository.UserSportsInfoRepository;
-import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.global.auth.EnumLoginType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -39,8 +39,8 @@ public class UserDataLoader implements CommandLineRunner {
                 .userName("test" + id)
                 .birth("1990-01-01")
                 .gender("male")
-                .provider(LoginEnumType.SERVICE)
-                .role(UserRoleEnumType.ROLE_USER)
+                .provider(EnumLoginType.SERVICE)
+                .role(EnumUserRole.ROLE_USER)
                 .termsAgree(true)
                 .providerId(id)
                 .build();
@@ -58,7 +58,7 @@ public class UserDataLoader implements CommandLineRunner {
                 .id(id)
                 .user(newUserData(id))
                 .sports(newSportsData(id))
-                .career(SportsCareer.BEGINNER)
+                .career(EnumSportsCareer.BEGINNER)
                 .build();
     }
 }

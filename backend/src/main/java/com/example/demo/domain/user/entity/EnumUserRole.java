@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum UserRoleEnumType {
+public enum EnumUserRole {
     ROLE_USER("일반 사용자"),
     ROLE_INSTRUCTOR("강사"),
     ROLE_ADMIN("관리자");

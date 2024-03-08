@@ -3,7 +3,7 @@ package com.example.demo.domain.user.entity;
 import lombok.Getter;
 
 @Getter
-public enum SportsCareer {
+public enum EnumSportsCareer {
     BEGINNER("입문자"),
     NOVICE("초보자"),
     INTERMEDIATE("중급자"),
@@ -13,12 +13,12 @@ public enum SportsCareer {
 
     private final String career;
 
-    SportsCareer(String career) {
+    EnumSportsCareer(String career) {
         this.career = career;
     }
     
-    public static SportsCareer of(String career) {
-        for (SportsCareer sportsCareer : SportsCareer.values()) {
+    public static EnumSportsCareer of(String career) {
+        for (EnumSportsCareer sportsCareer : EnumSportsCareer.values()) {
             if (sportsCareer.career.equals(career)) {
                 return sportsCareer;
             }

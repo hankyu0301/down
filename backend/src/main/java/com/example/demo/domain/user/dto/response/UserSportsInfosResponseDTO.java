@@ -1,6 +1,6 @@
 package com.example.demo.domain.user.dto.response;
 
-import com.example.demo.domain.user.entity.SportsCareer;
+import com.example.demo.domain.user.entity.EnumSportsCareer;
 import com.example.demo.domain.user.entity.UserSportsInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -36,7 +36,7 @@ public class UserSportsInfosResponseDTO {
         @Schema(description = "운동 종목 ID")
         private Long sportsId;
         @Schema(description = "운동 경력")
-        private SportsCareer career;
+        private EnumSportsCareer career;
         @Schema(description = "생성 시각")
         private LocalDateTime createdAt;
 

@@ -2,7 +2,7 @@ package com.example.demo.domain.user.entity;
 
 
 import com.example.demo.domain.util.BaseEntity;
-import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.global.auth.EnumLoginType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -41,7 +41,7 @@ public class User extends BaseEntity {
     @Comment("로그인 공급자 SNS 구분")
     @Column(name = "provider")
     @Enumerated(EnumType.STRING)
-    private LoginEnumType provider;
+    private EnumLoginType provider;
 
     @Comment("성별")
     @Column(name = "gender")
@@ -58,7 +58,7 @@ public class User extends BaseEntity {
     @Comment("사용자 권한")
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private UserRoleEnumType role;
+    private EnumUserRole role;
 
     @Comment("이용약관 동의 여부")
     @Column(name = "terms_agree")

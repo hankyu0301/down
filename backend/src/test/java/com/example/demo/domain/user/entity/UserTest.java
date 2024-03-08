@@ -2,7 +2,7 @@ package com.example.demo.domain.user.entity;
 
 
 import com.example.demo.domain.sports.entity.Sports;
-import com.example.demo.global.auth.LoginEnumType;
+import com.example.demo.global.auth.EnumLoginType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +28,11 @@ class UserTest {
         String password = "password";
         String nickName = "test";
         String userName = "Test User";
-        LoginEnumType provider = LoginEnumType.SERVICE;
+        EnumLoginType provider = EnumLoginType.SERVICE;
         String gender = "M";
         String birth = "1990-01-01";
         Long providerId = 1L;
-        UserRoleEnumType role = UserRoleEnumType.ROLE_USER;
+        EnumUserRole role = EnumUserRole.ROLE_USER;
         Boolean termsAgree = true;
 
         Sports sports = Sports.builder()
@@ -61,7 +61,7 @@ class UserTest {
         UserSportsInfo userSportsInfo = UserSportsInfo.builder()
                 .user(user)
                 .sports(sports)
-                .career(SportsCareer.GOD)
+                .career(EnumSportsCareer.GOD)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

@@ -4,7 +4,7 @@ package com.example.demo.global.auth;
 import lombok.Getter;
 
 @Getter
-public enum LoginEnumType {
+public enum EnumLoginType {
     SERVICE("service"),
     GOOGLE("google"),
     KAKAO("kakao"),
@@ -12,7 +12,7 @@ public enum LoginEnumType {
 
     private final String label;
 
-    LoginEnumType(String label) {
+    EnumLoginType(String label) {
         this.label = label;
     }
 }
