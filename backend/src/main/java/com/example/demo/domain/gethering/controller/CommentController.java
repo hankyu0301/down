@@ -1,6 +1,6 @@
 package com.example.demo.domain.gethering.controller;
 
-import com.example.demo.domain.gethering.dto.CommentResponseDTO;
+import com.example.demo.domain.gethering.dto.response.CommentResponseDTO;
 import com.example.demo.domain.gethering.dto.command.CommentCommand;
 import com.example.demo.domain.gethering.dto.response.CommentDeleteResponseDTO;
 import com.example.demo.domain.gethering.entity.Comment;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommentController {
 
-    private CommentService commentService;
+    private final CommentService commentService;
 
     @Operation(
             summary = "댓글 생성",

@@ -1,6 +1,6 @@
 package com.example.demo.domain.gethering.controller;
 
-import com.example.demo.domain.gethering.dto.ReplyResponseDTO;
+import com.example.demo.domain.gethering.dto.response.ReplyResponseDTO;
 import com.example.demo.domain.gethering.dto.command.ReplyCommand;
 import com.example.demo.domain.gethering.dto.response.ReplyDeleteResponseDTO;
 import com.example.demo.domain.gethering.entity.Reply;

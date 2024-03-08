@@ -28,7 +28,7 @@ public class TagService {
         return tagRepository.findByNameContaining(name);
     }
 
-    public Tag updateTag(Long id, TagCommand cmd) {
+    public Tag update(Long id, TagCommand cmd) {
         Assert.notNull(id, "태그 ID를 입력해주세요.");
         Assert.notNull(cmd, "태그 정보를 입력해주세요.");
 
@@ -40,7 +40,7 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public void deleteTag(Long id) {
+    public void delete(Long id) {
         Assert.notNull(id, "태그 ID를 입력해주세요.");
         tagRepository.deleteById(id);
     }

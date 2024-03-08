@@ -1,7 +1,7 @@
 package com.example.demo.domain.gethering.controller;
 
 
-import com.example.demo.domain.gethering.dto.GetheringBoardListResponseDTO;
+import com.example.demo.domain.gethering.dto.response.GetheringBoardListResponseDTO;
 import com.example.demo.domain.gethering.dto.command.GetheringCommand;
 import com.example.demo.domain.gethering.dto.response.GetheringDetailResponseDTO;
 import com.example.demo.domain.gethering.dto.response.GetheringResponseDTO;

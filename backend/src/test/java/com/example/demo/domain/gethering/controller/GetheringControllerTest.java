@@ -107,7 +107,7 @@ class GetheringControllerTest {
                 .gender(EnumGender.MAN)
                 .longitude(127.123456)
                 .career(EnumSportsCareer.GOD)
-                .maxPeople((short) 10)
+                .maxPeopleCount((short) 10)
                 .user(user)
                 .images(images)
                 .sports(sports)

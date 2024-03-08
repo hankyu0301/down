@@ -1,4 +1,4 @@
-package com.example.demo.domain.gethering.dto;
+package com.example.demo.domain.gethering.dto.response;
 
 import com.example.demo.domain.gethering.entity.Reply;
 import io.swagger.v3.oas.annotations.media.Schema;
