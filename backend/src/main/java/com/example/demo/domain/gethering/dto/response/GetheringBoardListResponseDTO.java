@@ -1,4 +1,4 @@
-package com.example.demo.domain.gethering.dto;
+package com.example.demo.domain.gethering.dto.response;
 
 import com.example.demo.domain.gethering.entity.Gethering;
 import com.example.demo.domain.gethering.entity.Tag;

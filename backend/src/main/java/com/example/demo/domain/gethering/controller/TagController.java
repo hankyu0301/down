@@ -51,13 +51,14 @@ public class TagController {
             )
     })
     @PostMapping
-    public ResponseEntity<SuccessResponse<TagResponseDTO>> createTag(
+    public ResponseEntity<SuccessResponse<TagResponseDTO>> register(
             @RequestBody TagCommand cmd
     ) {
          Tag tag = tagService.register(cmd);
 
          SuccessResponse<TagResponseDTO> response = SuccessResponse.<TagResponseDTO>builder()
                  .data(TagResponseDTO.of(tag))
+                 .message("태그 생성 성공")
                  .build();
 
         return ResponseEntity.ok(response);
@@ -82,13 +83,14 @@ public class TagController {
             )
     })
     @GetMapping
-    public ResponseEntity<SuccessResponse<TagSearchResponseDTO>> getTag(
+    public ResponseEntity<SuccessResponse<TagSearchResponseDTO>> list(
             @RequestParam("name") String name
     ) {
         List<Tag> tag = tagService.getTag(name);
 
         SuccessResponse<TagSearchResponseDTO> response = SuccessResponse.<TagSearchResponseDTO>builder()
                 .data(TagSearchResponseDTO.of(tag))
+                .message("태그 조회 성공")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -113,15 +115,16 @@ public class TagController {
                     )
             )
     })
-    @PutMapping
-    public ResponseEntity<SuccessResponse<TagResponseDTO>> updateTag(
-            @RequestParam("id") Long id,
+    @PutMapping("/{id}")
+    public ResponseEntity<SuccessResponse<TagResponseDTO>> update(
+            @PathVariable("id") Long id,
             @RequestBody TagCommand cmd
     ) {
-        Tag tag = tagService.updateTag(id, cmd);
+        Tag tag = tagService.update(id, cmd);
 
         SuccessResponse<TagResponseDTO> response = SuccessResponse.<TagResponseDTO>builder()
                 .data(TagResponseDTO.of(tag))
+                .message("태그 수정 성공")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -145,13 +148,14 @@ public class TagController {
                     )
             )
     })
-    @DeleteMapping
-    public ResponseEntity<SuccessResponse<TagDeleteResponseDTO>> deleteTag(
-            @RequestParam("id") Long id
+    @DeleteMapping("/{id}")
+    public ResponseEntity<SuccessResponse<TagDeleteResponseDTO>> delete(
+            @PathVariable("id") Long id
     ) {
-        tagService.deleteTag(id);
+        tagService.delete(id);
 
         SuccessResponse<TagDeleteResponseDTO> response = SuccessResponse.<TagDeleteResponseDTO>builder()
+                .data(TagDeleteResponseDTO.of(id))
                 .message("태그 삭제 성공")
                 .build();
 
