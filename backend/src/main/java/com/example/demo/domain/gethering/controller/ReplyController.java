@@ -64,6 +64,7 @@ public class ReplyController {
 
         SuccessResponse<ReplyResponseDTO> response = SuccessResponse.<ReplyResponseDTO>builder()
                 .data(ReplyResponseDTO.of(reply))
+                .message("대댓글이 생성되었습니다.")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -87,7 +88,7 @@ public class ReplyController {
                     )
             )
     })
-    @PostMapping("/{getheringId}/comment/{commentId}/reply/{replyId}/users/{userId}")
+    @PutMapping("/{getheringId}/comment/{commentId}/reply/{replyId}/users/{userId}")
     public ResponseEntity<SuccessResponse<ReplyResponseDTO>> modify(
             @Parameter(description = "모임 ID", example = "1")
             @PathVariable Long getheringId,
@@ -103,6 +104,7 @@ public class ReplyController {
 
         SuccessResponse<ReplyResponseDTO> response = SuccessResponse.<ReplyResponseDTO>builder()
                 .data(ReplyResponseDTO.of(reply))
+                .message("대댓글이 수정되었습니다.")
                 .build();
 
         return ResponseEntity.ok(response);
@@ -142,6 +144,7 @@ public class ReplyController {
 
         SuccessResponse<ReplyDeleteResponseDTO> response = SuccessResponse.<ReplyDeleteResponseDTO>builder()
                 .data(ReplyDeleteResponseDTO.of(replyId))
+                .message("대댓글이 삭제되었습니다.")
                 .build();
 
         return ResponseEntity.ok(response);
