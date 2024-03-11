@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
+
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -38,12 +40,11 @@ public class ChatRoomService {
     private final ChatMessageJpaRepository chatMessageJpaRepository;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String,Object> chatRedisTemplate;
-    private final ChannelTopic channelTopic;
+    private final ChannelTopic groupChannelTopic;
 
     public ChatRoomListResponseDto getAllChatRoomByUserId(long userId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+        User user = getUserById(userId);
 
         List<ChatRoomUser> chatRoomUserList = chatRoomUserJpaRepository.findAllWithChatRoomByUser(user);
 
@@ -53,13 +54,15 @@ public class ChatRoomService {
                     ChatMessage chatMessage = chatMessageJpaRepository.findTop1ByChatRoomOrderByCreatedAtDesc(cru.getChatRoom());
                     return new SimpleChatRoomResponseDto(chatMessage.getContent(), chatMessage.getCreatedAt(), cru.getChatRoom().getChatRoomName(), cru.getChatRoom().getId());
                 })
+                .sorted(comparing(SimpleChatRoomResponseDto::getLastMessageTime).reversed())
                 .collect(Collectors.toList());
 
         return new ChatRoomListResponseDto(simpleChatRoomResponseDtoList);
     }
 
     public ChatRoomDto getChatRoomWithUserListByChatRoomId(long chatRoomId) {
-        ChatRoom chatRoom = chatRoomJpaRepository.findChatRoomWithUsers(chatRoomId);
+
+        ChatRoom chatRoom = getChatRoomWithUserList(chatRoomId);
 
         List<UserInfoResponseDTO> dtoList = chatRoom.getChatRoomUserList()
                 .stream()
@@ -72,10 +75,9 @@ public class ChatRoomService {
 
     public ChatRoomCreateResponseDto createChatRoom(ChatRoomCreateRequest req) {
 
-        ChatRoom chatRoomJpa = chatRoomJpaRepository.save(new ChatRoom(req.getChatRoomName()));
+        ChatRoom chatRoomJpa = saveChatRoomToDatabase(req.getChatRoomName());
 
-        User inviter = userRepository.findById(req.getUserId())
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+        User inviter = getUserById(req.getUserId());
 
         List<User> userList = userRepository.findAllById(req.getUserIdList());
 
@@ -88,10 +90,6 @@ public class ChatRoomService {
                 .map(User::getUserName)
                 .collect(Collectors.joining(", "));
 
-        List<ChatRoomUser> chatRoomUserList = userList.stream()
-                .map(user -> new ChatRoomUser(user, chatRoomJpa))
-                .collect(Collectors.toList());
-
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .chatRoomId(chatRoomJpa.getId())
                 .userId(inviter.getId())
@@ -101,29 +99,27 @@ public class ChatRoomService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        ChatMessage chatMessageEntity = chatMessageDto.toEntity(chatRoomJpa);
+        ChatMessage chatMessage = saveChatMessageToDatabase(chatMessageDto.toEntity(chatRoomJpa));
+
+        chatMessageDto.setChatMessageId(chatMessage.getId());
+
+        List<ChatRoomUser> chatRoomUserList = userList.stream()
+                .map(user -> new ChatRoomUser(user, chatRoomJpa))
+                .collect(Collectors.toList());
 
         chatRoomUserJpaRepository.saveAll(chatRoomUserList);
-        chatMessageJpaRepository.save(chatMessageEntity);
-        try {
-            chatRedisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(chatMessageDto));
-        } catch (JsonProcessingException e) {
-            throw new CustomException(ExceptionCode.JSON_PARSING_ERROR);
-        }
+        publishChatMessage(chatMessageDto);
 
         return new ChatRoomCreateResponseDto(chatRoomJpa.getId(), chatRoomJpa.getChatRoomName(), req.getUserIdList());
     }
 
     public ChatRoomDeleteResponseDto exitChatroom(Long chatRoomId, ChatRoomDeleteRequest req)   {
 
-        User user = userRepository.findById(req.getUserId())
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+        User user = getUserById(req.getUserId());
 
-        ChatRoom chatRoom = chatRoomJpaRepository.findById(chatRoomId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM));
+        ChatRoom chatRoom = getChatRoomById(chatRoomId);
 
-        ChatRoomUser chatRoomUser = chatRoomUserJpaRepository.findByUserAndChatRoom(user, chatRoom)
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER));
+        ChatRoomUser chatRoomUser = getChatRoomUser(user, chatRoom);
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .chatRoomId(chatRoom.getId())
@@ -134,39 +130,27 @@ public class ChatRoomService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        ChatMessage chatMessageEntity = chatMessageDto.toEntity(chatRoom);
+        ChatMessage chatMessageEntity = saveChatMessageToDatabase(chatMessageDto.toEntity(chatRoom));
 
-        chatRoomUserJpaRepository.delete(chatRoomUser);
-        chatMessageJpaRepository.save(chatMessageEntity);
-        try {
-            chatRedisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(chatMessageDto));
-        } catch (JsonProcessingException e) {
-            throw new CustomException(ExceptionCode.JSON_PARSING_ERROR);
-        }
+        chatMessageDto.setChatMessageId(chatMessageEntity.getId());
+
+        deleteChatRoomUser(chatRoomUser);
+
+        publishChatMessage(chatMessageDto);
 
         return new ChatRoomDeleteResponseDto(chatRoom.getId());
     }
 
+
     public ChatRoomInviteResponseDto inviteChatRoom(ChatRoomInviteRequest req) {
 
-        User inviter = userRepository.findById(req.getInviterId())
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+        User inviter = getUserById(req.getInviterId());
 
-        User target = userRepository.findById(req.getTargetId())
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+        User target = getUserById(req.getTargetId());
 
-        ChatRoom chatRoom = chatRoomJpaRepository.findById(req.getChatRoomId())
-                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM));
+        ChatRoom chatRoom = getChatRoomById(req.getChatRoomId());
 
-        if(chatRoomUserJpaRepository.existsByUserAndChatRoom(inviter, chatRoom)) {
-            throw new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER);
-        }
-
-        if(chatRoomUserJpaRepository.existsByUserAndChatRoom(target, chatRoom)) {
-            throw new CustomException(ExceptionCode.ALREADY_EXIST_CHAT_ROOM_USER);
-        }
-
-        ChatRoomUser chatRoomUser = new ChatRoomUser(target, chatRoom);
+        validateChatRoomInvitation(inviter, target, chatRoom);
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .chatRoomId(chatRoom.getId())
@@ -177,17 +161,73 @@ public class ChatRoomService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        ChatMessage chatMessage = chatMessageDto.toEntity(chatRoom);
+        ChatMessage chatMessage = saveChatMessageToDatabase(chatMessageDto.toEntity(chatRoom));
 
-        chatRoomUserJpaRepository.save(chatRoomUser);
-        chatMessageJpaRepository.save(chatMessage);
-        try {
-            chatRedisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(chatMessageDto));
-        } catch (JsonProcessingException e) {
-            throw new CustomException(ExceptionCode.JSON_PARSING_ERROR);
-        }
+        chatMessageDto.setChatMessageId(chatMessage.getId());
+
+        ChatRoomUser chatRoomUser = new ChatRoomUser(target, chatRoom);
+        chatRoomUser.updateFirstMessageId(chatMessage.getId());
+
+        saveChatRoomUserToDatabase(chatRoomUser);
+        publishChatMessage(chatMessageDto);
 
         return new ChatRoomInviteResponseDto(inviter.getId(), target.getId(), chatRoom.getId());
     }
 
+    private void saveChatRoomUserToDatabase(ChatRoomUser chatRoomUser) {
+        chatRoomUserJpaRepository.save(chatRoomUser);
+    }
+
+    private ChatRoom getChatRoomWithUserList(long chatRoomId) {
+        return chatRoomJpaRepository.findByIdWithChatRoomUser(chatRoomId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM));
+    }
+
+    private User getUserById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+    }
+
+    private ChatRoom getChatRoomById(long chatRoomId) {
+        return chatRoomJpaRepository.findById(chatRoomId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM));
+    }
+
+    private ChatMessage saveChatMessageToDatabase(ChatMessage chatMessage) {
+        return chatMessageJpaRepository.save(chatMessage);
+    }
+
+    private ChatRoom saveChatRoomToDatabase(String chatRoomName) {
+        ChatRoom chatRoom = ChatRoom.builder()
+                .chatRoomName(chatRoomName)
+                .build();
+        return chatRoomJpaRepository.save(chatRoom);
+    }
+
+    private void deleteChatRoomUser(ChatRoomUser chatRoomUser) {
+        chatRoomUserJpaRepository.delete(chatRoomUser);
+    }
+
+    private void publishChatMessage(ChatMessageDto chatMessageDto) {
+        try {
+            chatRedisTemplate.convertAndSend(groupChannelTopic.getTopic(), objectMapper.writeValueAsString(chatMessageDto));
+        } catch (JsonProcessingException e) {
+            throw new CustomException(ExceptionCode.JSON_PARSING_ERROR);
+        }
+    }
+
+    private ChatRoomUser getChatRoomUser(User user , ChatRoom chatRoom) {
+        return chatRoomUserJpaRepository.findByUserAndChatRoom(user, chatRoom)
+                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER));
+    }
+
+    private void validateChatRoomInvitation(User inviter, User target, ChatRoom chatRoom) {
+        if(!chatRoomUserJpaRepository.existsByUserAndChatRoom(inviter, chatRoom)) {
+            throw new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER);
+        }
+
+        if(chatRoomUserJpaRepository.existsByUserAndChatRoom(target, chatRoom)) {
+            throw new CustomException(ExceptionCode.ALREADY_EXIST_CHAT_ROOM_USER);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.demo.domain.chat.service;
 
 import com.example.demo.domain.chat.dto.response.ChatMessageDto;
+import com.example.demo.domain.chat.dto.response.PrivateChatMessageDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +19,23 @@ public class RedisSubscriber {
     /**
      * Redis에서 메시지가 발행(publish)되면 대기하고 있던 Redis Subscriber 가 해당 메시지를 받아 처리한다.
      */
-    public void sendMessage(String publishMessage) {
+    public void sendGroupMessage(String publishMessage) {
         try {
             // ChatMessageDto 객채로 맵핑
             ChatMessageDto chatMessageDto = objectMapper.readValue(publishMessage, ChatMessageDto.class);
             // Websocket 구독자에게 채팅 메시지 Send
-            messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessageDto.getChatRoomId(), objectMapper.writeValueAsString(chatMessageDto));
+            messagingTemplate.convertAndSend("/sub/group/chat/room/" + chatMessageDto.getChatRoomId(), objectMapper.writeValueAsString(chatMessageDto));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    public void sendPrivateMessage(String publishMessage) {
+        try {
+            // ChatMessageDto 객채로 맵핑
+            PrivateChatMessageDto chatMessageDto = objectMapper.readValue(publishMessage, PrivateChatMessageDto.class);
+            // Websocket 구독자에게 채팅 메시지 Send
+            messagingTemplate.convertAndSend("/sub/private/chat/room/" + chatMessageDto.getChatRoomId(), objectMapper.writeValueAsString(chatMessageDto));
         } catch (Exception e) {
             log.error(e.getMessage());
         }

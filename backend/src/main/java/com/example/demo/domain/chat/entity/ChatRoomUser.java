@@ -6,6 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Entity
 @Table(name = "chat_room_user")
@@ -16,18 +19,30 @@ public class ChatRoomUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "first_message_id")
+    private Long firstMessageId = 0L;
+
+    @ElementCollection
+    private List<Long> deletedMessageIds = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "chatRoom_id")
+    @JoinColumn(name = "chatroom_id")
     private ChatRoom chatRoom;
 
     //private boolean isAdmin;
 
     public ChatRoomUser(User user, ChatRoom chatRoom) {
+        this.firstMessageId = 0L;
+        this.deletedMessageIds = new ArrayList<>();
         this.user = user;
         this.chatRoom = chatRoom;
+    }
+
+    public void updateFirstMessageId(Long id) {
+        this.firstMessageId = id;
     }
 }

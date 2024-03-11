@@ -41,7 +41,7 @@ class ChatMessageControllerTest {
     @WithMockUser
     void getMessageList() throws Exception {
         // Given
-        ChatMessageReadCondition cond = new ChatMessageReadCondition(1L, 0L, 20);
+        ChatMessageReadCondition cond = new ChatMessageReadCondition(1L, 1L, 0L, 20);
         ChatMessageReadResponseDto result = new ChatMessageReadResponseDto(10, false, List.of(
                 ChatMessageDto.builder()
                         .chatRoomId(1L)
@@ -56,6 +56,7 @@ class ChatMessageControllerTest {
 
         // When
         mockMvc.perform(get("/api/v1/group/chat/message")
+                        .param("userId", String.valueOf(cond.getUserId()))
                         .param("size", String.valueOf(cond.getSize()))
                         .param("chatRoomId", String.valueOf(cond.getChatRoomId()))
                         .param("lastMessageId", String.valueOf(cond.getLastChatMessageId()))

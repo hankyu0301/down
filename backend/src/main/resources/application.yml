@@ -97,3 +97,7 @@ logging:
 
 api:
   version-path: /api/v1
+
+file:
+  upload:
+    path: /static

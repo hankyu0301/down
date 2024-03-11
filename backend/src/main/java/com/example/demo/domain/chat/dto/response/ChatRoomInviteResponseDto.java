@@ -13,10 +13,10 @@ import lombok.Setter;
 @Schema(description = "채팅방 초대 응답")
 public class ChatRoomInviteResponseDto {
 
-    @Schema(description = "회원 id", example = "1")
+    @Schema(description = "초대한 회원 id", example = "1")
     private Long inviterId;
 
-    @Schema(description = "회원 id", example = "1")
+    @Schema(description = "초대 받은 회원 id", example = "1")
     private Long targetId;
 
     @Schema(description = "채팅방 id", example = "1")

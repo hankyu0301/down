@@ -121,7 +121,11 @@ public class ChatRoomController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "채팅방 생성 성공"
+                    description = "채팅방 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatRoomCreateResponseDto.class)
+                    )
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -162,7 +166,11 @@ public class ChatRoomController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "채팅방 퇴장 성공"
+                    description = "채팅방 퇴장 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatRoomDeleteResponseDto.class)
+                    )
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -208,7 +216,11 @@ public class ChatRoomController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "채팅방 초대 성공"
+                    description = "채팅방 초대 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatRoomInviteResponseDto.class)
+                    )
             ),
             @ApiResponse(
                     responseCode = "400",

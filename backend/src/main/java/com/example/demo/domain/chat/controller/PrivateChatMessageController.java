@@ -1,12 +1,11 @@
 package com.example.demo.domain.chat.controller;
 
-
-import com.example.demo.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.example.demo.domain.chat.dto.request.ChatMessageDeleteRequest;
 import com.example.demo.domain.chat.dto.request.ChatMessageReadCondition;
+import com.example.demo.domain.chat.dto.request.PrivateChatMessageCreateRequest;
 import com.example.demo.domain.chat.dto.response.ChatMessageDeleteResponseDto;
-import com.example.demo.domain.chat.dto.response.ChatMessageReadResponseDto;
-import com.example.demo.domain.chat.service.ChatMessageService;
+import com.example.demo.domain.chat.dto.response.PrivateChatMessageReadResponseDto;
+import com.example.demo.domain.chat.service.PrivateChatMessageService;
 import com.example.demo.domain.util.BaseResponse;
 import com.example.demo.domain.util.FailResponse;
 import com.example.demo.domain.util.SuccessResponse;
@@ -18,27 +17,30 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
-@RestController
 @Tag(
-        name = "그룹 채팅 메시지",
-        description = "그룹 채팅 메시지를 위한 API"
+        name = "개인 채팅 메시지",
+        description = "개인 채팅 메시지를 위한 API"
 )
-public class ChatMessageController {
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+public class PrivateChatMessageController {
 
-    private final ChatMessageService chatMessageService;
+    private final PrivateChatMessageService privateChatMessageService;
 
     /**
-     * websocket "/pub/group/chat/message"로 들어오는 메시징을 처리한다.
+     * websocket "/pub/private/chat/message"로 들어오는 메시징을 처리한다.
      */
-    @MessageMapping("/group/chat/message")
-    public void message(ChatMessageCreateRequest req){
-        chatMessageService.saveChatMessage(req);
+    @MessageMapping("/private/chat/message")
+    public void message(PrivateChatMessageCreateRequest req){
+        privateChatMessageService.sendMessage(req);
     }
+
 
     /**
      * 특정 채팅방의 최근 메시지 20개를 가져옴
@@ -53,7 +55,7 @@ public class ChatMessageController {
                     description = "채팅방 최근 메시지 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ChatMessageReadResponseDto.class)
+                            schema = @Schema(implementation = PrivateChatMessageReadResponseDto.class)
                     )
             ),
             @ApiResponse(
@@ -62,7 +64,6 @@ public class ChatMessageController {
                             """
                             - 회원이 존재하지 않습니다.
                             - 채팅방이 존재하지 않습니다.
-                            - 채팅방에 초대되지 않은 회원입니다.
                             """,
                     content = @Content(
                             mediaType = "application/json",
@@ -70,11 +71,11 @@ public class ChatMessageController {
                     )
             )
     })
-    @GetMapping("/api/v1/group/chat/message")
-    public ResponseEntity<BaseResponse<ChatMessageReadResponseDto>> messageList(@Valid @ModelAttribute ChatMessageReadCondition cond){
-        ChatMessageReadResponseDto result = chatMessageService.findLatestMessage(cond);
+    @GetMapping("/api/v1/private/chat/message")
+    public ResponseEntity<BaseResponse<PrivateChatMessageReadResponseDto>> messageList(@Valid @ModelAttribute ChatMessageReadCondition cond){
+        PrivateChatMessageReadResponseDto result = privateChatMessageService.findLatestMessage(cond);
 
-        SuccessResponse<ChatMessageReadResponseDto> response = SuccessResponse.<ChatMessageReadResponseDto>builder()
+        SuccessResponse<PrivateChatMessageReadResponseDto> response = SuccessResponse.<PrivateChatMessageReadResponseDto>builder()
                 .data(result)
                 .message("채팅 메시지 목록 조회 성공")
                 .build();
@@ -86,20 +87,13 @@ public class ChatMessageController {
             summary = "채팅 메시지 삭제",
             description = "채팅 메시지 삭제합니다."
     )
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "채팅 메시지 삭제 요청",
-            required = true,
-            content = @Content(
-                    schema = @Schema(implementation = ChatMessageDeleteRequest.class)
-            )
-    )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "채팅 메시지 삭제 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ChatMessageDeleteResponseDto.class)
+                            schema = @Schema(implementation = ChatMessageDeleteRequest.class)
                     )
             ),
             @ApiResponse(
@@ -109,7 +103,6 @@ public class ChatMessageController {
                             - 회원이 존재하지 않습니다.
                             - 메시지가 존재하지 않습니다.
                             - 채팅방이 존재하지 않습니다.
-                            - 채팅방에 초대되지 않은 회원입니다.
                             """,
                     content = @Content(
                             mediaType = "application/json",
@@ -117,9 +110,9 @@ public class ChatMessageController {
                     )
             )
     })
-    @PatchMapping("/api/v1/group/chat/message")
+    @PatchMapping("/api/v1/private/chat/message")
     public ResponseEntity<BaseResponse<ChatMessageDeleteResponseDto>> deleteMessage(@Valid @RequestBody ChatMessageDeleteRequest req){
-        ChatMessageDeleteResponseDto result = chatMessageService.deleteChatMessage(req);
+        ChatMessageDeleteResponseDto result = privateChatMessageService.deleteChatMessage(req);
 
         SuccessResponse<ChatMessageDeleteResponseDto> response = SuccessResponse.<ChatMessageDeleteResponseDto>builder()
                 .data(result)

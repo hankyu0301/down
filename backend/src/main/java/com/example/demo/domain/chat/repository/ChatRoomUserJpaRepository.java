@@ -13,6 +13,10 @@ import java.util.Optional;
 public interface ChatRoomUserJpaRepository extends JpaRepository<ChatRoomUser, Long> {
 
     Optional<ChatRoomUser> findByUserAndChatRoom(User user, ChatRoom chatRoom);
+
+    @Query("SELECT cru FROM ChatRoomUser cru LEFT JOIN FETCH cru.deletedMessageIds WHERE cru.user = :user AND cru.chatRoom = :chatRoom")
+    Optional<ChatRoomUser> findByUserAndChatRoomWithDeletedMessageIds(User user, ChatRoom chatRoom);
+
     boolean existsByUserAndChatRoom(User user, ChatRoom chatRoom);
 
     // 회원 entity로 채팅방 찾기
