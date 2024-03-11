@@ -1,11 +1,14 @@
 package com.example.demo.domain.chat.service;
 
 import com.example.demo.domain.chat.dto.request.ChatMessageCreateRequest;
+import com.example.demo.domain.chat.dto.request.ChatMessageDeleteRequest;
 import com.example.demo.domain.chat.dto.request.ChatMessageReadCondition;
+import com.example.demo.domain.chat.dto.response.ChatMessageDeleteResponseDto;
 import com.example.demo.domain.chat.dto.response.ChatMessageDto;
 import com.example.demo.domain.chat.dto.response.ChatMessageReadResponseDto;
 import com.example.demo.domain.chat.entity.ChatMessage;
 import com.example.demo.domain.chat.entity.ChatRoom;
+import com.example.demo.domain.chat.entity.ChatRoomUser;
 import com.example.demo.domain.chat.repository.ChatMessageJpaRepository;
 import com.example.demo.domain.chat.repository.ChatRoomJpaRepository;
 import com.example.demo.domain.chat.repository.ChatRoomUserJpaRepository;
@@ -16,13 +19,13 @@ import com.example.demo.global.exception.ExceptionCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -35,43 +38,89 @@ public class ChatMessageService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String,Object> chatRedisTemplate;
-    private final ChannelTopic channelTopic;
+    private final ChannelTopic groupChannelTopic;
 
     public void saveChatMessage(ChatMessageCreateRequest req) {
+        User user = getUserById(req.getUserId());
+        ChatRoom chatRoom = getChatRoomById(req.getChatRoomId());
+        validateUserInChatRoom(user, chatRoom);
 
-        User user = userRepository.findById(req.getUserId())
+        ChatMessageDto chatMessageDto = createChatMessage(user, req.getContent(), chatRoom);
+        ChatMessage chatMessage = chatMessageDto.toEntity(chatRoom);
+        chatMessageDto.setChatMessageId(chatMessage.getId());
+        saveChatMessageToDatabase(chatMessage);
+        publishChatMessage(chatMessageDto);
+    }
+
+    public ChatMessageReadResponseDto findLatestMessage(ChatMessageReadCondition cond) {
+        User user = getUserById(cond.getUserId());
+        ChatRoom chatRoom = getChatRoomById(cond.getChatRoomId());
+        ChatRoomUser chatRoomUser = getChatRoomUser(user, chatRoom);
+        return createChatMessageReadResponseDto(chatRoomUser.getDeletedMessageIds(), cond);
+    }
+
+    public ChatMessageDeleteResponseDto deleteChatMessage(ChatMessageDeleteRequest req) {
+        User user = getUserById(req.getUserId());
+        ChatMessage chatMessage = getChatMessageById(req.getChatMessageId());
+        ChatRoomUser chatRoomUser = getChatRoomUser(user, chatMessage.getChatRoom());
+        deleteAndSaveChatMessage(chatMessage, chatRoomUser);
+        return new ChatMessageDeleteResponseDto(chatMessage.getId());
+    }
+
+    private void deleteAndSaveChatMessage(ChatMessage chatMessage, ChatRoomUser chatRoomUser) {
+        chatRoomUser.getDeletedMessageIds().add(chatMessage.getId());
+        chatRoomUserJpaRepository.save(chatRoomUser);
+    }
+
+    private ChatMessage getChatMessageById(Long chatMessageId) {
+        return chatMessageJpaRepository.findByIdWithChatRoom(chatMessageId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_MESSAGE));
+    }
+
+    private ChatRoomUser getChatRoomUser(User user, ChatRoom chatRoom) {
+        return chatRoomUserJpaRepository.findByUserAndChatRoomWithDeletedMessageIds(user, chatRoom)
+                .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER));
+    }
+
+    private User getUserById(long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_USER));
+    }
 
-        ChatRoom chatRoom = chatRoomJpaRepository.findById(req.getChatRoomId())
+    private ChatRoom getChatRoomById(long chatRoomId) {
+        return chatRoomJpaRepository.findById(chatRoomId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM));
+    }
 
+    private void validateUserInChatRoom(User user, ChatRoom chatRoom) {
         if (!chatRoomUserJpaRepository.existsByUserAndChatRoom(user, chatRoom)) {
             throw new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER);
         }
+    }
 
-        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
-                .chatRoomId(req.getChatRoomId())
+    private ChatMessageDto createChatMessage(User user, String content, ChatRoom chatRoom) {
+        return ChatMessageDto.builder()
+                .chatRoomId(chatRoom.getId())
                 .userName(user.getUserName())
-                .userId(req.getUserId())
-                .content(req.getContent())
-                .type(ChatMessage.MessageType.valueOf(req.getType()))
+                .userId(user.getId())
+                .content(content)
+                .type(ChatMessage.MessageType.TALK)
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+    private void saveChatMessageToDatabase(ChatMessage chatMessage) {
+        chatMessageJpaRepository.save(chatMessage);
+    }
 
-        ChatMessage chatMessage = chatMessageDto.toEntity(chatRoom);
-        chatMessageJpaRepository.save(chatMessage); //  MySQL에 저장
+    private void publishChatMessage(ChatMessageDto chatMessageDto) {
         try {
-            chatRedisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(chatMessageDto));
+            chatRedisTemplate.convertAndSend(groupChannelTopic.getTopic(), objectMapper.writeValueAsString(chatMessageDto));
         } catch (JsonProcessingException e) {
             throw new CustomException(ExceptionCode.JSON_PARSING_ERROR);
         }
     }
 
-    /**
-     *  cond.lastMessageId 값이 없으면 jpaRepository에서 가장 최근에 생성된 20개만 불러옴.
-     *  cond.lastMessageId 값이 있다면 그 이전 메시지 20개를 가져옴.
-     */
-    public ChatMessageReadResponseDto findLatestMessage(ChatMessageReadCondition cond) {
-        return ChatMessageReadResponseDto.toDto(chatMessageJpaRepository.findLatestMessages(cond.getChatRoomId(), cond.getLastChatMessageId(), Pageable.ofSize(cond.getSize())));
+    private ChatMessageReadResponseDto createChatMessageReadResponseDto(List<Long> deletedMessageIds, ChatMessageReadCondition cond) {
+        return ChatMessageReadResponseDto.toDto(chatMessageJpaRepository.findLatestMessages(deletedMessageIds, cond));
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 @Entity
-@Table(name = "chat_room")
+@Table(name = "group_chat_room")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom {
@@ -18,6 +18,7 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "chatroom_name")
     private String chatRoomName;
 
     @OneToMany(mappedBy = "chatRoom")

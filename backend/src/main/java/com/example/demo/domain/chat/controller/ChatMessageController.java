@@ -2,13 +2,14 @@ package com.example.demo.domain.chat.controller;
 
 
 import com.example.demo.domain.chat.dto.request.ChatMessageCreateRequest;
+import com.example.demo.domain.chat.dto.request.ChatMessageDeleteRequest;
 import com.example.demo.domain.chat.dto.request.ChatMessageReadCondition;
+import com.example.demo.domain.chat.dto.response.ChatMessageDeleteResponseDto;
 import com.example.demo.domain.chat.dto.response.ChatMessageReadResponseDto;
 import com.example.demo.domain.chat.service.ChatMessageService;
 import com.example.demo.domain.util.BaseResponse;
 import com.example.demo.domain.util.FailResponse;
 import com.example.demo.domain.util.SuccessResponse;
-import com.example.demo.global.auth.jwt.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,10 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -33,14 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * websocket "/pub/group/chat/message"로 들어오는 메시징을 처리한다.
      */
     @MessageMapping("/group/chat/message")
-    public void message(ChatMessageCreateRequest req, @RequestHeader("Authorization") String authorizationHeader) {
-        jwtTokenProvider.validateToken(jwtTokenProvider.authorizationToJwt(authorizationHeader));
+    public void message(ChatMessageCreateRequest req){
         chatMessageService.saveChatMessage(req);
     }
 
@@ -54,7 +50,11 @@ public class ChatMessageController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "채팅방 최근 메시지 조회 성공"
+                    description = "채팅방 최근 메시지 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatMessageReadResponseDto.class)
+                    )
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -77,6 +77,53 @@ public class ChatMessageController {
         SuccessResponse<ChatMessageReadResponseDto> response = SuccessResponse.<ChatMessageReadResponseDto>builder()
                 .data(result)
                 .message("채팅 메시지 목록 조회 성공")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "채팅 메시지 삭제",
+            description = "채팅 메시지 삭제합니다."
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "채팅 메시지 삭제 요청",
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = ChatMessageDeleteRequest.class)
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "채팅 메시지 삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatMessageDeleteResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            """
+                            - 회원이 존재하지 않습니다.
+                            - 메시지가 존재하지 않습니다.
+                            - 채팅방이 존재하지 않습니다.
+                            - 채팅방에 초대되지 않은 회원입니다.
+                            """,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FailResponse.class)
+                    )
+            )
+    })
+    @PatchMapping("/api/v1/group/chat/message")
+    public ResponseEntity<BaseResponse<ChatMessageDeleteResponseDto>> deleteMessage(@Valid @RequestBody ChatMessageDeleteRequest req){
+        ChatMessageDeleteResponseDto result = chatMessageService.deleteChatMessage(req);
+
+        SuccessResponse<ChatMessageDeleteResponseDto> response = SuccessResponse.<ChatMessageDeleteResponseDto>builder()
+                .data(result)
+                .message("채팅 메시지 삭제 성공")
                 .build();
 
         return ResponseEntity.ok(response);

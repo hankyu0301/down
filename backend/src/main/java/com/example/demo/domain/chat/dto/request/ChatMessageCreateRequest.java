@@ -30,8 +30,4 @@ public class ChatMessageCreateRequest {
     @Schema(description = "메시지 내용", example = "안녕하세요.")
     private String content;
 
-    @NotNull(message = "메시지 타입은 필수 입력 값입니다.")
-    @Schema(description = "메시지 타입", example = "ENTER")
-    private String type;    //ENTER, QUIT, TALK
-
 }

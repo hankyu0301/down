@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 @Schema(description = "채팅 메시지 응답")
 public class ChatMessageDto {
 
+    @Schema(description = "채팅 메시지 ID", example = "1")
+    private Long chatMessageId;
+
     @Schema(description = "채팅방 ID", example = "1")
     private Long chatRoomId;
 
@@ -44,12 +47,13 @@ public class ChatMessageDto {
     }
 
     @Builder
-    public ChatMessageDto(Long chatRoomId, Long userId, String userName, String content, ChatMessage.MessageType type, LocalDateTime createdAt) {
+    public ChatMessageDto(Long chatMessageId, Long chatRoomId, Long userId, String userName, String content, ChatMessage.MessageType type, LocalDateTime createdAt) {
+        this.chatMessageId = chatMessageId;
         this.chatRoomId = chatRoomId;
         this.userId = userId;
         this.userName = userName;
         this.content = content;
-        this.type = String.valueOf(type);
+        this.type = type.toString();
         this.createdAt = createdAt;
     }
 }
