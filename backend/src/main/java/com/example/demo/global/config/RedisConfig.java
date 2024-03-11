@@ -39,14 +39,44 @@ public class RedisConfig {
     @Value("${spring.redis.password.chat}")
     private String chatPassword;
 
-    @Bean
-    public ChannelTopic channelTopic() {
-        return new ChannelTopic("chatRoom");
+    @Bean(name = "groupChannelTopic")
+    public ChannelTopic groupChannelTopic() {
+        return new ChannelTopic("groupChatRoom");
     }
 
-    @Bean
-    public MessageListenerAdapter messageListenerAdapter(RedisSubscriber redisSubscriber) {
-        return new MessageListenerAdapter(redisSubscriber, "sendMessage");
+    @Bean(name = "privateChannelTopic")
+    public ChannelTopic privateChannelTopic() {
+        return new ChannelTopic("privateChatRoom");
+    }
+
+    @Bean(name = "groupMessageListenerAdapter")
+    public MessageListenerAdapter groupMessageListenerAdapter(RedisSubscriber redisSubscriber) {
+        return new MessageListenerAdapter(redisSubscriber, "sendGroupMessage");
+    }
+
+    @Bean(name = "privateMessageListenerAdapter")
+    public MessageListenerAdapter privateMessageListenerAdapter(RedisSubscriber redisSubscriber) {
+        return new MessageListenerAdapter(redisSubscriber, "sendPrivateMessage");
+    }
+
+    @Bean(name = "redisGroupMessageListenerContainer")
+    public RedisMessageListenerContainer redisGroupMessageListenerContainer(RedisConnectionFactory connectionFactory,
+                                                              MessageListenerAdapter groupMessageListenerAdapter,
+                                                              ChannelTopic groupChannelTopic){
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(groupMessageListenerAdapter, groupChannelTopic);
+        return container;
+    }
+
+    @Bean(name = "redisPrivateMessageListenerContainer")
+    public RedisMessageListenerContainer redisPrivateMessageListenerContainer(RedisConnectionFactory connectionFactory,
+                                                              MessageListenerAdapter privateMessageListenerAdapter,
+                                                              ChannelTopic privateChannelTopic){
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(privateMessageListenerAdapter, privateChannelTopic);
+        return container;
     }
 
     @Bean(name = "emailRedisConnectionFactory")
@@ -68,18 +98,4 @@ public class RedisConfig {
         return new LettuceConnectionFactory(configuration);
     }
 
-
-    /** RedisMessageListenerContainer는 Redis Channel(Topic)로 부터 메시지를 받고,
-     주입된 리스너들에게 비동기적으로 dispatch 하는 역할을 수행하는 컨테이너이다.
-     즉, 발행된 메시지 처리를 위한 리스너들을 설정할 수 있다.
-     */
-    @Bean
-    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory,
-                                                              MessageListenerAdapter messageListenerAdapter,
-                                                              ChannelTopic channelTopic){
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(messageListenerAdapter, channelTopic);
-        return container;
-    }
 }
