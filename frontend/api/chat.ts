@@ -1,20 +1,63 @@
 import instance from "@/lib/axios/instance";
 import {
-  CreateChatRoomType,
-  GetChatMessagesType,
-  GetChatRoomType,
-  GetChatRoomsType,
-  LeaveChatRoomType,
+  CreateGroupChatRoomType,
+  GetGroupChatMessagesType,
+  GetGroupChatRoomType,
+  InviteGroupChatRoomType,
+  LeaveGroupChatRoomType,
 } from "@/types/chat";
 
-// 채팅 메세지
+// 채팅방 [그룹]
+
+// 채팅방 생성
+export const createGroupChatRoom = async (body: CreateGroupChatRoomType) => {
+  try {
+    const response = await instance.post(`/group/chatRoom`, body);
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+// 채팅방 초대
+export const inviteGroupChat = async ({
+  chatRoomId,
+}: InviteGroupChatRoomType) => {};
+
+// 채팅방 정보 조회
+export const getGroupChatRoom = async (chatRoomId: string | string[]) => {
+  try {
+    const response = await instance.get(`/group/chatRoom/${chatRoomId}`);
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+// 채팅방 목록 조회
+export const getGroupChatRooms = async (userId: number) => {
+  try {
+    const response = await instance.get(`/group/chatRoom/list/${userId}`);
+    return response.data;
+  } catch {}
+};
+
+// 채팅방 퇴장
+export const leaveChatRoom = async (body: LeaveGroupChatRoomType) => {
+  try {
+    const response = await instance.patch(`/group/chatRoom/`, body);
+    return response.data;
+  } catch (error) {}
+};
+
+// 채팅 메세지 [그룹]
 
 // 채팅 메세지 조회
-export const getChatMessages = async ({
+export const getGroupChatMessages = async ({
   chatRoomId,
   lastChatMessageId,
   size,
-}: GetChatMessagesType) => {
+}: GetGroupChatMessagesType) => {
   try {
     const response = await instance.get(`/chat/message`, {
       params: {
@@ -28,48 +71,3 @@ export const getChatMessages = async ({
     return error;
   }
 };
-
-// 채팅방
-
-// 채팅방 생성
-export const createChatRoom = async (body: CreateChatRoomType) => {
-  try {
-    const response = await instance.post(`/chatRoom`, body);
-    return response.data;
-  } catch (error) {
-    return error;
-  }
-};
-
-// 채팅방 정보 조회
-export const getChatRoom = async ({ chatRoomId }: GetChatRoomType) => {
-  try {
-    const response = await instance.get(`/chatRoom`, {
-      params: {
-        chatRoomId,
-      },
-    });
-  } catch (error) {
-    return error;
-  }
-};
-
-// 채팅방 목록 조회
-export const getChatRooms = async ({ userId }: GetChatRoomsType) => {
-  try {
-    const response = await instance.get(`/chatRoom/list`, {
-      params: {
-        userId,
-      },
-    });
-    return response.data;
-  } catch {}
-};
-
-// 채팅방 퇴장
-// export const leaveChatRoom = async (body: LeaveChatRoomType) => {
-//   try {
-//     const response = await instance.delete(`/chatRoom`, body);
-//     return response.data;
-//   } catch (error) {}
-// };

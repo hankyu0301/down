@@ -1,23 +1,24 @@
-export interface GetChatMessagesType {
+export interface GetGroupChatMessagesType {
   chatRoomId: number;
   lastChatMessageId: number;
   size: number;
 }
 
-export interface CreateChatRoomType {
+export interface CreateGroupChatRoomType {
+  userId: number;
   userIdList: Array<number>;
   chatRoomName: string;
 }
 
-export interface GetChatRoomType {
+export interface GetGroupChatRoomType {
   chatRoomId: number;
 }
 
-export interface LeaveChatRoomType {
+export interface InviteGroupChatRoomType {
+  chatRoomId: number;
+}
+
+export interface LeaveGroupChatRoomType {
   userId: number;
   chatRoomId: number;
-}
-
-export interface GetChatRoomsType {
-  userId: string;
 }
