@@ -14,11 +14,13 @@ import com.example.demo.domain.chat.repository.ChatRoomJpaRepository;
 import com.example.demo.domain.chat.repository.ChatRoomUserJpaRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.global.event.chat.ChatMessageCreatedEvent;
 import com.example.demo.global.exception.CustomException;
 import com.example.demo.global.exception.ExceptionCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
@@ -39,17 +41,22 @@ public class ChatMessageService {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String,Object> chatRedisTemplate;
     private final ChannelTopic groupChannelTopic;
+    private final ApplicationEventPublisher publisher;
 
     public void saveChatMessage(ChatMessageCreateRequest req) {
         User user = getUserById(req.getUserId());
         ChatRoom chatRoom = getChatRoomById(req.getChatRoomId());
         validateUserInChatRoom(user, chatRoom);
 
+        List<Long> chatRoomUserIds = chatRoomUserJpaRepository.findChatRoomUserIdsByChatRoom(chatRoom);
+        chatRoomUserIds.remove(user.getId());
+
         ChatMessageDto chatMessageDto = createChatMessage(user, req.getContent(), chatRoom);
         ChatMessage chatMessage = chatMessageDto.toEntity(chatRoom);
         chatMessageDto.setChatMessageId(chatMessage.getId());
         saveChatMessageToDatabase(chatMessage);
         publishChatMessage(chatMessageDto);
+        publisher.publishEvent(new ChatMessageCreatedEvent(chatRoomUserIds, chatMessageDto));
     }
 
     public ChatMessageReadResponseDto findLatestMessage(ChatMessageReadCondition cond) {
@@ -101,6 +108,7 @@ public class ChatMessageService {
     private ChatMessageDto createChatMessage(User user, String content, ChatRoom chatRoom) {
         return ChatMessageDto.builder()
                 .chatRoomId(chatRoom.getId())
+                .chatRoomName(chatRoom.getChatRoomName())
                 .userName(user.getUserName())
                 .userId(user.getId())
                 .content(content)

@@ -60,7 +60,9 @@ public enum ExceptionCode {
     NOT_EXIST_GETHERING("모임이 존재하지 않습니다.", 400),
     NOT_EXIST_COMMENT("댓글이 존재하지 않습니다.", 400),
     NOT_EXIST_REPLY("대댓글이 존재하지 않습니다.", 400),
-    NOT_MATCH_USER("사용자가 일치하지 않습니다.", 400);
+    NOT_MATCH_USER("사용자가 일치하지 않습니다.", 400),
+    NOT_FOUND_FCM_TOKEN("FCM 토큰이 존재하지 않습니다.", 400),
+    GOOGLE_REQUEST_TOKEN_ERROR("FCM 토큰 요청 에러", 400);
 
     private final String message;
     private final int httpStatusCode;

@@ -71,7 +71,7 @@ public class CustomChatMessageRepositoryImpl extends QuerydslRepositorySupport i
     }
     private List<ChatMessageDto> fetchResults(Pageable pageable, Predicate predicate) {
         return jpaQueryFactory
-                .select(constructor(ChatMessageDto.class, chatMessage.id, chatMessage.chatRoom.id, chatMessage.userId, chatMessage.userName, chatMessage.content, chatMessage.type, chatMessage.createdAt))
+                .select(constructor(ChatMessageDto.class, chatMessage.id, chatMessage.chatRoom.id, chatMessage.chatRoom.chatRoomName, chatMessage.userId, chatMessage.userName, chatMessage.content, chatMessage.type, chatMessage.createdAt))
                 .from(chatMessage)
                 .where(predicate)
                 .orderBy(chatMessage.id.desc())
