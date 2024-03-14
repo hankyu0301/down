@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { getGroupChatRoom } from "@/api/chat";
 import { useParams } from "next/navigation";
+import ChatContainer from "./ChatContainer";
 
 const ChatRoom = () => {
-  const [chatRoom, setChatRoom] = useState([]);
+  const [chatRoom, setChatRoom] = useState("");
   const params = useParams();
   console.log(params);
   useEffect(() => {
@@ -17,12 +18,13 @@ const ChatRoom = () => {
 
     getChatRoom();
   }, []);
+
+  console.log(chatRoom.chatRoomId);
+
   return (
     <div>
-      채팅방
-      {/* {chatRoom.map((room) => (
-        <div>{room.chatRoomName}</div>
-      ))} */}
+      {chatRoom && <div>{chatRoom.chatRoomName}</div>}
+      <ChatContainer />
     </div>
   );
 };

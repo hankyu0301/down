@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ModalType = "modalTypeExample";
+export type ModalType = "modalTypeExample" | "createGroupChat";
 
 interface ModalData {
   modalDataTypeExample?: string;
@@ -19,5 +19,5 @@ export const useModal = create<ModalStore>((set) => ({
   data: {},
   isOpen: false,
   onOpen: (type, data = {}) => set({ isOpen: true, type, data }),
-  onClose: () => set({ type: null, isOpen: false })
-}))
+  onClose: () => set({ type: null, isOpen: false }),
+}));

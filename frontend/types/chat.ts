@@ -5,8 +5,8 @@ export interface GetGroupChatMessagesType {
 }
 
 export interface CreateGroupChatRoomType {
-  userId: number;
-  userIdList: Array<number>;
+  userId: number | undefined;
+  userIdList: Array<number | undefined>;
   chatRoomName: string;
 }
 

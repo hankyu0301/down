@@ -1,10 +1,16 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   createGroupChatRoom,
   getGroupChatRoom,
   getGroupChatRooms,
 } from "@/api/chat";
 import { useRouter } from "next/navigation";
+import { useProfile } from "@/hooks/user/useProfile";
+import { useModal } from "@/store/useModalStore";
+import { Button } from "@/components/ui/button/button";
 
 interface chatRoomListType {
   chatRoomId: number;
@@ -14,6 +20,8 @@ interface chatRoomListType {
 
 const ChatRoomList = () => {
   const [chatRoomList, setChatRoomList] = useState<chatRoomListType[]>();
+  const user = useProfile();
+  const { onOpen } = useModal();
 
   const router = useRouter();
   useEffect(() => {
@@ -28,8 +36,8 @@ const ChatRoomList = () => {
 
   const createChat = async () => {
     const body = {
-      userId: 1,
-      userIdList: [1, 2, 3],
+      userId: user?.id,
+      userIdList: [user?.id, 1, 2],
       chatRoomName: "새 채팅방",
     };
     const response = await createGroupChatRoom(body);
@@ -38,7 +46,9 @@ const ChatRoomList = () => {
 
   return (
     <div>
-      <p onClick={createChat}>채팅방만들기</p>
+      <Button onClick={() => onOpen("createGroupChat")} variant="default">
+        Create group chat
+      </Button>
       {chatRoomList && (
         <>
           {chatRoomList.map((list) => (

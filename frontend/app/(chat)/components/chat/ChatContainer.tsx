@@ -57,7 +57,6 @@ const ChatContainer = () => {
   return (
     <div className="m-auto w-[60%]">
       <SocketIndicator />
-      <ChatRoomList />
       <h3 className="text-lg font-semibold mb-2">
         Login as a "{user?.nickName}"
       </h3>
