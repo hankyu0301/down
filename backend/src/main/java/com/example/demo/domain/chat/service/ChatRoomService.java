@@ -92,6 +92,7 @@ public class ChatRoomService {
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .chatRoomId(chatRoomJpa.getId())
+                .chatRoomName(chatRoomJpa.getChatRoomName())
                 .userId(inviter.getId())
                 .userName(inviter.getUserName())
                 .content(inviter.getUserName() + " 님이 " + invitedUsers + " 님을 초대했습니다.")
@@ -123,6 +124,7 @@ public class ChatRoomService {
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .chatRoomId(chatRoom.getId())
+                .chatRoomName(chatRoom.getChatRoomName())
                 .userId(user.getId())
                 .userName(user.getUserName())
                 .content(user.getUserName() + " 님이 퇴장했습니다.")
@@ -154,6 +156,7 @@ public class ChatRoomService {
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .chatRoomId(chatRoom.getId())
+                .chatRoomName(chatRoom.getChatRoomName())
                 .userId(inviter.getId())
                 .userName(inviter.getUserName())
                 .content(inviter.getUserName() + " 님이 " + target.getUserName() + " 님을 초대했습니다.")

@@ -9,7 +9,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: gksxorb147@gmail.com # downpass
-    password:
+    password: utvu kqsk rbbl fwbw
     properties:
       mail:
         smtp:
@@ -101,3 +101,9 @@ api:
 file:
   upload:
     path: /static
+
+firebase:
+  config:
+    path: /down_firebase_admin_sdk.json
+  app:
+    url: https://fcm.googleapis.com/v1/projects/down-eb5c8/messages:send

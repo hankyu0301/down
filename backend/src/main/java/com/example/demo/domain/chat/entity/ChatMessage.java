@@ -46,6 +46,7 @@ public class ChatMessage extends BaseEntity {
         return new ChatMessageDto(
                 this.id,
                 this.chatRoom.getId(),
+                this.chatRoom.getChatRoomName(),
                 this.userId,
                 this.userName,
                 this.content,

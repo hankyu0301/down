@@ -12,11 +12,13 @@ import com.example.demo.domain.chat.repository.PrivateChatMessageJpaRepository;
 import com.example.demo.domain.chat.repository.PrivateChatRoomJpaRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.global.event.chat.PrivateChatMessageCreatedEvent;
 import com.example.demo.global.exception.CustomException;
 import com.example.demo.global.exception.ExceptionCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class PrivateChatMessageService {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String,Object> chatRedisTemplate;
     private final ChannelTopic privateChannelTopic;
+    private final ApplicationEventPublisher publisher;
 
     public void sendMessage(PrivateChatMessageCreateRequest req) {
         User fromUser = getUser(req.getFromUser());
@@ -45,6 +48,7 @@ public class PrivateChatMessageService {
         PrivateChatMessage privateChatMessage = savePrivateChatMessageToDatabase(privateChatMessageDto.toEntity(privateChatRoom));
         privateChatMessageDto.setChatMessageId(privateChatMessage.getId());
         publishMessage(privateChatMessageDto);
+        publisher.publishEvent(new PrivateChatMessageCreatedEvent(toUser.getId(), privateChatRoom.getChatRoomName(), privateChatMessageDto));
     }
 
     public PrivateChatMessageReadResponseDto findLatestMessage(ChatMessageReadCondition cond) {

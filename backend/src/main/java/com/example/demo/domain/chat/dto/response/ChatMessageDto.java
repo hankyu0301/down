@@ -22,6 +22,9 @@ public class ChatMessageDto {
     @Schema(description = "채팅방 ID", example = "1")
     private Long chatRoomId;
 
+    @Schema(description = "채팅방 이름", example = "채팅방 1")
+    private String chatRoomName;
+
     @Schema(description = "회원 ID", example = "1")
     private Long userId;
 
@@ -47,9 +50,10 @@ public class ChatMessageDto {
     }
 
     @Builder
-    public ChatMessageDto(Long chatMessageId, Long chatRoomId, Long userId, String userName, String content, ChatMessage.MessageType type, LocalDateTime createdAt) {
+    public ChatMessageDto(Long chatMessageId, Long chatRoomId, String chatRoomName, Long userId, String userName, String content, ChatMessage.MessageType type, LocalDateTime createdAt) {
         this.chatMessageId = chatMessageId;
         this.chatRoomId = chatRoomId;
+        this.chatRoomName = chatRoomName;
         this.userId = userId;
         this.userName = userName;
         this.content = content;

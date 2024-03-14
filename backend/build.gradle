@@ -43,6 +43,13 @@ dependencies {
 	 * 참고 : https://spring.io/guides/gs/messaging-stomp-websocket/#scratch
 	 * */
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.webjars:sockjs-client:1.1.2'
+	implementation 'org.webjars:stomp-websocket:2.3.3-1'
+
+	/**
+	 * Firebase
+	 * */
+	implementation 'com.google.firebase:firebase-admin:9.1.1'
 
 	/**
 	 * Oauth 2
@@ -72,6 +79,9 @@ dependencies {
 	 * */
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+	/**
+	 * QueryDSL
+	 * */
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
