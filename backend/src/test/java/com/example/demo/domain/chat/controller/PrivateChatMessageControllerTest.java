@@ -1,10 +1,9 @@
 package com.example.demo.domain.chat.controller;
 
 import com.example.demo.domain.chat.dto.request.ChatMessageReadCondition;
-import com.example.demo.domain.chat.dto.response.ChatMessageDto;
-import com.example.demo.domain.chat.dto.response.ChatMessageReadResponseDto;
-import com.example.demo.domain.chat.entity.ChatMessage;
-import com.example.demo.domain.chat.service.ChatMessageService;
+import com.example.demo.domain.chat.dto.response.PrivateChatMessageDto;
+import com.example.demo.domain.chat.dto.response.PrivateChatMessageReadResponseDto;
+import com.example.demo.domain.chat.service.PrivateChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,39 +25,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RequiredArgsConstructor
-@WebMvcTest(ChatMessageController.class)
-class ChatMessageControllerTest {
+@WebMvcTest(PrivateChatMessageController.class)
+class PrivateChatMessageControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ChatMessageService chatMessageService;
+    private PrivateChatMessageService privateChatMessageService;
 
-    @DisplayName("O 성공 최근 메시지 조회")
+    @DisplayName("O 성공 채팅 메시지 목록 조회")
     @Test
     @WithMockUser
     void getMessageList() throws Exception {
         // Given
         ChatMessageReadCondition cond = new ChatMessageReadCondition(1L, 1L, 0L, 20);
-        ChatMessageReadResponseDto result = new ChatMessageReadResponseDto(1, false, List.of(
-                ChatMessageDto.builder()
+        PrivateChatMessageReadResponseDto result = new PrivateChatMessageReadResponseDto(1, false, List.of(
+                PrivateChatMessageDto.builder()
                         .chatMessageId(1L)
                         .chatRoomId(1L)
-                        .chatRoomName("testName")
-                        .userName("testUsername")
                         .userId(1L)
                         .userName("testUsername")
                         .content("testContent")
-                        .type(ChatMessage.MessageType.TALK)
-                        .createdAt(LocalDateTime.of(2024,3,18,0,0))
+                        .createdAt(LocalDateTime.of(2021, 8, 8, 0, 0, 0))
                         .build()
         ));
 
-        given(chatMessageService.findLatestMessage(any(ChatMessageReadCondition.class))).willReturn(result);
+        given(privateChatMessageService.findLatestMessage(any(ChatMessageReadCondition.class))).willReturn(result);
 
         // When
-        mockMvc.perform(get("/api/v1/group/chat/message")
+        mockMvc.perform(get("/api/v1/private/chat/message")
                         .param("userId", String.valueOf(cond.getUserId()))
                         .param("size", String.valueOf(cond.getSize()))
                         .param("chatRoomId", String.valueOf(cond.getChatRoomId()))
@@ -66,7 +62,7 @@ class ChatMessageControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(
-                content().contentType(MediaType.APPLICATION_JSON))
+                        content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
                         {"success":true,
                             "data":{
@@ -75,14 +71,15 @@ class ChatMessageControllerTest {
                                 "chatMessageResponseDtoList":[{
                                     "chatMessageId":1,
                                     "chatRoomId":1,
-                                    "chatRoomName":"testName",
                                     "userId":1,
-                                    "userName":"testUsername",
+                                    "userName":
+                                    "testUsername",
                                     "content":"testContent",
-                                    "type":"TALK",
-                                    "createdAt":"2024-03-18T00:00:00"}
+                                    "createdAt":"2021-08-08T00:00:00"}
                                     ]},
                                 "message":"채팅 메시지 목록 조회 성공"}
                 """));
     }
+
+
 }

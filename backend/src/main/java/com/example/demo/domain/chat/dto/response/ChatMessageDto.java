@@ -22,7 +22,7 @@ public class ChatMessageDto {
     @Schema(description = "채팅방 ID", example = "1")
     private Long chatRoomId;
 
-    @Schema(description = "채팅방 이름", example = "채팅방 1")
+    @Schema(description = "채팅방 이름", example = "채팅방1")
     private String chatRoomName;
 
     @Schema(description = "회원 ID", example = "1")
