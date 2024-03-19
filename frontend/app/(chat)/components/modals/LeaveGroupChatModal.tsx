@@ -29,15 +29,14 @@ const LeaveGroupChatModal = () => {
   const onClick = async () => {
     try {
       setIsLoading(true);
-      const chatRoomId = params.chatRoomId;
       const body = {
         userId: user?.id,
       };
 
-      await leaveGroupChatRoom(chatRoomId, body);
+      if (chatRoomId) await leaveGroupChatRoom(chatRoomId, body);
       onClose();
       router.refresh();
-      router.push("/");
+      router.push("/chat");
     } catch (error) {
       console.log(error);
     } finally {

@@ -28,12 +28,22 @@ import { Button } from "@/components/ui/button/button";
 
 import { useProfile } from "@/hooks/user/useProfile";
 import { createGroupChatRoom } from "@/api/chat";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 const CreateGroupChatModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
-  const params = useParams();
   const user = useProfile();
+
+  const queryClient = useQueryClient();
+
+  const createGroupChatMutation = useMutation({
+    mutationFn: createGroupChatRoom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["groupChatRooms"] });
+    },
+    onError: (error: any) => {},
+  });
 
   const formSchema = z.object({
     name: z
@@ -62,11 +72,10 @@ const CreateGroupChatModal = () => {
     try {
       const body = {
         userId: user?.id,
-        userIdList: [user?.id, 12, 2],
+        userIdList: [user?.id],
         chatRoomName: values.name,
       };
-      const response = await createGroupChatRoom(body);
-      console.log(response);
+      createGroupChatMutation.mutate(body);
       form.reset();
       router.refresh();
       onClose();

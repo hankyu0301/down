@@ -6,19 +6,6 @@ import { useParams } from "next/navigation";
 import ChatContainer from "./ChatContainer";
 
 const ChatRoom = () => {
-  const [chatRoom, setChatRoom] = useState("");
-  const params = useParams();
-  console.log(params);
-  useEffect(() => {
-    const getChatRoom = async () => {
-      const response = await getGroupChatRoom(params.chatRoomId);
-      setChatRoom(response.data);
-      console.log(response);
-    };
-
-    getChatRoom();
-  }, []);
-
   return (
     <div>
       <ChatContainer />

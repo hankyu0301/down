@@ -81,3 +81,18 @@ export const getGroupChatMessages = async ({
     return error;
   }
 };
+
+// 채팅방 [개인]
+
+// 채팅방 퇴장
+export const leavePrivateChatRoom = async (chatRoomId: number, body: any) => {
+  try {
+    const response = await instance.patch(
+      `/private/chatRoom/${chatRoomId}/exit`,
+      body
+    );
+    return response.data;
+  } catch (error) {}
+};
+
+// 채팅방 목록 조회

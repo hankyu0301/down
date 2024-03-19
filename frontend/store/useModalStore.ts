@@ -7,7 +7,7 @@ export type ModalType =
   | "leaveGroupChat";
 
 interface ModalData {
-  chatRoomId?: number;
+  chatRoomId?: number | string | string[];
   chatRoomName?: string;
   lastMessage?: string;
   lastMessageTime?: [];

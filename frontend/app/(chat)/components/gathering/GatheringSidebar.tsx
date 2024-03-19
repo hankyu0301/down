@@ -15,7 +15,7 @@ interface ChatRoomListType {
 }
 
 const GatheringSidebar = () => {
-  const [groupChatList, setGroupChatList] = useState<ChatRoomListType>([]);
+  const [groupChatList, setGroupChatList] = useState<ChatRoomListType[]>();
   const user = useProfile();
 
   console.log(user);
@@ -23,7 +23,7 @@ const GatheringSidebar = () => {
   //   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["groupChatRooms"],
-    queryFn: () => getGroupChatRooms(user.id),
+    queryFn: () => getGroupChatRooms(user!.id),
     enabled: !!user, // 유저 정보가 있는 경우에만 쿼리 실행
   });
 
@@ -40,7 +40,7 @@ const GatheringSidebar = () => {
         <Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
 
         <div className="space-y-[2px]">
-          {groupChatList.map((list) => (
+          {groupChatList?.map((list: ChatRoomListType) => (
             <GatheringGroupChat key={list.chatRoomId} groupChat={list} />
           ))}
         </div>
