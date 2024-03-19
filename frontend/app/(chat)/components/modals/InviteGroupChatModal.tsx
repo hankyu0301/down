@@ -27,31 +27,30 @@ import { Input } from "@/components/ui/input/input";
 import { Button } from "@/components/ui/button/button";
 
 import { useProfile } from "@/hooks/user/useProfile";
-import { createGroupChatRoom } from "@/api/chat";
+import { inviteGroupChat } from "@/api/chat";
 
-const CreateGroupChatModal = () => {
+const InviteGroupChatModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
   const params = useParams();
   const user = useProfile();
 
   const formSchema = z.object({
-    name: z
-      .string()
-      .min(1, {
-        message: "Channel name is required.",
-      })
-      .refine((name) => name !== "general", {
-        message: "Channel name cannot be 'general'",
-      }),
+    targetId: z.string().min(1, {
+      message: "targetId is required.",
+    }),
+    chatRoomId: z.string().min(1, {
+      message: "ChatRoomId is required.",
+    }),
   });
 
-  const isModalOpen = isOpen && type === "createGroupChat";
+  const isModalOpen = isOpen && type === "inviteGroupChat";
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      targetId: "",
+      chatRoomId: "",
     },
   });
 
@@ -61,11 +60,11 @@ const CreateGroupChatModal = () => {
     console.log(values);
     try {
       const body = {
-        userId: user?.id,
-        userIdList: [user?.id, 12, 2],
-        chatRoomName: values.name,
+        inviterId: Number(user?.id),
+        chatRoomId: Number(params.chatRoomId),
+        targetId: Number(values.targetId),
       };
-      const response = await createGroupChatRoom(body);
+      const response = await inviteGroupChat(body);
       console.log(response);
       form.reset();
       router.refresh();
@@ -83,7 +82,7 @@ const CreateGroupChatModal = () => {
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Create Group Chat
+            Invite GroupChat
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -91,17 +90,37 @@ const CreateGroupChatModal = () => {
             <div className="space-y-8 px-6">
               <FormField
                 control={form.control}
-                name="name"
+                name="targetId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="uppercase text-xs font-bold text-zinc-500">
-                      Room Name
+                      targetId
                     </FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
                         className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                        placeholder="Enter room name"
+                        placeholder="Enter targetId"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="chatRoomId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase text-xs font-bold text-zinc-500">
+                      chatRoomId
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
+                        placeholder="Enter chatRoomId"
                         {...field}
                       />
                     </FormControl>
@@ -112,7 +131,7 @@ const CreateGroupChatModal = () => {
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button disabled={isLoading} variant="default">
-                Create
+                Invite
               </Button>
             </DialogFooter>
           </form>
@@ -122,4 +141,4 @@ const CreateGroupChatModal = () => {
   );
 };
 
-export default CreateGroupChatModal;
+export default InviteGroupChatModal;

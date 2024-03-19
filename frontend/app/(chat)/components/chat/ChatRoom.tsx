@@ -19,11 +19,8 @@ const ChatRoom = () => {
     getChatRoom();
   }, []);
 
-  console.log(chatRoom.chatRoomId);
-
   return (
     <div>
-      {chatRoom && <div>{chatRoom.chatRoomName}</div>}
       <ChatContainer />
     </div>
   );

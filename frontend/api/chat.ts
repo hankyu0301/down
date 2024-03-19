@@ -20,9 +20,13 @@ export const createGroupChatRoom = async (body: CreateGroupChatRoomType) => {
 };
 
 // 채팅방 초대
-export const inviteGroupChat = async ({
-  chatRoomId,
-}: InviteGroupChatRoomType) => {};
+export const inviteGroupChat = async (body: InviteGroupChatRoomType) => {
+  try {
+    const response = await instance.post(`/group/chatRoom/invite`, body);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {}
+};
 
 // 채팅방 정보 조회
 export const getGroupChatRoom = async (chatRoomId: string | string[]) => {

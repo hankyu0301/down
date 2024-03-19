@@ -1,6 +1,9 @@
 import { create } from "zustand";
 
-export type ModalType = "modalTypeExample" | "createGroupChat";
+export type ModalType =
+  | "modalTypeExample"
+  | "createGroupChat"
+  | "inviteGroupChat";
 
 interface ModalData {
   modalDataTypeExample?: string;

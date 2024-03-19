@@ -15,6 +15,8 @@ export interface GetGroupChatRoomType {
 }
 
 export interface InviteGroupChatRoomType {
+  inviterId: number | undefined;
+  targetId: number;
   chatRoomId: number;
 }
 
