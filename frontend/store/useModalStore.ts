@@ -3,10 +3,14 @@ import { create } from "zustand";
 export type ModalType =
   | "modalTypeExample"
   | "createGroupChat"
-  | "inviteGroupChat";
+  | "inviteGroupChat"
+  | "leaveGroupChat";
 
 interface ModalData {
-  modalDataTypeExample?: string;
+  chatRoomId?: number;
+  chatRoomName?: string;
+  lastMessage?: string;
+  lastMessageTime?: [];
 }
 
 interface ModalStore {

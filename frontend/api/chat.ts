@@ -47,9 +47,15 @@ export const getGroupChatRooms = async (userId: number) => {
 };
 
 // 채팅방 퇴장
-export const leaveChatRoom = async (body: LeaveGroupChatRoomType) => {
+export const leaveGroupChatRoom = async (
+  chatRoomId: number | string | string[],
+  body: LeaveGroupChatRoomType
+) => {
   try {
-    const response = await instance.patch(`/group/chatRoom/`, body);
+    const response = await instance.patch(
+      `/group/chatRoom/${chatRoomId}/exit`,
+      body
+    );
     return response.data;
   } catch (error) {}
 };

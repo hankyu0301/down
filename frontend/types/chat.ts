@@ -21,6 +21,5 @@ export interface InviteGroupChatRoomType {
 }
 
 export interface LeaveGroupChatRoomType {
-  userId: number;
-  chatRoomId: number;
+  userId: number | undefined;
 }

@@ -31,6 +31,7 @@ import { inviteGroupChat } from "@/api/chat";
 
 const InviteGroupChatModal = () => {
   const { isOpen, onClose, type, data } = useModal();
+  const { chatRoomId, chatRoomName } = data;
   const router = useRouter();
   const params = useParams();
   const user = useProfile();
@@ -50,7 +51,7 @@ const InviteGroupChatModal = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       targetId: "",
-      chatRoomId: "",
+      chatRoomId: chatRoomId,
     },
   });
 
@@ -82,7 +83,7 @@ const InviteGroupChatModal = () => {
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Invite GroupChat
+            Invite Group Chat {chatRoomName}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
