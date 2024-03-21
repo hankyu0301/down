@@ -11,6 +11,7 @@ import com.example.demo.domain.user.repository.UserSportsInfoRepository;
 import com.example.demo.global.auth.EnumLoginType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class UserDataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final SportsRepository sportsRepository;
     private final UserSportsInfoRepository userSportsInfoRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
@@ -34,7 +36,7 @@ public class UserDataLoader implements CommandLineRunner {
         return User.builder()
                 .id(id)
                 .email("test" + id + "@test.com")
-                .password("test")
+                .password(passwordEncoder.encode("test"))
                 .nickName("test" + id)
                 .userName("test" + id)
                 .birth("1990-01-01")

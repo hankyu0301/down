@@ -24,7 +24,7 @@ public class RedisSubscriber {
             // ChatMessageDto 객채로 맵핑
             ChatMessageDto chatMessageDto = objectMapper.readValue(publishMessage, ChatMessageDto.class);
             // Websocket 구독자에게 채팅 메시지 Send
-            messagingTemplate.convertAndSend("/sub/group/chat/room/" + chatMessageDto.getChatRoomId(), objectMapper.writeValueAsString(chatMessageDto));
+            messagingTemplate.convertAndSend("/sub/chat/group/room/" + chatMessageDto.getChatRoomId(), objectMapper.writeValueAsString(chatMessageDto));
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -35,7 +35,7 @@ public class RedisSubscriber {
             // ChatMessageDto 객채로 맵핑
             PrivateChatMessageDto chatMessageDto = objectMapper.readValue(publishMessage, PrivateChatMessageDto.class);
             // Websocket 구독자에게 채팅 메시지 Send
-            messagingTemplate.convertAndSend("/sub/private/chat/room/" + chatMessageDto.getChatRoomId(), objectMapper.writeValueAsString(chatMessageDto));
+            messagingTemplate.convertAndSend("/sub/chat/private/room/" + chatMessageDto.getChatRoomId(), objectMapper.writeValueAsString(chatMessageDto));
         } catch (Exception e) {
             log.error(e.getMessage());
         }

@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +60,8 @@ public class ChatMessageService {
         publisher.publishEvent(new ChatMessageCreatedEvent(chatRoomUserIds, chatMessageDto));
     }
 
+    @PreAuthorize("@chatRoomGuard.check(#cond.chatRoomId)")
+    @Transactional(readOnly = true)
     public ChatMessageReadResponseDto findLatestMessage(ChatMessageReadCondition cond) {
         User user = getUserById(cond.getUserId());
         ChatRoom chatRoom = getChatRoomById(cond.getChatRoomId());
@@ -66,6 +69,7 @@ public class ChatMessageService {
         return createChatMessageReadResponseDto(chatRoomUser.getDeletedMessageIds(), cond);
     }
 
+    @PreAuthorize("@chatRoomGuard.check(#req.chatRoomId)")
     public ChatMessageDeleteResponseDto deleteChatMessage(ChatMessageDeleteRequest req) {
         User user = getUserById(req.getUserId());
         ChatMessage chatMessage = getChatMessageById(req.getChatMessageId());

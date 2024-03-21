@@ -25,4 +25,7 @@ public interface PrivateChatRoomJpaRepository extends JpaRepository<PrivateChatR
             "       or pcr.toUser = :user " +
             "       and pcr.id = :chatRoomId")
     Optional<PrivateChatRoom> findByUserAndIdWithDeleteMessageIds(User user, Long chatRoomId);
+
+    @Query("select pcr from PrivateChatRoom pcr join fetch pcr.fromUser join fetch pcr.toUser where pcr.id = :chatRoomId")
+    Optional<PrivateChatRoom> findByIdWithUsers(long chatRoomId);
 }

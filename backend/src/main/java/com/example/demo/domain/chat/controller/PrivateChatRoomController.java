@@ -56,7 +56,7 @@ public class PrivateChatRoomController {
                     )
             )
     })
-    @GetMapping("/api/v1/private/chatRoom/list/{userId}")
+    @GetMapping("/api/v1/private/chatRoom/list/users/{userId}")
     public ResponseEntity<BaseResponse<ChatRoomListResponseDto>> getAllChatRoomByUserId(@Parameter(description = "사용자 ID", example = "1")
                                                                                         @PathVariable long userId) {
 
@@ -65,6 +65,48 @@ public class PrivateChatRoomController {
         SuccessResponse<ChatRoomListResponseDto> response =  SuccessResponse.<ChatRoomListResponseDto>builder()
                 .data(result)
                 .message("채팅방 목록 조회 성공")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "채팅방 정보 조회",
+            description = "채팅방 정보를 조회합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "채팅방 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatRoomDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            """
+                            - 회원이 존재하지 않습니다.
+                            - 채팅방이 존재하지 않습니다.
+                            """,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FailResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/api/v1/private/chatRoom/{chatRoomId}/users/{userId}")
+    public ResponseEntity<BaseResponse<ChatRoomDto>> getChatRoomByIdWithUsers(@Parameter(description = "사용자 ID", example = "1")
+                                                                            @PathVariable long userId,
+                                                                            @Parameter(description = "사용자 ID", example = "1")
+                                                                            @PathVariable long chatRoomId) {
+
+        ChatRoomDto result = privateChatRoomService.getChatRoomByIdWithUsers(userId, chatRoomId);
+
+        SuccessResponse<ChatRoomDto> response =  SuccessResponse.<ChatRoomDto>builder()
+                .data(result)
+                .message("채팅방 정보 조회 성공")
                 .build();
 
         return ResponseEntity.ok(response);

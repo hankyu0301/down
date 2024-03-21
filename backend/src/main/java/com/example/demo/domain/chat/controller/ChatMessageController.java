@@ -10,6 +10,7 @@ import com.example.demo.domain.chat.service.ChatMessageService;
 import com.example.demo.domain.util.BaseResponse;
 import com.example.demo.domain.util.FailResponse;
 import com.example.demo.domain.util.SuccessResponse;
+import com.example.demo.global.aop.AssignUserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,6 +37,7 @@ public class ChatMessageController {
      * websocket "/pub/group/chat/message"로 들어오는 메시징을 처리한다.
      */
     @MessageMapping("/group/chat/message")
+    @AssignUserId
     public void message(ChatMessageCreateRequest req){
         chatMessageService.saveChatMessage(req);
     }

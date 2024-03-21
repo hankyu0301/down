@@ -1,8 +1,6 @@
 package com.example.demo.domain.chat.controller;
 
-import com.example.demo.domain.chat.dto.request.ChatRoomCreateRequest;
-import com.example.demo.domain.chat.dto.request.ChatRoomDeleteRequest;
-import com.example.demo.domain.chat.dto.request.ChatRoomInviteRequest;
+import com.example.demo.domain.chat.dto.request.*;
 import com.example.demo.domain.chat.dto.response.*;
 import com.example.demo.domain.chat.service.ChatRoomService;
 import com.example.demo.domain.user.dto.response.UserInfoResponseDTO;
@@ -55,7 +53,7 @@ class ChatRoomControllerTest {
         given(chatRoomService.getAllChatRoomByUserId(1L)).willReturn(result);
 
         // When
-        mockMvc.perform(get("/api/v1/group/chatRoom/list/{userId}", 1L)
+        mockMvc.perform(get("/api/v1/group/chatRoom/list/users/{userId}", 1L)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(
@@ -149,10 +147,10 @@ class ChatRoomControllerTest {
                 ))
                 .build();
 
-        given(chatRoomService.getChatRoomWithUserListByChatRoomId(1L)).willReturn(dto);
+        given(chatRoomService.getChatRoomWithUserListByChatRoomId(1L, 1L)).willReturn(dto);
 
         // When
-        mockMvc.perform(get("/api/v1/group/chatRoom/{chatRoomId}", 1L)
+        mockMvc.perform(get("/api/v1/group/chatRoom/{chatRoomId}/users/{userId}", 1L, 1L)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(
@@ -265,6 +263,62 @@ class ChatRoomControllerTest {
                                 "chatRoomId":1
                                 },
                             "message":"채팅방 초대 성공"}
+                """));
+    }
+
+    @DisplayName("O 성공 채팅방 초대 코드 생성")
+    @Test
+    @WithMockUser
+    void createInviteCode() throws Exception {
+        // Given
+        ChatRoomInviteCodeCreateRequest req = new ChatRoomInviteCodeCreateRequest(1L, 2L);
+        ChatRoomInviteCodeResponseDto result = new ChatRoomInviteCodeResponseDto(2L, "testInviteCode");
+
+        given(chatRoomService.createInviteCode(any(ChatRoomInviteCodeCreateRequest.class))).willReturn(result);
+
+        // When
+        mockMvc.perform(post("/api/v1/group/chatRoom/inviteCode")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {"success":true,
+                            "data":{
+                                "chatRoomId":2,
+                                "inviteCode":"testInviteCode"
+                                },
+                            "message":"채팅방 초대 코드 생성 성공"}
+                """));
+    }
+
+    @DisplayName("O 성공 채팅방 입장")
+    @Test
+    @WithMockUser
+    void joinChatRoom() throws Exception {
+        // Given
+        ChatRoomJoinRequest req = new ChatRoomJoinRequest(1L, "testInviteCode");
+        ChatRoomJoinResponseDto result = new ChatRoomJoinResponseDto(2L, "chatRoomName");
+
+        given(chatRoomService.joinChatRoomByInviteCode(any(ChatRoomJoinRequest.class))).willReturn(result);
+
+        // When
+        mockMvc.perform(post("/api/v1/group/chatRoom/join")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {"success":true,
+                            "data":{
+                                "chatRoomId":2,
+                                "chatRoomName":"chatRoomName"
+                                },
+                            "message":"채팅방 입장 성공"}
                 """));
     }
 }
