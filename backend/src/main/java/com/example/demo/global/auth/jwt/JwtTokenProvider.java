@@ -2,7 +2,6 @@ package com.example.demo.global.auth.jwt;
 
 
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.entity.EnumUserRole;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.auth.PrincipalDetails;
 import com.example.demo.global.exception.CustomException;
@@ -65,7 +64,7 @@ public class JwtTokenProvider {
 
         // Role (role): 사용자의 역할을 나타내는 정보입니다.
         // 사용자가 어떤 권한을 가지고 있는지를 나타낼 수 있습니다.
-        payloads.put("role", EnumUserRole.ROLE_USER.name());
+        payloads.put("role", user.getRole().toString());
         payloads.put("username", user.getUserName());
         payloads.put("id", user.getId());
 
@@ -121,15 +120,9 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = getClaimsFormToken(token);
-
-        String email = claims.get("email", String.class);
+        Long id = claims.get("id", Long.class);
         String role = claims.get("role", String.class);
-
-        return new UsernamePasswordAuthenticationToken(
-                email,
-                null,
-                List.of(new SimpleGrantedAuthority(role))
-        );
+        return new UsernamePasswordAuthenticationToken(id, null, List.of(new SimpleGrantedAuthority(role)));
     }
 
     public String parseToken(String headerValue) {
