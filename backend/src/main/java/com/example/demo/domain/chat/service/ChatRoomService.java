@@ -1,13 +1,13 @@
 package com.example.demo.domain.chat.service;
 
-import com.example.demo.domain.chat.dto.request.ChatRoomCreateRequest;
-import com.example.demo.domain.chat.dto.request.ChatRoomDeleteRequest;
-import com.example.demo.domain.chat.dto.request.ChatRoomInviteRequest;
+import com.example.demo.domain.chat.dto.request.*;
 import com.example.demo.domain.chat.dto.response.*;
 import com.example.demo.domain.chat.entity.ChatMessage;
 import com.example.demo.domain.chat.entity.ChatRoom;
+import com.example.demo.domain.chat.entity.ChatRoomInviteCode;
 import com.example.demo.domain.chat.entity.ChatRoomUser;
 import com.example.demo.domain.chat.repository.ChatMessageJpaRepository;
+import com.example.demo.domain.chat.repository.ChatRoomInviteCodeRepository;
 import com.example.demo.domain.chat.repository.ChatRoomJpaRepository;
 import com.example.demo.domain.chat.repository.ChatRoomUserJpaRepository;
 import com.example.demo.domain.user.dto.response.UserInfoResponseDTO;
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +39,13 @@ public class ChatRoomService {
     private final ChatRoomJpaRepository chatRoomJpaRepository;
     private final ChatRoomUserJpaRepository chatRoomUserJpaRepository;
     private final ChatMessageJpaRepository chatMessageJpaRepository;
+    private final ChatRoomInviteCodeRepository chatRoomInviteCodeRepository;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String,Object> chatRedisTemplate;
     private final ChannelTopic groupChannelTopic;
 
+    @PreAuthorize("@userGuard.check(#userId)")
+    @Transactional(readOnly = true)
     public ChatRoomListResponseDto getAllChatRoomByUserId(long userId) {
 
         User user = getUserById(userId);
@@ -60,9 +64,18 @@ public class ChatRoomService {
         return new ChatRoomListResponseDto(simpleChatRoomResponseDtoList);
     }
 
-    public ChatRoomDto getChatRoomWithUserListByChatRoomId(long chatRoomId) {
+    @PreAuthorize("@chatRoomGuard.check(#chatRoomId)")
+    @Transactional(readOnly = true)
+    public ChatRoomDto getChatRoomWithUserListByChatRoomId(long userId, long chatRoomId) {
+
+        User user = getUserById(userId);
 
         ChatRoom chatRoom = getChatRoomWithUserList(chatRoomId);
+
+        if(chatRoom.getChatRoomUserList().stream()
+                .noneMatch(chatRoomUser -> chatRoomUser.getUser().equals(user))) {
+            throw new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER);
+        }
 
         List<UserInfoResponseDTO> dtoList = chatRoom.getChatRoomUserList()
                 .stream()
@@ -73,6 +86,7 @@ public class ChatRoomService {
         return new ChatRoomDto(chatRoom.getId(), chatRoom.getChatRoomName(), dtoList);
     }
 
+    @PreAuthorize("@userGuard.check(#req.userId)")
     public ChatRoomCreateResponseDto createChatRoom(ChatRoomCreateRequest req) {
 
         ChatRoom chatRoomJpa = saveChatRoomToDatabase(req.getChatRoomName());
@@ -114,6 +128,7 @@ public class ChatRoomService {
         return new ChatRoomCreateResponseDto(chatRoomJpa.getId(), chatRoomJpa.getChatRoomName(), req.getUserIdList());
     }
 
+    @PreAuthorize("@chatRoomGuard.check(#chatRoomId)")
     public ChatRoomDeleteResponseDto exitChatroom(Long chatRoomId, ChatRoomDeleteRequest req)   {
 
         User user = getUserById(req.getUserId());
@@ -143,7 +158,7 @@ public class ChatRoomService {
         return new ChatRoomDeleteResponseDto(chatRoom.getId());
     }
 
-
+    @PreAuthorize("@chatRoomGuard.check(#req.chatRoomId)")
     public ChatRoomInviteResponseDto inviteChatRoom(ChatRoomInviteRequest req) {
 
         User inviter = getUserById(req.getInviterId());
@@ -175,6 +190,69 @@ public class ChatRoomService {
         publishChatMessage(chatMessageDto);
 
         return new ChatRoomInviteResponseDto(inviter.getId(), target.getId(), chatRoom.getId());
+    }
+
+    @PreAuthorize("@chatRoomGuard.check(#req.chatRoomId)")
+    public ChatRoomInviteCodeResponseDto createInviteCode(ChatRoomInviteCodeCreateRequest req) {
+
+        User user = getUserById(req.getUserId());
+
+        ChatRoom chatRoom = getChatRoomById(req.getChatRoomId());
+
+        validateUserIsChatRoomUser(user, chatRoom);
+
+        ChatRoomInviteCode chatRoomInviteCode = createAndSaveInviteCode(chatRoom.getId(), req.getUserId());
+
+        return new ChatRoomInviteCodeResponseDto(chatRoom.getId(), chatRoomInviteCode.getInviteCode());
+    }
+
+    @PreAuthorize("@userGuard.check(#req.userId)")
+    public ChatRoomJoinResponseDto joinChatRoomByInviteCode(ChatRoomJoinRequest req) {
+
+        ChatRoomInviteCode chatRoomInviteCode = chatRoomInviteCodeRepository.findByInviteCode(req.getInviteCode())
+                .orElseThrow(() -> new CustomException(ExceptionCode.INVALID_CHAT_ROOM_INVITE_CODE));
+
+        User user = getUserById(req.getUserId());
+
+        User inviter = getUserById(chatRoomInviteCode.getUserId());
+
+        ChatRoom chatRoom = getChatRoomById(chatRoomInviteCode.getChatRoomId());
+
+        if (chatRoomUserJpaRepository.existsByUserAndChatRoom(user, chatRoom)) {
+            throw new CustomException(ExceptionCode.ALREADY_EXIST_CHAT_ROOM_USER);
+        }
+
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .chatRoomId(chatRoom.getId())
+                .chatRoomName(chatRoom.getChatRoomName())
+                .userId(inviter.getId())
+                .userName(inviter.getUserName())
+                .content(inviter.getUserName() + " 님이 " + user.getUserName() + " 님을 초대했습니다.")
+                .type(ChatMessage.MessageType.ENTER)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        ChatMessage chatMessage = saveChatMessageToDatabase(chatMessageDto.toEntity(chatRoom));
+
+        chatMessageDto.setChatMessageId(chatMessage.getId());
+
+        ChatRoomUser chatRoomUser = new ChatRoomUser(user, chatRoom);
+        chatRoomUser.updateFirstMessageId(chatMessage.getId());
+
+        saveChatRoomUserToDatabase(chatRoomUser);
+        publishChatMessage(chatMessageDto);
+
+        return new ChatRoomJoinResponseDto(chatRoom.getId(), chatRoom.getChatRoomName());
+    }
+
+    private void validateUserIsChatRoomUser(User user, ChatRoom chatRoom) {
+        if(!chatRoomUserJpaRepository.existsByUserAndChatRoom(user, chatRoom)) {
+            throw new CustomException(ExceptionCode.NOT_EXIST_CHAT_ROOM_USER);
+        }
+    }
+
+    private ChatRoomInviteCode createAndSaveInviteCode(Long chatRoomId, Long userId) {
+        return chatRoomInviteCodeRepository.save(new ChatRoomInviteCode(chatRoomId, userId));
     }
 
     private void saveChatRoomUserToDatabase(ChatRoomUser chatRoomUser) {

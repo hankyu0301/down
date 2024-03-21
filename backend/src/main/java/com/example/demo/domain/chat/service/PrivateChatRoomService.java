@@ -2,17 +2,20 @@ package com.example.demo.domain.chat.service;
 
 import com.example.demo.domain.chat.dto.request.ChatRoomDeleteRequest;
 import com.example.demo.domain.chat.dto.response.ChatRoomDeleteResponseDto;
+import com.example.demo.domain.chat.dto.response.ChatRoomDto;
 import com.example.demo.domain.chat.dto.response.ChatRoomListResponseDto;
 import com.example.demo.domain.chat.dto.response.SimpleChatRoomResponseDto;
 import com.example.demo.domain.chat.entity.PrivateChatMessage;
 import com.example.demo.domain.chat.entity.PrivateChatRoom;
 import com.example.demo.domain.chat.repository.PrivateChatMessageJpaRepository;
 import com.example.demo.domain.chat.repository.PrivateChatRoomJpaRepository;
+import com.example.demo.domain.user.dto.response.UserInfoResponseDTO;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.global.exception.CustomException;
 import com.example.demo.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +33,10 @@ public class PrivateChatRoomService {
     private final PrivateChatRoomJpaRepository privateChatRoomJpaRepository;
     private final PrivateChatMessageJpaRepository privateChatMessageJpaRepository;
 
+    @PreAuthorize("@userGuard.check(#userId)")
+    @Transactional(readOnly = true)
     public ChatRoomListResponseDto getAllChatRoomByUserId(long userId) {
+
         User user = getUserById(userId);
 
         List<PrivateChatRoom> privateChatRoomList = privateChatRoomJpaRepository.findAllAccessibleByUser(user);
@@ -43,6 +49,28 @@ public class PrivateChatRoomService {
         return new ChatRoomListResponseDto(simpleChatRoomResponseDtoList);
     }
 
+    @PreAuthorize("@privateChatRoomGuard.check(#chatRoomId)")
+    @Transactional(readOnly = true)
+    public ChatRoomDto getChatRoomByIdWithUsers(long userId, long chatRoomId) {
+
+        User user = getUserById(userId);
+
+        PrivateChatRoom privateChatRoom = getPrivateChatRoomByIdAndUser(chatRoomId, user);
+
+        return ChatRoomDto.builder()
+                .chatRoomId(privateChatRoom.getId())
+                .chatRoomName(privateChatRoom.getChatRoomName())
+                .userInfoResponseDTOList(
+                        List.of(
+                                UserInfoResponseDTO.from(privateChatRoom.getFromUser()),
+                                UserInfoResponseDTO.from(privateChatRoom.getToUser())
+                        )
+                )
+                .build();
+    }
+
+
+    @PreAuthorize("@privateChatRoomGuard.check(#chatRoomId)")
     public ChatRoomDeleteResponseDto exitChatroom(long chatRoomId, ChatRoomDeleteRequest req) {
         User user = getUserById(req.getUserId());
 

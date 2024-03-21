@@ -3,6 +3,7 @@ package com.example.demo.domain.chat.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,9 +22,8 @@ public class ChatMessageCreateRequest {
     @Schema(description = "채팅방 id", example = "1")
     private Long chatRoomId;
 
-    @NotNull(message = "회원 id는 필수 입력 값입니다.")
-    @Positive(message = "올바른 회원 id를 입력해주세요.")
-    @Schema(description = "회원 id", example = "1")
+    @Null
+    @Schema(description = "유저 id", example = "1", hidden = true)
     private Long userId;
 
     @NotBlank(message = "메시지 내용은 필수 입력 값입니다.")

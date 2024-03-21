@@ -52,7 +52,7 @@ class PrivateChatRoomControllerTest {
         given(privateChatRoomService.getAllChatRoomByUserId(1L)).willReturn(result);
 
         // When
-        mockMvc.perform(get("/api/v1/private/chatRoom/list/{userId}", 1L)
+        mockMvc.perform(get("/api/v1/private/chatRoom/list/users/{userId}", 1L)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(

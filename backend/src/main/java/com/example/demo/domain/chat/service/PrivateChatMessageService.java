@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,7 @@ public class PrivateChatMessageService {
     private final ApplicationEventPublisher publisher;
 
     public void sendMessage(PrivateChatMessageCreateRequest req) {
-        User fromUser = getUser(req.getFromUser());
+        User fromUser = getUser(req.getUserId());
         User toUser = getUser(req.getToUser());
         PrivateChatRoom privateChatRoom = findOrCreatePrivateChatRoom(fromUser, toUser);
         PrivateChatMessageDto privateChatMessageDto = createPrivateChatMessageDto(privateChatRoom, fromUser, req.getContent());
@@ -51,6 +52,8 @@ public class PrivateChatMessageService {
         publisher.publishEvent(new PrivateChatMessageCreatedEvent(toUser.getId(), privateChatRoom.getChatRoomName(), privateChatMessageDto));
     }
 
+    @PreAuthorize("@privateChatRoomGuard.check(#cond.chatRoomId)")
+    @Transactional(readOnly = true)
     public PrivateChatMessageReadResponseDto findLatestMessage(ChatMessageReadCondition cond) {
         User user = getUser(cond.getUserId());
 
@@ -61,6 +64,7 @@ public class PrivateChatMessageService {
         return PrivateChatMessageReadResponseDto.toDto(privateChatMessageJpaRepository.findLatestMessages(cond, deletedMessageIds, privateChatRoom.getLastMessageId(user)));
     }
 
+    @PreAuthorize("@privateChatRoomGuard.check(#req.chatRoomId)")
     public ChatMessageDeleteResponseDto deleteChatMessage(ChatMessageDeleteRequest req) {
         User user = getUser(req.getUserId());
         PrivateChatMessage privateChatMessage = getPrivateChatMessage(req.getChatMessageId());

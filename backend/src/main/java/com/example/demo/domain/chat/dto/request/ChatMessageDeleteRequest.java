@@ -15,7 +15,7 @@ public class ChatMessageDeleteRequest {
 
     @NotNull(message = "회원 ID는 필수 입력 값입니다.")
     @Positive(message = "올바른 회원 ID를 입력해주세요.")
-    @Schema(description = "회원 ID")
+    @Schema(description = "회원 ID", example = "1")
     private Long userId;
 
     @NotNull(message = "채팅방 ID는 필수 입력 값입니다.")

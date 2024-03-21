@@ -9,6 +9,7 @@ import com.example.demo.domain.chat.service.PrivateChatMessageService;
 import com.example.demo.domain.util.BaseResponse;
 import com.example.demo.domain.util.FailResponse;
 import com.example.demo.domain.util.SuccessResponse;
+import com.example.demo.global.aop.AssignUserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,6 +38,7 @@ public class PrivateChatMessageController {
      * websocket "/pub/private/chat/message"로 들어오는 메시징을 처리한다.
      */
     @MessageMapping("/private/chat/message")
+    @AssignUserId
     public void message(PrivateChatMessageCreateRequest req){
         privateChatMessageService.sendMessage(req);
     }

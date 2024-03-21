@@ -115,6 +115,9 @@ public class PrivateChatRoom {
         if (user.equals(fromUser)) {
             return fromUserDeletedMessageIds;
         } else return toUserDeletedMessageIds;
+    }
 
+    public boolean isParticipant(Long userId) {
+        return fromUser.getId().equals(userId) || toUser.getId().equals(userId);
     }
 }

@@ -1,8 +1,6 @@
 package com.example.demo.domain.chat.controller;
 
-import com.example.demo.domain.chat.dto.request.ChatRoomCreateRequest;
-import com.example.demo.domain.chat.dto.request.ChatRoomDeleteRequest;
-import com.example.demo.domain.chat.dto.request.ChatRoomInviteRequest;
+import com.example.demo.domain.chat.dto.request.*;
 import com.example.demo.domain.chat.dto.response.*;
 import com.example.demo.domain.chat.service.ChatRoomService;
 import com.example.demo.domain.util.BaseResponse;
@@ -55,7 +53,7 @@ public class ChatRoomController {
                     )
             )
     })
-    @GetMapping("/api/v1/group/chatRoom/list/{userId}")
+    @GetMapping("/api/v1/group/chatRoom/list/users/{userId}")
     public ResponseEntity<BaseResponse<ChatRoomListResponseDto>> getAllChatRoomByUserId(@Parameter(description = "사용자 ID", example = "1")
                                                                              @PathVariable long userId) {
 
@@ -86,7 +84,9 @@ public class ChatRoomController {
                     responseCode = "400",
                     description =
                             """
+                            - 회원이 존재하지 않습니다.
                             - 채팅방이 존재하지 않습니다.
+                            - 채팅방에 초대되지 않은 회원입니다.
                             """,
                     content = @Content(
                             mediaType = "application/json",
@@ -94,10 +94,12 @@ public class ChatRoomController {
                     )
             )
     })
-    @GetMapping("/api/v1/group/chatRoom/{chatRoomId}")
+    @GetMapping("/api/v1/group/chatRoom/{chatRoomId}/users/{userId}")
     public ResponseEntity<BaseResponse<ChatRoomDto>> getChatRoom(@Parameter(description = "채팅방 ID", example = "1")
-                                                                     @PathVariable long chatRoomId) {
-        ChatRoomDto result = chatRoomService.getChatRoomWithUserListByChatRoomId(chatRoomId);
+                                                                 @PathVariable long chatRoomId,
+                                                                 @Parameter(description = "회원 ID", example = "1")
+                                                                 @PathVariable long userId) {
+        ChatRoomDto result = chatRoomService.getChatRoomWithUserListByChatRoomId(userId, chatRoomId);
 
         SuccessResponse<ChatRoomDto> response =  SuccessResponse.<ChatRoomDto>builder()
                 .data(result)
@@ -245,6 +247,100 @@ public class ChatRoomController {
         SuccessResponse<ChatRoomInviteResponseDto> response =  SuccessResponse.<ChatRoomInviteResponseDto>builder()
                 .data(result)
                 .message("채팅방 초대 성공")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "채팅방 초대 코드 생성",
+            description = "채팅방 초대 코드를 생성 합니다."
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "채팅방 초대 코드 생성 요청",
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = ChatRoomInviteCodeCreateRequest.class)
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "채팅방 초대 코드 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatRoomInviteCodeResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            """
+                            - 회원이 존재하지 않습니다.
+                            - 채팅방이 존재하지 않습니다.
+                            - 채팅방에 초대되지 않은 회원입니다.
+                            """,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FailResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/api/v1/group/chatRoom/inviteCode")
+    public ResponseEntity<BaseResponse<ChatRoomInviteCodeResponseDto>> createChatRoomInviteCode(@Valid @RequestBody ChatRoomInviteCodeCreateRequest req) {
+
+        ChatRoomInviteCodeResponseDto result = chatRoomService.createInviteCode(req);
+
+        SuccessResponse<ChatRoomInviteCodeResponseDto> response =  SuccessResponse.<ChatRoomInviteCodeResponseDto>builder()
+                .data(result)
+                .message("채팅방 초대 코드 생성 성공")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "채팅방 입장",
+            description = "채팅방에 입장 합니다."
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "채팅방 입장 요청",
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = ChatRoomJoinRequest.class)
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "채팅방 입장 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChatRoomJoinResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            """
+                            - 회원이 존재하지 않습니다.
+                            - 채팅방이 존재하지 않습니다.
+                            - 초대 코드가 유효하지 않습니다.
+                            """,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FailResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/api/v1/group/chatRoom/join")
+    public ResponseEntity<BaseResponse<ChatRoomJoinResponseDto>> joinChatRoom(@Valid @RequestBody ChatRoomJoinRequest req) {
+
+        ChatRoomJoinResponseDto result = chatRoomService.joinChatRoomByInviteCode(req);
+
+        SuccessResponse<ChatRoomJoinResponseDto> response =  SuccessResponse.<ChatRoomJoinResponseDto>builder()
+                .data(result)
+                .message("채팅방 입장 성공")
                 .build();
 
         return ResponseEntity.ok(response);
