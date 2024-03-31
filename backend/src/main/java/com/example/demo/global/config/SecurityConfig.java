@@ -35,7 +35,7 @@ public class SecurityConfig {
     };
 
     public static final String[] PRIVATE_URLS = {
-            "/private/**"
+            "/private/**", "/api/v1/private/chat/**", "/api/v1/private/chatRoom/**", "/api/v1/group/chat/**", "/api/v1/group/chatRoom/**"
     };
 
     @Bean
